@@ -248,6 +248,17 @@
             <form id="entry-form" onsubmit="app.saveEntry(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                 <input type="hidden" id="entry-id">
 
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Find anime or manga</label>
+                    <div class="flex gap-2">
+                        <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Demon Slayer" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
+                        <button type="button" id="catalog-search-button" onclick="app.searchCatalog()" class="shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
+                    </div>
+                    <p class="text-[11px] text-slate-500">Search the free Jikan catalogue, then choose a result to fill in the title and poster. You can still enter everything manually.</p>
+                    <div id="catalog-search-status" class="hidden text-xs text-slate-400" role="status" aria-live="polite"></div>
+                    <div id="catalog-search-results" class="hidden space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Title *</label>
                     <input type="text" id="form-title" required placeholder="e.g. Jujutsu Kaisen, Chainsaw Man" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
@@ -966,12 +977,39 @@
             }
 
             // Modal & Dialog Management
-            openModal(modalId) {
+            openModal(modalId, entryId = null) {
                 const modal = document.getElementById(modalId);
                 const content = document.getElementById(modalId + '-content');
-                
+                if (!modal || !content) return;
+
                 if (modalId === 'platforms-modal') {
                     this.renderPlatformsList();
+                }
+
+                if (modalId === 'entry-modal') {
+                    const form = document.getElementById('entry-form');
+                    form.reset();
+                    document.getElementById('entry-id').value = '';
+                    this.clearCatalogSearch();
+                    document.getElementById('modal-title').querySelector('span').textContent = entryId ? 'Edit Media' : 'Add New Media';
+                    if (entryId) {
+                        const entry = this.entries.find(item => item.id === entryId);
+                        if (entry) {
+                            document.getElementById('entry-id').value = entry.id;
+                            document.getElementById('form-title').value = entry.title || '';
+                            document.getElementById('form-category').value = entry.category || 'anime';
+                            document.getElementById('form-status').value = entry.status || 'active';
+                            document.getElementById('form-current-progress').value = entry.currentProgress || 0;
+                            document.getElementById('form-total-progress').value = entry.totalProgress || 0;
+                            document.getElementById('form-rating').value = entry.rating || '';
+                            document.getElementById('form-season').value = entry.season || '';
+                            document.getElementById('form-cover-url').value = entry.coverUrl || '';
+                            document.getElementById('form-external-url').value = entry.externalUrl || '';
+                        }
+                    } else {
+                        document.getElementById('form-category').value = this.activeCategory || 'anime';
+                    }
+                    this.toggleCategoryFormLabels();
                 }
 
                 modal.classList.remove('opacity-0', 'pointer-events-none');
@@ -1048,6 +1086,114 @@
                 document.getElementById('lbl-progress-current').textContent = curLabel;
                 document.getElementById('lbl-progress-total').textContent = totLabel;
                 document.getElementById('status-tab-active-label').textContent = this.activeCategory === 'anime' ? 'Watching' : 'Reading';
+            }
+
+            // Anime and manga search (Jikan API, no API key required)
+            clearCatalogSearch() {
+                const input = document.getElementById('catalog-search-input');
+                const results = document.getElementById('catalog-search-results');
+                const status = document.getElementById('catalog-search-status');
+                if (input) input.value = '';
+                if (results) { results.innerHTML = ''; results.classList.add('hidden'); }
+                if (status) { status.textContent = ''; status.classList.add('hidden'); }
+                const button = document.getElementById('catalog-search-button');
+                if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search'; }
+            }
+
+            async searchCatalog() {
+                const query = document.getElementById('catalog-search-input').value.trim();
+                const category = document.getElementById('form-category').value;
+                const resultsEl = document.getElementById('catalog-search-results');
+                const statusEl = document.getElementById('catalog-search-status');
+                const button = document.getElementById('catalog-search-button');
+
+                if (query.length < 2) {
+                    statusEl.textContent = 'Enter at least 2 characters to search.';
+                    statusEl.classList.remove('hidden');
+                    resultsEl.classList.add('hidden');
+                    return;
+                }
+
+                button.disabled = true;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Searching';
+                statusEl.textContent = 'Searching the catalogue…';
+                statusEl.classList.remove('hidden');
+                resultsEl.innerHTML = '';
+                resultsEl.classList.add('hidden');
+
+                try {
+                    const endpoint = category === 'manga' ? 'manga' : 'anime';
+                    const url = `https://api.jikan.moe/v4/${endpoint}?q=${encodeURIComponent(query)}&limit=6&sfw=true`;
+                    const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    if (response.status === 429) throw new Error('The catalogue is receiving too many requests. Wait a few seconds and try again.');
+                    if (!response.ok) throw new Error('The catalogue could not be reached right now. Please try again later.');
+                    const payload = await response.json();
+                    const items = Array.isArray(payload.data) ? payload.data : [];
+
+                    if (!items.length) {
+                        statusEl.textContent = 'No matches found. Try another spelling, or enter the title manually.';
+                        return;
+                    }
+
+                    statusEl.textContent = `Choose a result (${items.length} shown).`;
+                    resultsEl.classList.remove('hidden');
+                    items.forEach(item => {
+                        const title = item.title || item.title_english || 'Untitled';
+                        const imageUrl = item.images?.webp?.image_url || item.images?.jpg?.image_url || '';
+                        const year = item.year || item.published?.from?.slice(0, 4) || 'Year unknown';
+                        const total = category === 'manga' ? item.chapters : item.episodes;
+                        const type = item.type || (category === 'manga' ? 'Manga' : 'Anime');
+
+                        const resultButton = document.createElement('button');
+                        resultButton.type = 'button';
+                        resultButton.className = 'w-full flex items-center gap-3 p-2 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-800 hover:border-brand-500/60 text-left transition-colors';
+                        resultButton.setAttribute('aria-label', `Select ${title}`);
+
+                        const poster = document.createElement('img');
+                        poster.className = 'w-12 h-16 object-cover rounded-lg bg-slate-800 shrink-0';
+                        poster.alt = '';
+                        poster.loading = 'lazy';
+                        poster.src = imageUrl || 'https://placehold.co/96x128/0f172a/94a3b8?text=No+Poster';
+                        poster.onerror = () => { poster.onerror = null; poster.src = 'https://placehold.co/96x128/0f172a/94a3b8?text=No+Poster'; };
+
+                        const info = document.createElement('span');
+                        info.className = 'min-w-0 flex-1';
+                        const titleLine = document.createElement('span');
+                        titleLine.className = 'block text-sm font-semibold text-slate-100';
+                        titleLine.textContent = title;
+                        const metaLine = document.createElement('span');
+                        metaLine.className = 'block mt-1 text-xs text-slate-400';
+                        const countLabel = category === 'manga' ? 'chapters' : 'episodes';
+                        metaLine.textContent = `${type} · ${year} · ${total ? `${total} ${countLabel}` : `unknown ${countLabel}`}`;
+                        info.append(titleLine, metaLine);
+                        const selectIcon = document.createElement('span');
+                        selectIcon.className = 'text-slate-500';
+                        selectIcon.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+                        resultButton.append(poster, info, selectIcon);
+                        resultButton.addEventListener('click', () => this.selectCatalogResult({ title, imageUrl, total, year, category }));
+                        resultsEl.appendChild(resultButton);
+                    });
+                } catch (error) {
+                    statusEl.textContent = error.message || 'Something went wrong while searching. You can still add the title manually.';
+                } finally {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
+                }
+            }
+
+            selectCatalogResult(item) {
+                document.getElementById('form-title').value = item.title;
+                document.getElementById('form-category').value = item.category;
+                if (item.imageUrl) document.getElementById('form-cover-url').value = item.imageUrl;
+                if (Number.isInteger(item.total) && item.total > 0) {
+                    document.getElementById('form-total-progress').value = item.total;
+                }
+                this.toggleCategoryFormLabels();
+                const statusEl = document.getElementById('catalog-search-status');
+                statusEl.textContent = `Selected “${item.title}”. Check the details below, then save your entry.`;
+                statusEl.classList.remove('hidden');
+                document.getElementById('catalog-search-results').classList.add('hidden');
+                this.showToast(`Loaded details for "${item.title}"`, 'success');
             }
 
             saveEntry(e) {
