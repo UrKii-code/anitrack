@@ -254,7 +254,7 @@
                         <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Demon Slayer" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
                         <button type="button" id="catalog-search-button" onclick="app.searchCatalog()" class="shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
                     </div>
-                    <p class="text-[11px] text-slate-500">Search the free Jikan catalogue, then choose a result to fill in the title and poster. You can still enter everything manually.</p>
+                    <p class="text-[11px] text-slate-500">Search the free Kitsu catalogue, then choose a result to fill in the title and poster. You can still enter everything manually.</p>
                     <div id="catalog-search-status" class="hidden text-xs text-slate-400" role="status" aria-live="polite"></div>
                     <div id="catalog-search-results" class="hidden space-y-2 max-h-64 overflow-y-auto pr-1"></div>
                 </div>
@@ -1088,7 +1088,7 @@
                 document.getElementById('status-tab-active-label').textContent = this.activeCategory === 'anime' ? 'Watching' : 'Reading';
             }
 
-            // Anime and manga search (Jikan API, no API key required)
+            // Anime and manga search (Kitsu API)
             clearCatalogSearch() {
                 const input = document.getElementById('catalog-search-input');
                 const results = document.getElementById('catalog-search-results');
@@ -1116,17 +1116,18 @@
 
                 button.disabled = true;
                 button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Searching';
-                statusEl.textContent = 'Searching the catalogue…';
+                statusEl.textContent = 'Searching Kitsu catalogue…';
                 statusEl.classList.remove('hidden');
                 resultsEl.innerHTML = '';
                 resultsEl.classList.add('hidden');
 
                 try {
                     const endpoint = category === 'manga' ? 'manga' : 'anime';
-                    const url = `https://api.jikan.moe/v4/${endpoint}?q=${encodeURIComponent(query)}&limit=6&sfw=true`;
-                    const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
-                    if (response.status === 429) throw new Error('The catalogue is receiving too many requests. Wait a few seconds and try again.');
-                    if (!response.ok) throw new Error('The catalogue could not be reached right now. Please try again later.');
+                    const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
+                    
+                    const response = await fetch(url, { headers: { 'Accept': 'application/vnd.api+json' } });
+                    if (!response.ok) throw new Error('Could not reach Kitsu API right now. Please try again later.');
+                    
                     const payload = await response.json();
                     const items = Array.isArray(payload.data) ? payload.data : [];
 
@@ -1137,12 +1138,14 @@
 
                     statusEl.textContent = `Choose a result (${items.length} shown).`;
                     resultsEl.classList.remove('hidden');
+                    
                     items.forEach(item => {
-                        const title = item.title || item.title_english || 'Untitled';
-                        const imageUrl = item.images?.webp?.image_url || item.images?.jpg?.image_url || '';
-                        const year = item.year || item.published?.from?.slice(0, 4) || 'Year unknown';
-                        const total = category === 'manga' ? item.chapters : item.episodes;
-                        const type = item.type || (category === 'manga' ? 'Manga' : 'Anime');
+                        const attr = item.attributes || {};
+                        const title = attr.canonicalTitle || attr.titles?.en || attr.titles?.en_jp || 'Untitled';
+                        const imageUrl = attr.posterImage?.medium || attr.posterImage?.original || '';
+                        const year = attr.startDate ? attr.startDate.slice(0, 4) : 'Year unknown';
+                        const total = category === 'manga' ? attr.chapterCount : attr.episodeCount;
+                        const type = category === 'manga' ? 'Manga' : 'Anime';
 
                         const resultButton = document.createElement('button');
                         resultButton.type = 'button';
@@ -1164,7 +1167,7 @@
                         const metaLine = document.createElement('span');
                         metaLine.className = 'block mt-1 text-xs text-slate-400';
                         const countLabel = category === 'manga' ? 'chapters' : 'episodes';
-                        metaLine.textContent = `${type} · ${year} · ${total ? `${total} ${countLabel}` : `unknown ${countLabel}`}`;
+                        metaLine.textContent = `${type} · ${year} · ${total ? `${total}${countLabel}` : `unknown ${countLabel}`}`;
                         info.append(titleLine, metaLine);
                         const selectIcon = document.createElement('span');
                         selectIcon.className = 'text-slate-500';
