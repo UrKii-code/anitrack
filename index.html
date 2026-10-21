@@ -103,7 +103,7 @@
                     <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.2</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.3</span>
                     </div>
                 </div>
 
@@ -320,9 +320,6 @@
                         <select id="form-status" onchange="app.handleFormStatusChange()" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none cursor-pointer">
                             <option value="active" id="opt-status-active">Watching</option>
                             <option value="completed">Completed</option>
-                            <option value="on-hold">On Hold</option>
-                            <option value="dropped">Dropped</option>
-                            <option value="plan-to-watch">Plan to Watch</option>
                         </select>
                     </div>
                 </div>
@@ -346,7 +343,7 @@
                 <!-- Internet Rating Badge Preview -->
                 <div id="form-external-rating-preview" class="hidden p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
                     <span class="text-slate-400">Internet Rating (<span id="form-rating-source-text">Kitsu</span>):</span>
-                    <span class="font-bold text-cyber-cyan"><i class="fa-solid fa-star text-amber-400 mr-1"></i><span id="form-external-rating-value">0.0</span> / 10</span>
+                    <span class="font-bold text-amber-400"><i class="fa-solid fa-star mr-1"></i><span id="form-external-rating-value">0.0</span> / 10</span>
                 </div>
 
                 <!-- Cover Image URL & Live Preview -->
@@ -494,7 +491,7 @@
         </div>
     </div>
 
-    <!-- Modal 4: Generic Confirmation Dialog Modal (Fixed with z-[9999] stacking & isolation) -->
+    <!-- Modal 4: Generic Confirmation Dialog Modal -->
     <div id="confirm-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
         <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl p-6 space-y-4 text-center transform scale-95 transition-transform duration-200" id="confirm-modal-content">
             <div class="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto text-xl">
@@ -511,7 +508,7 @@
         </div>
     </div>
 
-    <!-- Modal 5: Data & Backup Import/Export & MAL XML Modal -->
+    <!-- Modal 5: Data & Backup Import/Export Modal -->
     <div id="data-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
         <div class="glass-card bg-slate-900/95 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="data-modal-content">
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
@@ -713,12 +710,16 @@
                 window.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         ['entry-modal', 'platforms-modal', 'platform-form-modal', 'confirm-modal', 'data-modal'].forEach(id => this.closeModal(id));
+                        document.querySelectorAll('.card-action-menu').forEach(m => m.classList.add('hidden'));
                     }
                 });
 
                 window.addEventListener('click', (e) => {
                     if (!e.target.closest('.platform-dropdown-btn') && !e.target.closest('.platform-dropdown-menu')) {
                         document.querySelectorAll('.platform-dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+                    }
+                    if (!e.target.closest('.card-action-btn') && !e.target.closest('.card-action-menu')) {
+                        document.querySelectorAll('.card-action-menu').forEach(menu => menu.classList.add('hidden'));
                     }
                 });
 
@@ -1287,6 +1288,18 @@
                 menu.classList.toggle('hidden');
             }
 
+            toggleCardMenu(entryId, e) {
+                if (e) e.stopPropagation();
+                const menu = document.getElementById(`card-menu-${entryId}`);
+                if (!menu) return;
+
+                document.querySelectorAll('.card-action-menu').forEach(m => {
+                    if (m !== menu) m.classList.add('hidden');
+                });
+
+                menu.classList.toggle('hidden');
+            }
+
             openModal(modalId, entryId = null) {
                 const modal = document.getElementById(modalId);
                 const content = document.getElementById(modalId + '-content');
@@ -1315,7 +1328,7 @@
                             document.getElementById('form-title-english').value = entry.titleEnglish || entry.title || '';
                             document.getElementById('form-title-romanji').value = entry.titleRomanji || entry.title || '';
                             document.getElementById('form-category').value = entry.category || 'anime';
-                            document.getElementById('form-status').value = entry.status || 'active';
+                            document.getElementById('form-status').value = entry.status === 'completed' ? 'completed' : 'active';
                             document.getElementById('form-current-progress').value = entry.currentProgress || 0;
                             document.getElementById('form-total-progress').value = entry.totalProgress || 0;
                             document.getElementById('form-season').value = entry.season || '';
@@ -1390,7 +1403,7 @@
 
             exportJSON() {
                 const backupData = {
-                    version: '3.2',
+                    version: '3.3',
                     exportedAt: new Date().toISOString(),
                     entries: this.entries,
                     platforms: this.platforms,
@@ -1443,7 +1456,6 @@
                 e.target.value = '';
             }
 
-            // Advanced MyAnimeList (MAL) XML Importer with DOMParser & Duplicate Strategy
             importMAL(e) {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -1464,13 +1476,11 @@
                         let updatedCount = 0;
                         let skippedCount = 0;
 
-                        // Helper text extractor
                         const getNodeText = (parent, tag) => {
                             const el = parent.querySelector(tag);
                             return el ? el.textContent.trim() : '';
                         };
 
-                        // Process Anime & Manga nodes
                         const processEntries = (nodes, category) => {
                             nodes.forEach(node => {
                                 const title = getNodeText(node, category === 'anime' ? 'series_title' : 'manga_title');
@@ -1485,23 +1495,14 @@
                                 const startDate = getNodeText(node, 'my_start_date');
                                 const finishDate = getNodeText(node, 'my_finish_date');
 
-                                // Map MAL Status to AniTrack Status
                                 let status = 'active';
                                 if (statusRaw.includes('completed') || (totalProg > 0 && currentProg >= totalProg)) {
                                     status = 'completed';
-                                } else if (statusRaw.includes('onhold') || statusRaw.includes('on-hold')) {
-                                    status = 'on-hold';
-                                } else if (statusRaw.includes('dropped')) {
-                                    status = 'dropped';
-                                } else if (statusRaw.includes('plantowatch') || statusRaw.includes('plan to watch') || statusRaw.includes('plan to read')) {
-                                    status = 'plan-to-watch';
                                 }
 
-                                // Map Score to External Rating (MAL scale is 1-10)
                                 let externalRating = score > 0 ? score : 0;
                                 let ratingSource = externalRating > 0 ? 'MyAnimeList' : '';
 
-                                // Format Season / Subtype / Dates
                                 let season = type ? type.toUpperCase() : (category === 'anime' ? 'TV' : 'MANGA');
                                 if (startDate && startDate !== '0000-00-00') {
                                     season += ` (${startDate.slice(0, 4)})`;
@@ -1527,7 +1528,6 @@
                                     updatedAt: Date.now()
                                 };
 
-                                // Check Duplicate
                                 const existingIndex = this.entries.findIndex(item => 
                                     (externalId && item.externalId === externalId) || 
                                     item.title?.toLowerCase() === title.toLowerCase()
@@ -1540,7 +1540,7 @@
                                         this.entries[existingIndex] = {
                                             ...this.entries[existingIndex],
                                             ...entryData,
-                                            id: this.entries[existingIndex].id // retain original internal ID
+                                            id: this.entries[existingIndex].id
                                         };
                                         updatedCount++;
                                     } else if (strategy === 'import') {
@@ -1630,7 +1630,7 @@
                 const total = this.entries.length;
                 const animeCnt = this.entries.filter(i => i.category === 'anime').length;
                 const mangaCnt = this.entries.filter(i => i.category === 'manga').length;
-                const activeCnt = this.entries.filter(i => i.status === 'active' || i.status === 'on-hold' || i.status === 'plan-to-watch').length;
+                const activeCnt = this.entries.filter(i => i.status === 'active').length;
                 const completedCnt = this.entries.filter(i => i.status === 'completed').length;
 
                 document.getElementById('stat-total').textContent = total;
@@ -1670,11 +1670,7 @@
             getFilteredEntries() {
                 return this.entries.filter(item => {
                     if (item.category !== this.activeCategory) return false;
-                    if (this.activeStatus === 'active') {
-                        if (item.status === 'completed') return false;
-                    } else if (this.activeStatus === 'completed') {
-                        if (item.status !== 'completed') return false;
-                    }
+                    if (this.activeStatus !== 'all' && item.status !== this.activeStatus) return false;
 
                     if (this.searchQuery) {
                         const engMatch = item.titleEnglish && item.titleEnglish.toLowerCase().includes(this.searchQuery);
@@ -1750,45 +1746,50 @@
                 const applicablePlatforms = this.platforms.filter(p => p.enabled && (p.category === item.category || p.category === 'both'));
 
                 return `
-                    <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/80">
+                    <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85">
                         
                         <!-- Poster Container (2:3 Aspect Ratio) -->
                         <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
                             <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent opacity-95"></div>
                             
-                            <!-- Internet Rating Badge -->
-                            <div class="absolute top-2 left-2 flex flex-col gap-1">
+                            <!-- Rating Badge (Yellow star symbol) -->
+                            <div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
                                 ${item.externalRating > 0 ? `
-                                    <div class="bg-slate-950/80 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-bold text-cyber-cyan border border-cyber-cyan/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Kitsu')})">
-                                        <i class="fa-solid fa-globe text-[8px]"></i>
+                                    <div class="bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Kitsu')})">
+                                        <i class="fa-solid fa-star text-[9px]"></i>
                                         <span>${item.externalRating.toFixed(1)}</span>
                                     </div>
                                 ` : ''}
                             </div>
 
-                            <!-- Status Badge -->
-                            <div class="absolute top-2 right-2 shadow-md">
+                            <!-- Clear Status Badge -->
+                            <div class="absolute top-2 right-2 z-10 shadow-lg">
                                 ${isCompleted 
-                                    ? `<span class="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Done</span>`
-                                    : `<span class="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-md bg-cyan-500/20 text-cyber-cyan border border-cyan-500/30">${isAnime ? 'Watching' : 'Reading'}</span>`
+                                    ? `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-emerald-500 text-slate-950 border border-emerald-300 shadow">Completed</span>`
+                                    : `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-cyber-cyan text-slate-950 border border-cyan-300 shadow">${isAnime ? 'Watching' : 'Reading'}</span>`
                                 }
                             </div>
 
-                            <!-- Controls Overlay -->
-                            <div class="absolute top-10 right-2 flex flex-col gap-1.5 z-20">
-                                <button onclick="app.openModal('entry-modal', '${item.id}')" aria-label="Edit entry" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform" title="Edit Entry">
-                                    <i class="fa-solid fa-pen-to-square text-[11px] sm:text-xs"></i>
+                            <!-- 3-Dot Card Menu Trigger & Popover -->
+                            <div class="absolute bottom-2 right-2 z-30">
+                                <button onclick="app.toggleCardMenu('${item.id}', event)" aria-label="Card options" class="card-action-btn w-8 h-8 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                                    <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
                                 </button>
-                                <button onclick="app.deleteEntry('${item.id}', event)" aria-label="Delete entry" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-rose-950/90 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-800/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform" title="Delete">
-                                    <i class="fa-solid fa-trash-can text-[11px] sm:text-xs"></i>
-                                </button>
+                                <div id="card-menu-${item.id}" class="card-action-menu hidden absolute right-0 bottom-full mb-1.5 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-40 text-left">
+                                    <button onclick="app.openModal('entry-modal', '${item.id}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
+                                        <i class="fa-solid fa-pen-to-square text-brand-400"></i> Edit
+                                    </button>
+                                    <button onclick="app.deleteEntry('${item.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 flex items-center gap-2 transition-colors">
+                                        <i class="fa-solid fa-trash-can text-rose-400"></i> Delete
+                                    </button>
+                                </div>
                             </div>
 
-                            <!-- Title & Season Badge -->
-                            <div class="absolute bottom-2 left-2 right-2 z-10">
-                                ${item.season ? `<p class="text-[9px] sm:text-[10px] font-semibold text-brand-300 uppercase tracking-wider truncate mb-0.5">${this.escapeHTML(item.season)}</p>` : ''}
-                                <h4 class="text-xs sm:text-sm font-bold text-white truncate leading-tight" title="${this.escapeHTML(displayTitle)}">${this.escapeHTML(displayTitle)}</h4>
+                            <!-- Title & Season Badge (Fixed truncation with multi-line wrap) -->
+                            <div class="absolute bottom-2 left-2 right-12 z-10 pointer-events-none">
+                                ${item.season ? `<p class="text-[9px] font-semibold text-brand-300 uppercase tracking-wider truncate mb-0.5">${this.escapeHTML(item.season)}</p>` : ''}
+                                <h4 class="text-xs sm:text-sm font-bold text-white leading-tight line-clamp-2" title="${this.escapeHTML(displayTitle)}">${this.escapeHTML(displayTitle)}</h4>
                             </div>
                         </div>
 
@@ -1796,7 +1797,7 @@
                         <div class="p-2.5 sm:p-3 bg-slate-900/90 flex flex-col justify-between flex-grow space-y-2">
                             
                             <div class="flex items-center justify-between text-[11px] sm:text-xs">
-                                <span class="text-slate-400 font-medium">Progress</span>
+                                <span class="text-slate-400 font-medium">Episodes</span>
                                 <span class="font-bold text-slate-200">
                                     ${item.currentProgress} <span class="text-slate-500">/ ${item.totalProgress > 0 ? item.totalProgress : '∞'}</span>
                                 </span>
