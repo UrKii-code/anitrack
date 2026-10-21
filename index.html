@@ -14,6 +14,7 @@
                     colors: {
                         brand: {
                             50: '#eef2ff',
+                            300: '#a5b4fc',
                             400: '#818cf8',
                             500: '#6366f1',
                             600: '#4f46e5',
@@ -64,6 +65,14 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-full flex flex-col antialiased selection:bg-brand-500 selection:text-white">
@@ -76,7 +85,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="app.resetFilters()">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="app.resetFilters()" role="button" aria-label="Reset filters and return to top">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-cyber-cyan to-cyber-pink p-0.5 shadow-lg shadow-brand-500/20">
                         <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
                             <i class="fa-solid font-bold fa-play text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan to-cyber-pink"></i>
@@ -84,23 +93,23 @@
                     </div>
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v2.6</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v2.7</span>
                     </div>
                 </div>
 
                 <!-- Action Controls -->
                 <div class="flex items-center space-x-1.5 sm:space-x-3">
-                    <button onclick="app.openModal('entry-modal')" class="bg-gradient-to-r from-brand-600 to-cyber-purple hover:from-brand-500 hover:to-cyber-pink active:scale-95 text-white font-semibold text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-brand-600/30 transition-all flex items-center gap-1.5 sm:gap-2">
+                    <button onclick="app.openModal('entry-modal')" aria-label="Add new entry" class="bg-gradient-to-r from-brand-600 to-cyber-purple hover:from-brand-500 hover:to-cyber-pink active:scale-95 text-white font-semibold text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-brand-600/30 transition-all flex items-center gap-1.5 sm:gap-2">
                         <i class="fa-solid fa-plus text-xs"></i>
                         <span class="hidden xs:inline sm:inline">Add Entry</span>
                     </button>
                     
-                    <button onclick="app.openModal('platforms-modal')" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-300 hover:text-white border border-slate-800 p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl text-sm transition-all flex items-center gap-2" title="Custom Link Manager">
+                    <button onclick="app.openModal('platforms-modal')" aria-label="Open custom links manager" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-300 hover:text-white border border-slate-800 p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl text-sm transition-all flex items-center gap-2" title="Custom Link Manager">
                         <i class="fa-solid fa-link text-cyber-cyan"></i>
                         <span class="hidden md:inline">Custom Links</span>
                     </button>
 
-                    <button onclick="app.openModal('data-modal')" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-300 hover:text-white border border-slate-800 p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl text-sm transition-all flex items-center gap-2" title="Data & Backups">
+                    <button onclick="app.openModal('data-modal')" aria-label="Open data backup and import manager" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-300 hover:text-white border border-slate-800 p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl text-sm transition-all flex items-center gap-2" title="Data & Backups">
                         <i class="fa-solid fa-database text-brand-400"></i>
                         <span class="hidden md:inline">Data & MAL</span>
                     </button>
@@ -203,7 +212,7 @@
                         <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
                     </div>
 
-                    <button onclick="app.resetFilters()" class="p-2.5 text-slate-400 hover:text-white active:scale-95 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all flex-shrink-0" title="Reset Filters">
+                    <button onclick="app.resetFilters()" class="p-2.5 text-slate-400 hover:text-white active:scale-95 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all flex-shrink-0" title="Reset Filters" aria-label="Reset Search Filters">
                         <i class="fa-solid fa-rotate-left text-xs sm:text-sm"></i>
                     </button>
                 </div>
@@ -213,8 +222,15 @@
         <!-- Media Grid (Optimized for Mobile Touch) -->
         <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5"></div>
 
+        <!-- Load More Container for Large Libraries -->
+        <div id="load-more-container" class="hidden flex justify-center pt-4">
+            <button onclick="app.loadMoreEntries()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2">
+                <i class="fa-solid fa-angle-down"></i> Load More Entries
+            </button>
+        </div>
+
         <!-- Floating Mobile Quick Add Button -->
-        <button onclick="app.openModal('entry-modal')" class="sm:hidden fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-brand-600 to-cyber-purple text-white shadow-xl shadow-brand-600/40 active:scale-90 transition-transform flex items-center justify-center text-xl border border-white/20">
+        <button onclick="app.openModal('entry-modal')" aria-label="Add entry float button" class="sm:hidden fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-brand-600 to-cyber-purple text-white shadow-xl shadow-brand-600/40 active:scale-90 transition-transform flex items-center justify-center text-xl border border-white/20">
             <i class="fa-solid fa-plus"></i>
         </button>
 
@@ -240,7 +256,7 @@
                     <i class="fa-solid fa-circle-plus text-brand-400"></i>
                     <span>Add New Media</span>
                 </h3>
-                <button onclick="app.closeModal('entry-modal')" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                <button onclick="app.closeModal('entry-modal')" aria-label="Close modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -254,7 +270,7 @@
                         <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Demon Slayer" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
                         <button type="button" id="catalog-search-button" onclick="app.searchCatalog()" class="shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
                     </div>
-                    <p class="text-[11px] text-slate-500">Search the free Kitsu catalogue, then choose a result to fill in the title and poster. You can still enter everything manually.</p>
+                    <p class="text-[11px] text-slate-500">Search the free Kitsu catalogue, then choose a result to fill in details. You can still enter everything manually.</p>
                     <div id="catalog-search-status" class="hidden text-xs text-slate-400" role="status" aria-live="polite"></div>
                     <div id="catalog-search-results" class="hidden space-y-2 max-h-64 overflow-y-auto pr-1"></div>
                 </div>
@@ -337,7 +353,7 @@
                         <p class="text-xs text-slate-400">Settings &gt; Platforms & External Destinations</p>
                     </div>
                 </div>
-                <button onclick="app.closeModal('platforms-modal')" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                <button onclick="app.closeModal('platforms-modal')" aria-label="Close custom platforms modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -392,7 +408,7 @@
                     <i class="fa-solid fa-link text-cyber-cyan"></i>
                     <span>Add Custom Platform</span>
                 </h3>
-                <button onclick="app.closeModal('platform-form-modal')" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                <button onclick="app.closeModal('platform-form-modal')" aria-label="Close platform form modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -477,12 +493,17 @@
                     <i class="fa-solid fa-database text-cyber-cyan"></i>
                     <span>Data & Import/Export</span>
                 </h3>
-                <button onclick="app.closeModal('data-modal')" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                <button onclick="app.closeModal('data-modal')" aria-label="Close data modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
             <div class="p-6 space-y-5">
+                <div class="p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl text-[11px] text-brand-300 leading-relaxed">
+                    <i class="fa-solid fa-circle-info mr-1"></i>
+                    <strong>Note:</strong> Data is saved in your browser's local storage and does not sync between devices automatically. Use JSON Backup to transfer collections.
+                </div>
+
                 <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2.5">
                     <div class="flex items-center gap-2 text-sm font-semibold text-brand-400">
                         <i class="fa-solid fa-file-code"></i>
@@ -529,6 +550,9 @@
     </div>
 
     <script>
+        // Inline SVG Data URL Fallback for Posters
+        const SVG_POSTER_FALLBACK = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='450' viewBox='0 0 300 450'%3E%3Crect width='100%25' height='100%25' fill='%230f172a'/%3E%3Ctext x='50%25' y='48%25' dominant-baseline='middle' text-anchor='middle' fill='%23475569' font-family='sans-serif' font-size='14' font-weight='bold'%3ENo Cover Image%3C/text%3E%3C/svg%3E";
+
         class AniTrackApp {
             constructor() {
                 this.STORAGE_KEY = 'anitrack_library_v1';
@@ -539,11 +563,17 @@
                 this.platforms = [];
                 this.defaultPlatforms = { anime: '', manga: '' };
                 
-                // Active Filters
+                // Active Filters & Pagination
                 this.activeCategory = 'anime'; // 'anime' | 'manga'
                 this.activeStatus = 'all';      // 'all' | 'active' | 'completed'
                 this.searchQuery = '';
                 this.sortBy = 'updated';
+                this.renderLimit = 30;
+                this.renderBatchSize = 30;
+
+                // Catalog Search Management
+                this.catalogAbortController = null;
+                this.searchRequestId = 0;
 
                 this.init();
             }
@@ -561,6 +591,7 @@
                     if (storedEntries) {
                         this.entries = JSON.parse(storedEntries);
                     } else {
+                        // Seed only if empty
                         this.entries = this.getDefaultSeedData();
                         this.saveEntriesToStorage();
                     }
@@ -718,6 +749,17 @@
                 });
             }
 
+            // HTML Escaping Utility
+            escapeHTML(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             openPlatformFormModal(platformId = null) {
                 const form = document.getElementById('platform-form');
                 form.reset();
@@ -777,7 +819,7 @@
                     const index = this.platforms.findIndex(p => p.id === id);
                     if (index !== -1) {
                         this.platforms[index] = { ...this.platforms[index], name, url, category, icon, iconUrl, description, enabled };
-                        this.showToast(`Updated platform "${name}"`, 'success');
+                        this.showToast(`Updated platform "${this.escapeHTML(name)}"`, 'success');
                     }
                 } else {
                     const newPf = {
@@ -785,7 +827,7 @@
                         name, url, category, icon: icon || 'fa-globe', iconUrl, description, enabled
                     };
                     this.platforms.push(newPf);
-                    this.showToast(`Added new platform "${name}"`, 'success');
+                    this.showToast(`Added new platform "${this.escapeHTML(name)}"`, 'success');
                 }
 
                 this.savePlatformsToStorage();
@@ -801,7 +843,7 @@
                     this.savePlatformsToStorage();
                     this.renderPlatformsList();
                     this.renderGrid();
-                    this.showToast(`${pf.name} ${pf.enabled ? 'Enabled' : 'Disabled'}`, 'info');
+                    this.showToast(`${this.escapeHTML(pf.name)} ${pf.enabled ? 'Enabled' : 'Disabled'}`, 'info');
                 }
             }
 
@@ -811,11 +853,10 @@
 
                 this.showConfirmDialog(
                     'Delete Platform',
-                    `Are you sure you want to delete "${pf.name}"? Title-specific links added in entries will remain preserved.`,
+                    `Are you sure you want to delete "${this.escapeHTML(pf.name)}"? Title-specific links added in entries will remain preserved.`,
                     () => {
                         this.platforms = this.platforms.filter(p => p.id !== id);
                         
-                        // Clear defaults if matched
                         if (this.defaultPlatforms.anime === id) this.defaultPlatforms.anime = '';
                         if (this.defaultPlatforms.manga === id) this.defaultPlatforms.manga = '';
                         this.saveDefaultsToStorage();
@@ -823,7 +864,7 @@
                         this.savePlatformsToStorage();
                         this.renderPlatformsList();
                         this.renderGrid();
-                        this.showToast(`Deleted platform "${pf.name}"`, 'info');
+                        this.showToast(`Deleted platform "${this.escapeHTML(pf.name)}"`, 'info');
                     }
                 );
             }
@@ -850,7 +891,6 @@
                 this.showToast('Default platform preferences updated', 'success');
             }
 
-            // Render Platforms Manager UI
             renderPlatformsList() {
                 const container = document.getElementById('platforms-list-container');
                 const search = (document.getElementById('platform-search')?.value || '').toLowerCase();
@@ -860,7 +900,6 @@
                     (p.description && p.description.toLowerCase().includes(search))
                 );
 
-                // Update Default Selector Dropdowns
                 const animeSelect = document.getElementById('default-anime-platform');
                 const mangaSelect = document.getElementById('default-manga-platform');
 
@@ -868,10 +907,10 @@
                 const mangaPlatforms = this.platforms.filter(p => p.enabled && (p.category === 'manga' || p.category === 'both'));
 
                 animeSelect.innerHTML = `<option value="">None (Custom URLs only)</option>` + 
-                    animePlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.anime === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+                    animePlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.anime === p.id ? 'selected' : ''}>${this.escapeHTML(p.name)}</option>`).join('');
 
                 mangaSelect.innerHTML = `<option value="">None (Custom URLs only)</option>` + 
-                    mangaPlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.manga === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+                    mangaPlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.manga === p.id ? 'selected' : ''}>${this.escapeHTML(p.name)}</option>`).join('');
 
                 if (filtered.length === 0) {
                     container.innerHTML = `
@@ -888,23 +927,22 @@
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-cyber-cyan text-base overflow-hidden flex-shrink-0">
                                 ${pf.iconUrl 
-                                    ? `<img src="${pf.iconUrl}" alt="${pf.name}" class="w-full h-full object-cover">`
-                                    : `<i class="fa-solid ${pf.icon || 'fa-globe'}"></i>`
+                                    ? `<img src="${this.escapeHTML(pf.iconUrl)}" alt="${this.escapeHTML(pf.name)}" class="w-full h-full object-cover">`
+                                    : `<i class="fa-solid ${this.escapeHTML(pf.icon || 'fa-globe')}"></i>`
                                 }
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <h4 class="text-sm font-bold text-white">${pf.name}</h4>
+                                    <h4 class="text-sm font-bold text-white">${this.escapeHTML(pf.name)}</h4>
                                     <span class="px-2 py-0.5 text-[10px] font-semibold rounded-md ${pf.category === 'anime' ? 'bg-brand-500/20 text-brand-300' : pf.category === 'manga' ? 'bg-pink-500/20 text-cyber-pink' : 'bg-purple-500/20 text-purple-300'}">
                                         ${pf.category === 'both' ? 'Anime & Manga' : pf.category.toUpperCase()}
                                     </span>
                                 </div>
-                                <a href="${pf.url}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-400 hover:text-cyber-cyan truncate max-w-xs block mt-0.5">${pf.url}</a>
+                                <a href="${this.escapeHTML(pf.url)}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-400 hover:text-cyber-cyan truncate max-w-xs block mt-0.5">${this.escapeHTML(pf.url)}</a>
                             </div>
                         </div>
 
                         <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 border-t sm:border-t-0 border-slate-800/80 pt-2 sm:pt-0">
-                            <!-- Move Reorder Buttons -->
                             <div class="flex items-center gap-1">
                                 <button onclick="app.movePlatform('${pf.id}', -1)" ${idx === 0 ? 'disabled class="opacity-30 p-1.5 text-slate-600"' : 'class="p-1.5 text-slate-400 hover:text-white"'} title="Move Up">
                                     <i class="fa-solid fa-chevron-up text-xs"></i>
@@ -914,17 +952,14 @@
                                 </button>
                             </div>
 
-                            <!-- Enable / Disable Switcher -->
                             <button onclick="app.togglePlatformEnabled('${pf.id}')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${pf.enabled ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-400'}">
                                 ${pf.enabled ? 'Enabled' : 'Disabled'}
                             </button>
 
-                            <!-- Edit Button -->
                             <button onclick="app.openPlatformFormModal('${pf.id}')" class="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg text-xs" title="Edit Platform">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
 
-                            <!-- Delete Button -->
                             <button onclick="app.confirmDeletePlatform('${pf.id}')" class="p-1.5 text-rose-400 hover:text-rose-300 bg-rose-950/30 border border-rose-900/40 rounded-lg text-xs" title="Delete Platform">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
@@ -934,24 +969,20 @@
                 `).join('');
             }
 
-            // Open Link Dispatcher
             openMediaPlatformLink(entryId, platformUrl = null) {
                 const entry = this.entries.find(e => e.id === entryId);
                 if (!entry) return;
 
-                // Priority 1: Title-Specific Link explicitly saved
                 if (entry.externalUrl) {
                     window.open(entry.externalUrl, '_blank', 'noopener,noreferrer');
                     return;
                 }
 
-                // Priority 2: Selected Platform URL
                 if (platformUrl) {
                     window.open(platformUrl, '_blank', 'noopener,noreferrer');
                     return;
                 }
 
-                // Priority 3: Category Default Platform
                 const defaultId = entry.category === 'anime' ? this.defaultPlatforms.anime : this.defaultPlatforms.manga;
                 const defaultPlatform = this.platforms.find(p => p.id === defaultId && p.enabled);
 
@@ -968,7 +999,6 @@
                 const menu = document.getElementById(`platform-menu-${entryId}`);
                 if (!menu) return;
 
-                // Close all others
                 document.querySelectorAll('.platform-dropdown-menu').forEach(m => {
                     if (m !== menu) m.classList.add('hidden');
                 });
@@ -976,7 +1006,6 @@
                 menu.classList.toggle('hidden');
             }
 
-            // Modal & Dialog Management
             openModal(modalId, entryId = null) {
                 const modal = document.getElementById(modalId);
                 const content = document.getElementById(modalId + '-content');
@@ -1047,22 +1076,26 @@
 
             setCategory(category) {
                 this.activeCategory = category;
+                this.renderLimit = this.renderBatchSize;
                 this.toggleCategoryFormLabels();
                 this.render();
             }
 
             setStatus(status) {
                 this.activeStatus = status;
+                this.renderLimit = this.renderBatchSize;
                 this.render();
             }
 
             handleSearch() {
                 this.searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+                this.renderLimit = this.renderBatchSize;
                 this.renderGrid();
             }
 
             handleSort() {
                 this.sortBy = document.getElementById('sort-select').value;
+                this.renderLimit = this.renderBatchSize;
                 this.renderGrid();
             }
 
@@ -1073,6 +1106,7 @@
                 document.getElementById('sort-select').value = 'updated';
                 this.activeCategory = 'anime';
                 this.activeStatus = 'all';
+                this.renderLimit = this.renderBatchSize;
                 this.render();
             }
 
@@ -1088,8 +1122,12 @@
                 document.getElementById('status-tab-active-label').textContent = this.activeCategory === 'anime' ? 'Watching' : 'Reading';
             }
 
-            // Anime and manga search (Kitsu API)
+            // Kitsu Catalogue API Integration with Timeout & Abort Controller
             clearCatalogSearch() {
+                if (this.catalogAbortController) {
+                    this.catalogAbortController.abort();
+                    this.catalogAbortController = null;
+                }
                 const input = document.getElementById('catalog-search-input');
                 const results = document.getElementById('catalog-search-results');
                 const status = document.getElementById('catalog-search-status');
@@ -1114,6 +1152,13 @@
                     return;
                 }
 
+                // Cancel pending requests
+                if (this.catalogAbortController) {
+                    this.catalogAbortController.abort();
+                }
+                this.catalogAbortController = new AbortController();
+                const currentRequestId = ++this.searchRequestId;
+
                 button.disabled = true;
                 button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Searching';
                 statusEl.textContent = 'Searching Kitsu catalogue…';
@@ -1121,12 +1166,32 @@
                 resultsEl.innerHTML = '';
                 resultsEl.classList.add('hidden');
 
+                // Set 8-second request timeout
+                const timeoutId = setTimeout(() => {
+                    if (this.catalogAbortController) {
+                        this.catalogAbortController.abort('timeout');
+                    }
+                }, 8000);
+
                 try {
                     const endpoint = category === 'manga' ? 'manga' : 'anime';
                     const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
                     
-                    const response = await fetch(url, { headers: { 'Accept': 'application/vnd.api+json' } });
-                    if (!response.ok) throw new Error('Could not reach Kitsu API right now. Please try again later.');
+                    const response = await fetch(url, { 
+                        headers: { 'Accept': 'application/vnd.api+json' },
+                        signal: this.catalogAbortController.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+
+                    if (currentRequestId !== this.searchRequestId) return; // Stale request check
+
+                    if (response.status === 429) {
+                        throw new Error('Too many requests. Please wait a few seconds and try again.');
+                    }
+                    if (!response.ok) {
+                        throw new Error('Could not reach Kitsu API right now. Please try again later.');
+                    }
                     
                     const payload = await response.json();
                     const items = Array.isArray(payload.data) ? payload.data : [];
@@ -1138,7 +1203,7 @@
 
                     statusEl.textContent = `Choose a result (${items.length} shown).`;
                     resultsEl.classList.remove('hidden');
-                    
+
                     items.forEach(item => {
                         const attr = item.attributes || {};
                         const title = attr.canonicalTitle || attr.titles?.en || attr.titles?.en_jp || 'Untitled';
@@ -1156,8 +1221,8 @@
                         poster.className = 'w-12 h-16 object-cover rounded-lg bg-slate-800 shrink-0';
                         poster.alt = '';
                         poster.loading = 'lazy';
-                        poster.src = imageUrl || 'https://placehold.co/96x128/0f172a/94a3b8?text=No+Poster';
-                        poster.onerror = () => { poster.onerror = null; poster.src = 'https://placehold.co/96x128/0f172a/94a3b8?text=No+Poster'; };
+                        poster.src = imageUrl || SVG_POSTER_FALLBACK;
+                        poster.onerror = () => { poster.onerror = null; poster.src = SVG_POSTER_FALLBACK; };
 
                         const info = document.createElement('span');
                         info.className = 'min-w-0 flex-1';
@@ -1167,20 +1232,30 @@
                         const metaLine = document.createElement('span');
                         metaLine.className = 'block mt-1 text-xs text-slate-400';
                         const countLabel = category === 'manga' ? 'chapters' : 'episodes';
-                        metaLine.textContent = `${type} · ${year} · ${total ? `${total}${countLabel}` : `unknown ${countLabel}`}`;
+                        metaLine.textContent = `${type} · ${year} · ${total ? `${total} ${countLabel}` : `unknown ${countLabel}`}`;
+                        
                         info.append(titleLine, metaLine);
                         const selectIcon = document.createElement('span');
                         selectIcon.className = 'text-slate-500';
                         selectIcon.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+                        
                         resultButton.append(poster, info, selectIcon);
                         resultButton.addEventListener('click', () => this.selectCatalogResult({ title, imageUrl, total, year, category }));
                         resultsEl.appendChild(resultButton);
                     });
                 } catch (error) {
-                    statusEl.textContent = error.message || 'Something went wrong while searching. You can still add the title manually.';
+                    if (error.name === 'AbortError') {
+                        if (error === 'timeout') {
+                            statusEl.textContent = 'Request timed out. Check your connection or add manually.';
+                        }
+                        return; // Ignored manual aborts
+                    }
+                    statusEl.textContent = error.message || 'Something went wrong while searching. You can still add manually.';
                 } finally {
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
+                    if (currentRequestId === this.searchRequestId) {
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
+                    }
                 }
             }
 
@@ -1196,7 +1271,7 @@
                 statusEl.textContent = `Selected “${item.title}”. Check the details below, then save your entry.`;
                 statusEl.classList.remove('hidden');
                 document.getElementById('catalog-search-results').classList.add('hidden');
-                this.showToast(`Loaded details for "${item.title}"`, 'success');
+                this.showToast(`Loaded details for "${this.escapeHTML(item.title)}"`, 'success');
             }
 
             saveEntry(e) {
@@ -1225,7 +1300,7 @@
                             title, category, status, currentProgress, totalProgress, rating, season, coverUrl, externalUrl,
                             updatedAt: Date.now()
                         };
-                        this.showToast(`Updated "${title}"`, 'success');
+                        this.showToast(`Updated "${this.escapeHTML(title)}"`, 'success');
                     }
                 } else {
                     const newEntry = {
@@ -1234,7 +1309,7 @@
                         updatedAt: Date.now()
                     };
                     this.entries.unshift(newEntry);
-                    this.showToast(`Added "${title}"`, 'success');
+                    this.showToast(`Added "${this.escapeHTML(title)}"`, 'success');
                 }
 
                 this.saveEntriesToStorage();
@@ -1256,9 +1331,9 @@
                 if (entry.totalProgress > 0 && entry.currentProgress >= entry.totalProgress) {
                     entry.currentProgress = entry.totalProgress;
                     entry.status = 'completed';
-                    this.showToast(`🎉 Completed "${entry.title}"!`, 'success');
+                    this.showToast(`🎉 Completed "${this.escapeHTML(entry.title)}"!`, 'success');
                 } else {
-                    this.showToast(`Updated "${entry.title}" to ${unit} ${entry.currentProgress}`, 'info');
+                    this.showToast(`Updated "${this.escapeHTML(entry.title)}" to ${unit} ${entry.currentProgress}`, 'info');
                 }
 
                 this.saveEntriesToStorage();
@@ -1272,20 +1347,20 @@
 
                 this.showConfirmDialog(
                     'Delete Media Entry',
-                    `Are you sure you want to delete "${entry.title}"?`,
+                    `Are you sure you want to delete "${this.escapeHTML(entry.title)}"?`,
                     () => {
                         this.entries = this.entries.filter(item => item.id !== id);
                         this.saveEntriesToStorage();
-                        this.showToast(`Removed "${entry.title}"`, 'info');
+                        this.showToast(`Removed "${this.escapeHTML(entry.title)}"`, 'info');
                         this.render();
                     }
                 );
             }
 
-            // Data Backups
+            // Data Backups & JSON Validation
             exportJSON() {
                 const backupData = {
-                    version: '2.6',
+                    version: '2.7',
                     exportedAt: new Date().toISOString(),
                     entries: this.entries,
                     platforms: this.platforms,
@@ -1310,25 +1385,30 @@
                 reader.onload = (event) => {
                     try {
                         const imported = JSON.parse(event.target.result);
+                        let validEntries = [];
+                        
                         if (Array.isArray(imported)) {
-                            this.entries = imported;
-                        } else if (imported.entries && Array.isArray(imported.entries)) {
-                            this.entries = imported.entries;
+                            validEntries = imported;
+                        } else if (imported && imported.entries && Array.isArray(imported.entries)) {
+                            validEntries = imported.entries;
                             if (imported.platforms) this.platforms = imported.platforms;
                             if (imported.defaultPlatforms) this.defaultPlatforms = imported.defaultPlatforms;
                         } else {
-                            throw new Error('Invalid format');
+                            throw new Error('Invalid backup schema');
                         }
+
+                        // Basic entry shape validation
+                        this.entries = validEntries.filter(item => item && typeof item === 'object' && item.title);
 
                         this.saveEntriesToStorage();
                         this.savePlatformsToStorage();
                         this.saveDefaultsToStorage();
 
-                        this.showToast('Successfully restored backup!', 'success');
+                        this.showToast('Successfully restored library backup!', 'success');
                         this.closeModal('data-modal');
                         this.render();
                     } catch (err) {
-                        this.showToast('Invalid JSON backup file', 'error');
+                        this.showToast('Invalid JSON file format.', 'error');
                     }
                 };
                 reader.readAsText(file);
@@ -1414,7 +1494,8 @@
                 const activeCnt = this.entries.filter(i => i.status === 'active').length;
                 const completedCnt = this.entries.filter(i => i.status === 'completed').length;
                 
-                const ratedEntries = this.entries.filter(i => i.rating > 0);
+                // Unrated entries strictly excluded from calculation
+                const ratedEntries = this.entries.filter(i => typeof i.rating === 'number' && i.rating > 0);
                 const avgRating = ratedEntries.length > 0 
                     ? (ratedEntries.reduce((acc, i) => acc + i.rating, 0) / ratedEntries.length).toFixed(1)
                     : '0.0';
@@ -1460,13 +1541,13 @@
                     if (this.activeStatus !== 'all' && item.status !== this.activeStatus) return false;
 
                     if (this.searchQuery) {
-                        const titleMatch = item.title.toLowerCase().includes(this.searchQuery);
+                        const titleMatch = item.title && item.title.toLowerCase().includes(this.searchQuery);
                         const seasonMatch = item.season && item.season.toLowerCase().includes(this.searchQuery);
                         if (!titleMatch && !seasonMatch) return false;
                     }
                     return true;
                 }).sort((a, b) => {
-                    if (this.sortBy === 'title') return a.title.localeCompare(b.title);
+                    if (this.sortBy === 'title') return (a.title || '').localeCompare(b.title || '');
                     if (this.sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
                     if (this.sortBy === 'progress') {
                         const pctA = a.totalProgress > 0 ? (a.currentProgress / a.totalProgress) : 0;
@@ -1477,22 +1558,37 @@
                 });
             }
 
+            loadMoreEntries() {
+                this.renderLimit += this.renderBatchSize;
+                this.renderGrid();
+            }
+
             renderGrid() {
                 const grid = document.getElementById('media-grid');
                 const emptyState = document.getElementById('empty-state');
+                const loadMoreBtn = document.getElementById('load-more-container');
+                
                 const filtered = this.getFilteredEntries();
 
                 if (filtered.length === 0) {
                     grid.innerHTML = '';
                     emptyState.classList.remove('hidden');
                     emptyState.classList.add('flex');
+                    loadMoreBtn.classList.add('hidden');
                     return;
                 }
 
                 emptyState.classList.add('hidden');
                 emptyState.classList.remove('flex');
 
-                grid.innerHTML = filtered.map(item => this.createCardHTML(item)).join('');
+                const itemsToDisplay = filtered.slice(0, this.renderLimit);
+                grid.innerHTML = itemsToDisplay.map(item => this.createCardHTML(item)).join('');
+
+                if (filtered.length > this.renderLimit) {
+                    loadMoreBtn.classList.remove('hidden');
+                } else {
+                    loadMoreBtn.classList.add('hidden');
+                }
             }
 
             createCardHTML(item) {
@@ -1506,21 +1602,20 @@
                     progressPct = 100;
                 }
 
-                const cover = item.coverUrl || `https://placehold.co/400x600/0f172a/6366f1?text=${encodeURIComponent(item.title.substring(0, 20))}`;
+                const cover = item.coverUrl || SVG_POSTER_FALLBACK;
                 const isCompleted = item.status === 'completed';
 
-                // Applicable Enabled Custom Link Platforms for this entry
                 const applicablePlatforms = this.platforms.filter(p => p.enabled && (p.category === item.category || p.category === 'both'));
 
                 return `
                     <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/80">
                         
-                        <!-- Poster Container -->
-                        <div class="relative aspect-[3/4] overflow-hidden bg-slate-900">
-                            <img src="${cover}" alt="${item.title}" onerror="this.src='https://placehold.co/400x600/0f172a/6366f1?text=${encodeURIComponent(item.title.substring(0,15))}'" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent opacity-90"></div>
+                        <!-- Poster Container (2:3 Aspect Ratio) -->
+                        <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+                            <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90"></div>
                             
-                            <!-- Rating -->
+                            <!-- Rating Indicator -->
                             ${item.rating > 0 ? `
                                 <div class="absolute top-2 left-2 bg-slate-950/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-black text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md">
                                     <i class="fa-solid fa-star text-[9px] sm:text-[10px]"></i>
@@ -1536,24 +1631,24 @@
                                 }
                             </div>
 
-                            <!-- Mobile Quick Access Overlay Controls -->
+                            <!-- Mobile/Desktop Controls Overlay -->
                             <div class="absolute top-10 right-2 flex flex-col gap-1.5 z-20">
-                                <button onclick="app.openModal('entry-modal', '${item.id}')" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform" title="Edit Entry">
+                                <button onclick="app.openModal('entry-modal', '${item.id}')" aria-label="Edit entry" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform" title="Edit Entry">
                                     <i class="fa-solid fa-pen-to-square text-[11px] sm:text-xs"></i>
                                 </button>
-                                <button onclick="app.deleteEntry('${item.id}', event)" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-rose-950/90 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-800/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform" title="Delete">
+                                <button onclick="app.deleteEntry('${item.id}', event)" aria-label="Delete entry" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-rose-950/90 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-800/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform" title="Delete">
                                     <i class="fa-solid fa-trash-can text-[11px] sm:text-xs"></i>
                                 </button>
                             </div>
 
-                            <!-- Bottom Overlay Title & Season -->
+                            <!-- Title & Season Badge -->
                             <div class="absolute bottom-2 left-2 right-2 z-10">
-                                ${item.season ? `<p class="text-[9px] sm:text-[10px] font-semibold text-brand-300 uppercase tracking-wider truncate mb-0.5">${item.season}</p>` : ''}
-                                <h4 class="text-xs sm:text-sm font-bold text-white truncate leading-tight" title="${item.title}">${item.title}</h4>
+                                ${item.season ? `<p class="text-[9px] sm:text-[10px] font-semibold text-brand-300 uppercase tracking-wider truncate mb-0.5">${this.escapeHTML(item.season)}</p>` : ''}
+                                <h4 class="text-xs sm:text-sm font-bold text-white truncate leading-tight" title="${this.escapeHTML(item.title)}">${this.escapeHTML(item.title)}</h4>
                             </div>
                         </div>
 
-                        <!-- Touch-Friendly Card Footer / Quick Controls -->
+                        <!-- Card Footer Controls -->
                         <div class="p-2.5 sm:p-3 bg-slate-900/90 flex flex-col justify-between flex-grow space-y-2">
                             
                             <div class="flex items-center justify-between text-[11px] sm:text-xs">
@@ -1568,7 +1663,7 @@
                                 <div class="h-full rounded-full ${isCompleted ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-brand-500 to-cyber-cyan'} transition-all duration-300" style="width: ${item.totalProgress > 0 ? progressPct : (item.currentProgress > 0 ? '100' : '0')}%"></div>
                             </div>
 
-                            <!-- Action Bar Buttons (Optimized for Touch Tapping) -->
+                            <!-- Action Bar Buttons -->
                             <div class="grid grid-cols-2 gap-1.5 pt-1">
                                 <div class="relative">
                                     <button onclick="app.openMediaPlatformLink('${item.id}')" class="w-full h-8 sm:h-9 rounded-lg bg-brand-600/90 hover:bg-brand-500 active:scale-95 text-white flex items-center justify-center gap-1 text-[11px] sm:text-xs font-semibold shadow transition-all">
@@ -1576,7 +1671,7 @@
                                         <span>${isAnime ? 'Watch' : 'Read'}</span>
                                     </button>
                                     ${applicablePlatforms.length > 0 ? `
-                                        <button onclick="app.togglePlatformMenu('${item.id}', event)" class="platform-dropdown-btn absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center text-[9px] shadow">
+                                        <button onclick="app.togglePlatformMenu('${item.id}', event)" aria-label="Select custom streaming platform" class="platform-dropdown-btn absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center text-[9px] shadow">
                                             <i class="fa-solid fa-chevron-down"></i>
                                         </button>
                                         <div id="platform-menu-${item.id}" class="platform-dropdown-menu hidden absolute left-0 bottom-full mb-1.5 w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-30 text-left">
@@ -1584,9 +1679,9 @@
                                                 Select Platform
                                             </div>
                                             ${applicablePlatforms.map(pf => `
-                                                <button onclick="app.openMediaPlatformLink('${item.id}', '${pf.url}')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
-                                                    <i class="fa-solid ${pf.icon || 'fa-globe'} text-slate-400 text-xs"></i>
-                                                    <span class="truncate">${pf.name}</span>
+                                                <button onclick="app.openMediaPlatformLink('${item.id}', '${this.escapeHTML(pf.url)}')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
+                                                    <i class="fa-solid ${this.escapeHTML(pf.icon || 'fa-globe')} text-slate-400 text-xs"></i>
+                                                    <span class="truncate">${this.escapeHTML(pf.name)}</span>
                                                 </button>
                                             `).join('')}
                                         </div>
