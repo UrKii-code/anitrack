@@ -2,8 +2,16 @@
 <html lang="en" class="dark h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AniTrack - Cyberpunk Anime & Manga Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AniTrack — Anime & Manga Tracker</title>
+
+    <!-- PWA Meta & Links -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#030712">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -75,10 +83,16 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-full flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-full flex flex-col antialiased selection:bg-brand-500 selection:text-white pt-safe">
 
     <!-- Toast Notifications Container -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- Offline Status Indicator Banner -->
+    <div id="offline-banner" class="hidden bg-amber-500/20 border-b border-amber-500/30 text-amber-300 text-xs py-2 px-4 text-center font-semibold flex items-center justify-center gap-2">
+        <i class="fa-solid fa-wifi"></i>
+        <span>You are currently offline. Local tracking enabled; catalogue search requires internet.</span>
+    </div>
 
     <!-- Main Navigation Bar -->
     <header class="sticky top-0 z-40 glass-card border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
@@ -86,19 +100,21 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3 cursor-pointer" onclick="app.resetFilters()" role="button" aria-label="Reset filters and return to top">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-cyber-cyan to-cyber-pink p-0.5 shadow-lg shadow-brand-500/20">
-                        <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                            <i class="fa-solid font-bold fa-play text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan to-cyber-pink"></i>
-                        </div>
-                    </div>
+                    <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v2.8</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.0</span>
                     </div>
                 </div>
 
                 <!-- Action Controls -->
                 <div class="flex items-center space-x-1.5 sm:space-x-3">
+                    <!-- Install App PWA Button -->
+                    <button id="pwa-install-btn" onclick="app.installPWA()" class="hidden bg-slate-900 hover:bg-slate-800 text-cyber-cyan border border-cyber-cyan/40 p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-lg shadow-cyan-500/10">
+                        <i class="fa-solid fa-download"></i>
+                        <span class="hidden sm:inline">Install App</span>
+                    </button>
+
                     <button onclick="app.openModal('entry-modal')" aria-label="Add new entry" class="bg-gradient-to-r from-brand-600 to-cyber-purple hover:from-brand-500 hover:to-cyber-pink active:scale-95 text-white font-semibold text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-brand-600/30 transition-all flex items-center gap-1.5 sm:gap-2">
                         <i class="fa-solid fa-plus text-xs"></i>
                         <span class="hidden xs:inline sm:inline">Add Entry</span>
@@ -120,8 +136,8 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-24 sm:pb-8">
         
-        <!-- Dashboard Header Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+        <!-- Dashboard Header Stats (Personal & Average Ratings Removed) -->
+        <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
             <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between border-l-4 border-l-brand-500">
                 <div>
                     <p class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-400">Total Entries</p>
@@ -152,17 +168,6 @@
                 </div>
                 <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm sm:text-xl border border-emerald-500/20 flex-shrink-0">
                     <i class="fa-solid fa-check-double"></i>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between border-l-4 border-l-cyber-pink">
-                <div>
-                    <p class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-400">Avg Personal Rating</p>
-                    <h3 id="stat-avg-rating" class="text-xl sm:text-3xl font-extrabold text-cyber-pink mt-0.5 sm:mt-1">0.0</h3>
-                    <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1">Across rated titles</p>
-                </div>
-                <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-pink-500/10 text-cyber-pink flex items-center justify-center text-sm sm:text-xl border border-pink-500/20 flex-shrink-0">
-                    <i class="fa-solid fa-star"></i>
                 </div>
             </div>
         </div>
@@ -214,8 +219,6 @@
                         <select id="sort-select" onchange="app.handleSort()" class="w-full bg-slate-900/80 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-xs sm:text-sm text-slate-200 rounded-xl pl-9 sm:pl-10 pr-8 py-2.5 outline-none transition-all appearance-none cursor-pointer">
                             <option value="updated">Recently Updated</option>
                             <option value="title">Title (A - Z)</option>
-                            <option value="rating">Highest Personal Rating</option>
-                            <option value="externalRating">Highest Kitsu Rating</option>
                             <option value="progress">Completion %</option>
                         </select>
                         <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
@@ -228,10 +231,10 @@
             </div>
         </div>
 
-        <!-- Media Grid (Optimized for Mobile Touch) -->
+        <!-- Media Grid -->
         <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5"></div>
 
-        <!-- Load More Container for Large Libraries -->
+        <!-- Load More Container -->
         <div id="load-more-container" class="hidden flex justify-center pt-4">
             <button onclick="app.loadMoreEntries()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2">
                 <i class="fa-solid fa-angle-down"></i> Load More Entries
@@ -273,23 +276,19 @@
             <form id="entry-form" onsubmit="app.saveEntry(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                 <input type="hidden" id="entry-id">
                 <input type="hidden" id="form-external-id">
-                <input type="hidden" id="form-external-rating">
-                <input type="hidden" id="form-rating-source">
-                <input type="hidden" id="form-rating-updated-at">
 
-                <!-- Catalogue Auto-Fill Search Bar -->
+                <!-- Catalogue Search Bar -->
                 <div class="space-y-2 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
                     <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Search Kitsu Catalogue (Auto-Fill)</label>
                     <div class="flex gap-2">
                         <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Demon Slayer" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
                         <button type="button" id="catalog-search-button" onclick="app.searchCatalog()" class="shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
                     </div>
-                    <p class="text-[11px] text-slate-500">Auto-fills English &amp; Romanji titles, total count, community score, and poster.</p>
                     <div id="catalog-search-status" class="hidden text-xs text-slate-400" role="status" aria-live="polite"></div>
                     <div id="catalog-search-results" class="hidden space-y-2 max-h-56 overflow-y-auto pr-1"></div>
                     <div id="duplicate-warning" class="hidden p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-center gap-2">
                         <i class="fa-solid fa-triangle-exclamation"></i>
-                        <span id="duplicate-warning-text">An entry with this title already exists in your library.</span>
+                        <span>An entry with this title already exists in your library.</span>
                     </div>
                 </div>
 
@@ -333,21 +332,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Personal Rating (0 - 10)</label>
-                        <input type="number" id="form-rating" min="0" max="10" step="0.1" placeholder="e.g. 8.5" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Season / Arc / Subtype</label>
-                        <input type="text" id="form-season" placeholder="e.g. Season 2, Hashira Training Arc" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
-                    </div>
-                </div>
-
-                <!-- Community Rating Badge Preview -->
-                <div id="form-external-rating-preview" class="hidden p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Community Score (<span id="form-rating-source-text">Kitsu</span>):</span>
-                    <span class="font-bold text-cyber-cyan"><i class="fa-solid fa-star text-amber-400 mr-1"></i><span id="form-external-rating-value">0.0</span> / 10</span>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Season / Arc / Subtype</label>
+                    <input type="text" id="form-season" placeholder="e.g. Season 2, Hashira Training Arc" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
                 </div>
 
                 <!-- Cover Image URL & Live Preview -->
@@ -528,7 +515,7 @@
             <div class="p-6 space-y-5">
                 <div class="p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl text-[11px] text-brand-300 leading-relaxed">
                     <i class="fa-solid fa-circle-info mr-1"></i>
-                    <strong>Note:</strong> Data is saved in your browser's local storage and does not sync between devices automatically. Use JSON Backup to transfer collections.
+                    <strong>Note:</strong> Data is saved in browser local storage. Use JSON Export to backup or transfer between devices.
                 </div>
 
                 <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2.5">
@@ -590,17 +577,18 @@
                 this.defaultPlatforms = { anime: '', manga: '' };
                 
                 // Settings & Filters
-                this.titleDisplayMode = 'english'; // 'english' | 'romanji'
-                this.activeCategory = 'anime';    // 'anime' | 'manga'
-                this.activeStatus = 'all';         // 'all' | 'active' | 'completed'
+                this.titleDisplayMode = 'english'; 
+                this.activeCategory = 'anime';    
+                this.activeStatus = 'all';         
                 this.searchQuery = '';
                 this.sortBy = 'updated';
                 this.renderLimit = 30;
                 this.renderBatchSize = 30;
 
-                // Catalog Search Management
+                // Catalogue Search & PWA Prompts
                 this.catalogAbortController = null;
                 this.searchRequestId = 0;
+                this.deferredPrompt = null;
 
                 this.init();
             }
@@ -608,6 +596,7 @@
             init() {
                 this.loadFromStorage();
                 this.setupEventListeners();
+                this.setupPWA();
                 this.render();
             }
 
@@ -687,9 +676,6 @@
                         status: 'completed',
                         currentProgress: 10,
                         totalProgress: 10,
-                        rating: 9.5,
-                        externalRating: 8.6,
-                        ratingSource: 'Kitsu',
                         season: 'Season 1',
                         coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80',
                         externalUrl: 'https://www.netflix.com',
@@ -710,6 +696,53 @@
                         document.querySelectorAll('.platform-dropdown-menu').forEach(menu => menu.classList.add('hidden'));
                     }
                 });
+
+                // Offline Network Listeners
+                const updateOnlineStatus = () => {
+                    const banner = document.getElementById('offline-banner');
+                    if (navigator.onLine) {
+                        banner.classList.add('hidden');
+                    } else {
+                        banner.classList.remove('hidden');
+                    }
+                };
+                window.addEventListener('online', updateOnlineStatus);
+                window.addEventListener('offline', updateOnlineStatus);
+                updateOnlineStatus();
+            }
+
+            // PWA Registration & Install Trigger
+            setupPWA() {
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('./service-worker.js').catch(err => {
+                            console.warn('Service Worker registration failed:', err);
+                        });
+                    });
+                }
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    const installBtn = document.getElementById('pwa-install-btn');
+                    if (installBtn) installBtn.classList.remove('hidden');
+                });
+
+                window.addEventListener('appinstalled', () => {
+                    this.deferredPrompt = null;
+                    const installBtn = document.getElementById('pwa-install-btn');
+                    if (installBtn) installBtn.classList.add('hidden');
+                    this.showToast('AniTrack installed successfully!', 'success');
+                });
+            }
+
+            installPWA() {
+                if (!this.deferredPrompt) return;
+                this.deferredPrompt.prompt();
+                this.deferredPrompt.userChoice.then(() => {
+                    this.deferredPrompt = null;
+                    document.getElementById('pwa-install-btn').classList.add('hidden');
+                });
             }
 
             escapeHTML(str) {
@@ -722,7 +755,6 @@
                     .replace(/'/g, '&#039;');
             }
 
-            // Dual-Title Resolution Helper
             getEntryTitle(entry) {
                 if (!entry) return 'Untitled';
                 if (this.titleDisplayMode === 'english') {
@@ -747,12 +779,10 @@
                 this.renderGrid();
             }
 
-            // Form Event Logic (Smart Completed handling & Poster Previews)
             handleFormStatusChange() {
                 const status = document.getElementById('form-status').value;
                 const totalInput = document.getElementById('form-total-progress');
                 const currentInput = document.getElementById('form-current-progress');
-
                 const totalVal = parseInt(totalInput.value) || 0;
 
                 if (status === 'completed') {
@@ -784,7 +814,6 @@
                 }
             }
 
-            // Kitsu Catalogue API Integration
             clearCatalogSearch() {
                 if (this.catalogAbortController) {
                     this.catalogAbortController.abort();
@@ -803,6 +832,11 @@
             }
 
             async searchCatalog() {
+                if (!navigator.onLine) {
+                    this.showToast('Catalogue search requires an active internet connection.', 'error');
+                    return;
+                }
+
                 const query = document.getElementById('catalog-search-input').value.trim();
                 const category = document.getElementById('form-category').value;
                 const resultsEl = document.getElementById('catalog-search-results');
@@ -816,9 +850,7 @@
                     return;
                 }
 
-                if (this.catalogAbortController) {
-                    this.catalogAbortController.abort();
-                }
+                if (this.catalogAbortController) this.catalogAbortController.abort();
                 this.catalogAbortController = new AbortController();
                 const currentRequestId = ++this.searchRequestId;
 
@@ -867,13 +899,6 @@
                         const total = category === 'manga' ? attr.chapterCount : attr.episodeCount;
                         const subtype = attr.subtype ? attr.subtype.toUpperCase() : (category === 'manga' ? 'MANGA' : 'ANIME');
 
-                        // Convert 0-100 Kitsu averageRating to 0.0-10.0 scale
-                        let externalRating = null;
-                        if (attr.averageRating) {
-                            externalRating = parseFloat((parseFloat(attr.averageRating) / 10).toFixed(1));
-                        }
-
-                        // Construct Auto Season / Subtype text
                         let seasonInfo = subtype;
                         if (year) seasonInfo += ` (${year})`;
 
@@ -900,7 +925,7 @@
                         const metaLine = document.createElement('span');
                         metaLine.className = 'block mt-0.5 text-[11px] text-slate-400';
                         const countLabel = category === 'manga' ? 'ch' : 'ep';
-                        metaLine.textContent = `${subtype} · ${year || 'N/A'} · ${total ? `${total} ${countLabel}` : 'Ongoing'} ${externalRating ? `· ★ ${externalRating}` : ''}`;
+                        metaLine.textContent = `${subtype} · ${year || 'N/A'} · ${total ? `${total} ${countLabel}` : 'Ongoing'}`;
 
                         info.append(titleLine, romLine, metaLine);
                         resultButton.append(poster, info);
@@ -912,7 +937,6 @@
                             imageUrl,
                             total,
                             seasonInfo,
-                            externalRating,
                             category
                         }));
                         resultsEl.appendChild(resultButton);
@@ -941,21 +965,9 @@
                     document.getElementById('form-total-progress').value = item.total;
                 }
 
-                if (item.externalRating) {
-                    document.getElementById('form-external-rating').value = item.externalRating;
-                    document.getElementById('form-rating-source').value = 'Kitsu';
-                    document.getElementById('form-rating-updated-at').value = new Date().toISOString();
-                    
-                    document.getElementById('form-external-rating-value').textContent = item.externalRating.toFixed(1);
-                    document.getElementById('form-external-rating-preview').classList.remove('hidden');
-                } else {
-                    document.getElementById('form-external-rating-preview').classList.add('hidden');
-                }
-
                 this.updatePosterPreview();
                 this.toggleCategoryFormLabels();
 
-                // Duplicate Check
                 const currentEntryId = document.getElementById('entry-id').value;
                 const isDuplicate = this.entries.some(e => e.id !== currentEntryId && (
                     (item.id && e.externalId === item.id) || 
@@ -964,11 +976,8 @@
                 ));
 
                 const dupWarn = document.getElementById('duplicate-warning');
-                if (isDuplicate) {
-                    dupWarn.classList.remove('hidden');
-                } else {
-                    dupWarn.classList.add('hidden');
-                }
+                if (isDuplicate) dupWarn.classList.remove('hidden');
+                else dupWarn.classList.add('hidden');
 
                 const statusEl = document.getElementById('catalog-search-status');
                 statusEl.textContent = `Auto-filled details for "${item.titleEnglish}".`;
@@ -977,7 +986,6 @@
                 this.showToast(`Auto-filled details for "${this.escapeHTML(item.titleEnglish)}"`, 'success');
             }
 
-            // Save / Update Entry
             saveEntry(e) {
                 e.preventDefault();
                 const id = document.getElementById('entry-id').value;
@@ -988,10 +996,6 @@
                 let status = document.getElementById('form-status').value;
                 let currentProgress = parseInt(document.getElementById('form-current-progress').value) || 0;
                 const totalProgress = parseInt(document.getElementById('form-total-progress').value) || 0;
-                const rating = parseFloat(document.getElementById('form-rating').value) || 0;
-                const externalRating = parseFloat(document.getElementById('form-external-rating').value) || 0;
-                const ratingSource = document.getElementById('form-rating-source').value;
-                const ratingUpdatedAt = document.getElementById('form-rating-updated-at').value;
                 const season = document.getElementById('form-season').value.trim();
                 const coverUrl = document.getElementById('form-cover-url').value.trim();
                 const externalUrl = document.getElementById('form-external-url').value.trim();
@@ -1009,8 +1013,7 @@
                         this.entries[index] = {
                             ...this.entries[index],
                             externalId, title, titleEnglish, titleRomanji, category, status, 
-                            currentProgress, totalProgress, rating, externalRating, ratingSource, 
-                            ratingUpdatedAt, season, coverUrl, externalUrl,
+                            currentProgress, totalProgress, season, coverUrl, externalUrl,
                             updatedAt: Date.now()
                         };
                         this.showToast(`Updated "${this.escapeHTML(title)}"`, 'success');
@@ -1019,8 +1022,7 @@
                     const newEntry = {
                         id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                         externalId, title, titleEnglish, titleRomanji, category, status, 
-                        currentProgress, totalProgress, rating, externalRating, ratingSource, 
-                        ratingUpdatedAt, season, coverUrl, externalUrl,
+                        currentProgress, totalProgress, season, coverUrl, externalUrl,
                         updatedAt: Date.now()
                     };
                     this.entries.unshift(newEntry);
@@ -1032,7 +1034,6 @@
                 this.render();
             }
 
-            // Quick Actions & Controls
             incrementProgress(id, e) {
                 if (e) e.stopPropagation();
                 const entry = this.entries.find(item => item.id === id);
@@ -1073,7 +1074,6 @@
                 );
             }
 
-            // Platforms & Links UI
             openPlatformFormModal(platformId = null) {
                 const form = document.getElementById('platform-form');
                 form.reset();
@@ -1176,7 +1176,6 @@
             renderPlatformsList() {
                 const container = document.getElementById('platforms-list-container');
                 const search = (document.getElementById('platform-search')?.value || '').toLowerCase();
-
                 const filtered = this.platforms.filter(p => p.name.toLowerCase().includes(search));
 
                 const animeSelect = document.getElementById('default-anime-platform');
@@ -1243,7 +1242,6 @@
                 menu.classList.toggle('hidden');
             }
 
-            // Modal & Confirmation Handlers
             openModal(modalId, entryId = null) {
                 const modal = document.getElementById(modalId);
                 const content = document.getElementById(modalId + '-content');
@@ -1256,10 +1254,6 @@
                     form.reset();
                     document.getElementById('entry-id').value = '';
                     document.getElementById('form-external-id').value = '';
-                    document.getElementById('form-external-rating').value = '';
-                    document.getElementById('form-rating-source').value = '';
-                    document.getElementById('form-rating-updated-at').value = '';
-                    document.getElementById('form-external-rating-preview').classList.add('hidden');
                     this.updatePosterPreview();
                     this.clearCatalogSearch();
 
@@ -1275,18 +1269,10 @@
                             document.getElementById('form-status').value = entry.status || 'active';
                             document.getElementById('form-current-progress').value = entry.currentProgress || 0;
                             document.getElementById('form-total-progress').value = entry.totalProgress || 0;
-                            document.getElementById('form-rating').value = entry.rating || '';
                             document.getElementById('form-season').value = entry.season || '';
                             document.getElementById('form-cover-url').value = entry.coverUrl || '';
                             document.getElementById('form-external-url').value = entry.externalUrl || '';
 
-                            if (entry.externalRating) {
-                                document.getElementById('form-external-rating').value = entry.externalRating;
-                                document.getElementById('form-rating-source').value = entry.ratingSource || 'Kitsu';
-                                document.getElementById('form-rating-updated-at').value = entry.ratingUpdatedAt || '';
-                                document.getElementById('form-external-rating-value').textContent = entry.externalRating.toFixed(1);
-                                document.getElementById('form-external-rating-preview').classList.remove('hidden');
-                            }
                             this.updatePosterPreview();
                         }
                     } else {
@@ -1328,10 +1314,9 @@
                 this.openModal('confirm-modal');
             }
 
-            // Backup & Import / Export
             exportJSON() {
                 const backupData = {
-                    version: '2.8',
+                    version: '3.0',
                     exportedAt: new Date().toISOString(),
                     entries: this.entries,
                     platforms: this.platforms,
@@ -1387,7 +1372,7 @@
             confirmReset() {
                 this.showConfirmDialog(
                     'Reset Storage Library',
-                    'DANGER: This will permanently wipe all media entries, settings, and custom link configurations. Continue?',
+                    'DANGER: Permanently wipe all media entries and settings? Continue?',
                     () => {
                         this.entries = [];
                         this.platforms = this.getDefaultPlatforms();
@@ -1420,7 +1405,6 @@
 
                             const watchedEp = parseInt(node.querySelector('my_watched_episodes')?.textContent || '0');
                             const totalEp = parseInt(node.querySelector('series_episodes')?.textContent || '0');
-                            const score = parseFloat(node.querySelector('my_score')?.textContent || '0');
                             const statusRaw = node.querySelector('my_status')?.textContent || '';
 
                             let status = 'active';
@@ -1432,7 +1416,7 @@
                                 id: 'mal-a-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                                 title, titleEnglish: title, titleRomanji: title, category: 'anime', status,
                                 currentProgress: watchedEp, totalProgress: totalEp,
-                                rating: score, season: '', coverUrl: '', externalUrl: '', updatedAt: Date.now()
+                                season: '', coverUrl: '', externalUrl: '', updatedAt: Date.now()
                             });
                             importedCount++;
                         });
@@ -1449,7 +1433,6 @@
                 e.target.value = '';
             }
 
-            // Filters, Sorts & Grid Render
             setCategory(category) {
                 this.activeCategory = category;
                 this.renderLimit = this.renderBatchSize;
@@ -1506,18 +1489,12 @@
                 const mangaCnt = this.entries.filter(i => i.category === 'manga').length;
                 const activeCnt = this.entries.filter(i => i.status === 'active').length;
                 const completedCnt = this.entries.filter(i => i.status === 'completed').length;
-                
-                const ratedEntries = this.entries.filter(i => typeof i.rating === 'number' && i.rating > 0);
-                const avgRating = ratedEntries.length > 0 
-                    ? (ratedEntries.reduce((acc, i) => acc + i.rating, 0) / ratedEntries.length).toFixed(1)
-                    : '0.0';
 
                 document.getElementById('stat-total').textContent = total;
                 document.getElementById('stat-anime-cnt').textContent = animeCnt;
                 document.getElementById('stat-manga-cnt').textContent = mangaCnt;
                 document.getElementById('stat-active').textContent = activeCnt;
                 document.getElementById('stat-completed').textContent = completedCnt;
-                document.getElementById('stat-avg-rating').textContent = avgRating;
 
                 document.getElementById('badge-anime-count').textContent = animeCnt;
                 document.getElementById('badge-manga-count').textContent = mangaCnt;
@@ -1565,8 +1542,6 @@
                     const titleB = this.getEntryTitle(b);
 
                     if (this.sortBy === 'title') return titleA.localeCompare(titleB);
-                    if (this.sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
-                    if (this.sortBy === 'externalRating') return (b.externalRating || 0) - (a.externalRating || 0);
                     if (this.sortBy === 'progress') {
                         const pctA = a.totalProgress > 0 ? (a.currentProgress / a.totalProgress) : 0;
                         const pctB = b.totalProgress > 0 ? (b.currentProgress / b.totalProgress) : 0;
@@ -1633,22 +1608,6 @@
                         <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
                             <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90"></div>
-                            
-                            <!-- Rating Badges (Personal Score & Community Score) -->
-                            <div class="absolute top-2 left-2 flex flex-col gap-1">
-                                ${item.rating > 0 ? `
-                                    <div class="bg-slate-950/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Personal Rating">
-                                        <i class="fa-solid fa-star text-[9px]"></i>
-                                        <span>${item.rating.toFixed(1)}</span>
-                                    </div>
-                                ` : ''}
-                                ${item.externalRating > 0 ? `
-                                    <div class="bg-slate-950/80 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-bold text-cyber-cyan border border-cyber-cyan/30 flex items-center gap-1 shadow-md" title="Community Score (${this.escapeHTML(item.ratingSource || 'Kitsu')})">
-                                        <i class="fa-solid fa-globe text-[8px]"></i>
-                                        <span>${item.externalRating.toFixed(1)}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
 
                             <!-- Status Badge -->
                             <div class="absolute top-2 right-2 shadow-md">
@@ -1658,7 +1617,7 @@
                                 }
                             </div>
 
-                            <!-- Mobile/Desktop Controls Overlay -->
+                            <!-- Controls Overlay -->
                             <div class="absolute top-10 right-2 flex flex-col gap-1.5 z-20">
                                 <button onclick="app.openModal('entry-modal', '${item.id}')" aria-label="Edit entry" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform" title="Edit Entry">
                                     <i class="fa-solid fa-pen-to-square text-[11px] sm:text-xs"></i>
