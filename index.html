@@ -93,7 +93,7 @@
                     </div>
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v2.7</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v2.8</span>
                     </div>
                 </div>
 
@@ -157,7 +157,7 @@
 
             <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between border-l-4 border-l-cyber-pink">
                 <div>
-                    <p class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-400">Avg Rating</p>
+                    <p class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-400">Avg Personal Rating</p>
                     <h3 id="stat-avg-rating" class="text-xl sm:text-3xl font-extrabold text-cyber-pink mt-0.5 sm:mt-1">0.0</h3>
                     <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1">Across rated titles</p>
                 </div>
@@ -183,12 +183,20 @@
                     </button>
                 </div>
 
-                <div class="flex items-center bg-slate-900/50 p-1 rounded-xl border border-slate-800/60 overflow-x-auto w-full sm:w-auto justify-between sm:justify-start">
-                    <button id="status-tab-all" onclick="app.setStatus('all')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">All</button>
-                    <button id="status-tab-active" onclick="app.setStatus('active')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">
-                        <span id="status-tab-active-label">Watching</span>
-                    </button>
-                    <button id="status-tab-completed" onclick="app.setStatus('completed')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">Completed</button>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center bg-slate-900/50 p-1 rounded-xl border border-slate-800/60 overflow-x-auto w-full sm:w-auto justify-between sm:justify-start">
+                        <button id="status-tab-all" onclick="app.setStatus('all')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">All</button>
+                        <button id="status-tab-active" onclick="app.setStatus('active')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">
+                            <span id="status-tab-active-label">Watching</span>
+                        </button>
+                        <button id="status-tab-completed" onclick="app.setStatus('completed')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">Completed</button>
+                    </div>
+
+                    <!-- Title Display Mode Toggle -->
+                    <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
+                        <button id="title-mode-english" onclick="app.setTitleDisplayMode('english')" class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-colors" title="Display English Title First">ENG</button>
+                        <button id="title-mode-romanji" onclick="app.setTitleDisplayMode('romanji')" class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-colors" title="Display Romanji Title First">ROM</button>
+                    </div>
                 </div>
             </div>
 
@@ -197,7 +205,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3">
                 <div class="relative sm:col-span-7">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs sm:text-sm"></i>
-                    <input type="text" id="search-input" oninput="app.handleSearch()" placeholder="Search titles or arcs..." class="w-full bg-slate-900/80 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-xs sm:text-sm text-slate-200 placeholder-slate-500 rounded-xl pl-9 sm:pl-10 pr-4 py-2.5 outline-none transition-all">
+                    <input type="text" id="search-input" oninput="app.handleSearch()" placeholder="Search English, Romanji, or arcs..." class="w-full bg-slate-900/80 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-xs sm:text-sm text-slate-200 placeholder-slate-500 rounded-xl pl-9 sm:pl-10 pr-4 py-2.5 outline-none transition-all">
                 </div>
 
                 <div class="sm:col-span-5 flex items-center gap-2">
@@ -206,7 +214,8 @@
                         <select id="sort-select" onchange="app.handleSort()" class="w-full bg-slate-900/80 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-xs sm:text-sm text-slate-200 rounded-xl pl-9 sm:pl-10 pr-8 py-2.5 outline-none transition-all appearance-none cursor-pointer">
                             <option value="updated">Recently Updated</option>
                             <option value="title">Title (A - Z)</option>
-                            <option value="rating">Highest Rating</option>
+                            <option value="rating">Highest Personal Rating</option>
+                            <option value="externalRating">Highest Kitsu Rating</option>
                             <option value="progress">Completion %</option>
                         </select>
                         <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
@@ -263,21 +272,37 @@
 
             <form id="entry-form" onsubmit="app.saveEntry(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                 <input type="hidden" id="entry-id">
+                <input type="hidden" id="form-external-id">
+                <input type="hidden" id="form-external-rating">
+                <input type="hidden" id="form-rating-source">
+                <input type="hidden" id="form-rating-updated-at">
 
-                <div class="space-y-2">
-                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Find anime or manga</label>
+                <!-- Catalogue Auto-Fill Search Bar -->
+                <div class="space-y-2 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Search Kitsu Catalogue (Auto-Fill)</label>
                     <div class="flex gap-2">
                         <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Demon Slayer" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
                         <button type="button" id="catalog-search-button" onclick="app.searchCatalog()" class="shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
                     </div>
-                    <p class="text-[11px] text-slate-500">Search the free Kitsu catalogue, then choose a result to fill in details. You can still enter everything manually.</p>
+                    <p class="text-[11px] text-slate-500">Auto-fills English &amp; Romanji titles, total count, community score, and poster.</p>
                     <div id="catalog-search-status" class="hidden text-xs text-slate-400" role="status" aria-live="polite"></div>
-                    <div id="catalog-search-results" class="hidden space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+                    <div id="catalog-search-results" class="hidden space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+                    <div id="duplicate-warning" class="hidden p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span id="duplicate-warning-text">An entry with this title already exists in your library.</span>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Title *</label>
-                    <input type="text" id="form-title" required placeholder="e.g. Jujutsu Kaisen, Chainsaw Man" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                <!-- Dual Title Fields -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">English Title</label>
+                        <input type="text" id="form-title-english" placeholder="e.g. Demon Slayer" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Romanji Title</label>
+                        <input type="text" id="form-title-romanji" placeholder="e.g. Kimetsu no Yaiba" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -290,7 +315,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Status *</label>
-                        <select id="form-status" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none cursor-pointer">
+                        <select id="form-status" onchange="app.handleFormStatusChange()" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none cursor-pointer">
                             <option value="active" id="opt-status-active">Watching</option>
                             <option value="completed">Completed</option>
                         </select>
@@ -304,31 +329,40 @@
                     </div>
                     <div>
                         <label id="lbl-progress-total" class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Total Episodes (0 = ∞)</label>
-                        <input type="number" id="form-total-progress" min="0" value="0" placeholder="0 for ongoing" class="w-full bg-slate-900 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                        <input type="number" id="form-total-progress" min="0" value="0" placeholder="0 for ongoing" onchange="app.handleFormTotalChange()" class="w-full bg-slate-900 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Rating (0 - 10)</label>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Personal Rating (0 - 10)</label>
                         <input type="number" id="form-rating" min="0" max="10" step="0.1" placeholder="e.g. 8.5" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Season / Arc</label>
-                        <input type="text" id="form-season" placeholder="e.g. Season 2, Shibuya Arc" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Season / Arc / Subtype</label>
+                        <input type="text" id="form-season" placeholder="e.g. Season 2, Hashira Training Arc" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Cover Image URL</label>
-                    <input type="url" id="form-cover-url" placeholder="https://domain.com/poster.jpg" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                <!-- Community Rating Badge Preview -->
+                <div id="form-external-rating-preview" class="hidden p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
+                    <span class="text-slate-400">Community Score (<span id="form-rating-source-text">Kitsu</span>):</span>
+                    <span class="font-bold text-cyber-cyan"><i class="fa-solid fa-star text-amber-400 mr-1"></i><span id="form-external-rating-value">0.0</span> / 10</span>
+                </div>
+
+                <!-- Cover Image URL & Live Preview -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider">Cover Image URL</label>
+                    <div class="flex gap-3 items-center">
+                        <input type="url" id="form-cover-url" placeholder="https://domain.com/poster.jpg" oninput="app.updatePosterPreview()" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                        <img id="poster-preview" src="" alt="Preview" class="w-10 h-14 object-cover rounded-lg bg-slate-950 border border-slate-800 shrink-0 hidden">
+                    </div>
                 </div>
 
                 <!-- Custom Link Override Field -->
                 <div class="space-y-2 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
                     <label class="block text-xs font-medium text-brand-300 uppercase tracking-wider">Title-Specific External Link (Optional)</label>
                     <input type="url" id="form-external-url" placeholder="https://crunchyroll.com/series/custom-id" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
-                    <p class="text-[11px] text-slate-500">Overrides global platform base URLs for direct access to this title.</p>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
@@ -359,7 +393,6 @@
             </div>
 
             <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
-                <!-- Top Actions Bar -->
                 <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
                     <div class="relative flex-grow max-w-md">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
@@ -371,14 +404,12 @@
                     </button>
                 </div>
 
-                <!-- Default Platform Selectors -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950/80 p-4 rounded-xl border border-slate-800/80">
                     <div>
                         <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider mb-1.5">
                             <i class="fa-solid fa-tv mr-1"></i> Default Anime Platform
                         </label>
                         <select id="default-anime-platform" onchange="app.saveDefaultPlatforms()" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none cursor-pointer">
-                            <!-- Populated dynamically -->
                         </select>
                     </div>
                     <div>
@@ -386,15 +417,11 @@
                             <i class="fa-solid fa-book-open mr-1"></i> Default Manga Platform
                         </label>
                         <select id="default-manga-platform" onchange="app.saveDefaultPlatforms()" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none cursor-pointer">
-                            <!-- Populated dynamically -->
                         </select>
                     </div>
                 </div>
 
-                <!-- Platforms List / Table -->
-                <div id="platforms-list-container" class="space-y-3">
-                    <!-- Platforms rendered here -->
-                </div>
+                <div id="platforms-list-container" class="space-y-3"></div>
             </div>
         </div>
     </div>
@@ -550,7 +577,6 @@
     </div>
 
     <script>
-        // Inline SVG Data URL Fallback for Posters
         const SVG_POSTER_FALLBACK = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='450' viewBox='0 0 300 450'%3E%3Crect width='100%25' height='100%25' fill='%230f172a'/%3E%3Ctext x='50%25' y='48%25' dominant-baseline='middle' text-anchor='middle' fill='%23475569' font-family='sans-serif' font-size='14' font-weight='bold'%3ENo Cover Image%3C/text%3E%3C/svg%3E";
 
         class AniTrackApp {
@@ -563,9 +589,10 @@
                 this.platforms = [];
                 this.defaultPlatforms = { anime: '', manga: '' };
                 
-                // Active Filters & Pagination
-                this.activeCategory = 'anime'; // 'anime' | 'manga'
-                this.activeStatus = 'all';      // 'all' | 'active' | 'completed'
+                // Settings & Filters
+                this.titleDisplayMode = 'english'; // 'english' | 'romanji'
+                this.activeCategory = 'anime';    // 'anime' | 'manga'
+                this.activeStatus = 'all';         // 'all' | 'active' | 'completed'
                 this.searchQuery = '';
                 this.sortBy = 'updated';
                 this.renderLimit = 30;
@@ -584,14 +611,12 @@
                 this.render();
             }
 
-            // Persistence
             loadFromStorage() {
                 try {
                     const storedEntries = localStorage.getItem(this.STORAGE_KEY);
                     if (storedEntries) {
                         this.entries = JSON.parse(storedEntries);
                     } else {
-                        // Seed only if empty
                         this.entries = this.getDefaultSeedData();
                         this.saveEntriesToStorage();
                     }
@@ -608,10 +633,7 @@
                     if (storedDefaults) {
                         this.defaultPlatforms = JSON.parse(storedDefaults);
                     } else {
-                        this.defaultPlatforms = {
-                            anime: 'pf-crunchyroll',
-                            manga: 'pf-mangaplus'
-                        };
+                        this.defaultPlatforms = { anime: 'pf-crunchyroll', manga: 'pf-mangaplus' };
                         this.saveDefaultsToStorage();
                     }
                 } catch (e) {
@@ -647,46 +669,10 @@
 
             getDefaultPlatforms() {
                 return [
-                    {
-                        id: 'pf-crunchyroll',
-                        name: 'Crunchyroll',
-                        url: 'https://www.crunchyroll.com',
-                        category: 'anime',
-                        icon: 'fa-play',
-                        iconUrl: '',
-                        description: 'Anime streaming service',
-                        enabled: true
-                    },
-                    {
-                        id: 'pf-netflix',
-                        name: 'Netflix',
-                        url: 'https://www.netflix.com',
-                        category: 'anime',
-                        icon: 'fa-tv',
-                        iconUrl: '',
-                        description: 'Global streaming platform',
-                        enabled: true
-                    },
-                    {
-                        id: 'pf-mangaplus',
-                        name: 'MangaPlus',
-                        url: 'https://mangaplus.shueisha.co.jp',
-                        category: 'manga',
-                        icon: 'fa-book-open',
-                        iconUrl: '',
-                        description: 'Official Shueisha manga reader',
-                        enabled: true
-                    },
-                    {
-                        id: 'pf-viz',
-                        name: 'VIZ Media',
-                        url: 'https://www.viz.com',
-                        category: 'manga',
-                        icon: 'fa-book',
-                        iconUrl: '',
-                        description: 'Official manga reader & publisher',
-                        enabled: true
-                    }
+                    { id: 'pf-crunchyroll', name: 'Crunchyroll', url: 'https://www.crunchyroll.com', category: 'anime', icon: 'fa-play', enabled: true },
+                    { id: 'pf-netflix', name: 'Netflix', url: 'https://www.netflix.com', category: 'anime', icon: 'fa-tv', enabled: true },
+                    { id: 'pf-mangaplus', name: 'MangaPlus', url: 'https://mangaplus.shueisha.co.jp', category: 'manga', icon: 'fa-book-open', enabled: true },
+                    { id: 'pf-viz', name: 'VIZ Media', url: 'https://www.viz.com', category: 'manga', icon: 'fa-book', enabled: true }
                 ];
             }
 
@@ -695,41 +681,19 @@
                     {
                         id: 'demo-1',
                         title: 'Cyberpunk: Edgerunners',
+                        titleEnglish: 'Cyberpunk: Edgerunners',
+                        titleRomanji: 'Cyberpunk: Edgerunners',
                         category: 'anime',
                         status: 'completed',
                         currentProgress: 10,
                         totalProgress: 10,
                         rating: 9.5,
+                        externalRating: 8.6,
+                        ratingSource: 'Kitsu',
                         season: 'Season 1',
                         coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80',
                         externalUrl: 'https://www.netflix.com',
                         updatedAt: Date.now() - 100000000
-                    },
-                    {
-                        id: 'demo-2',
-                        title: 'Jujutsu Kaisen',
-                        category: 'anime',
-                        status: 'active',
-                        currentProgress: 18,
-                        totalProgress: 24,
-                        rating: 8.8,
-                        season: 'Shibuya Incident Arc',
-                        coverUrl: '',
-                        externalUrl: 'https://www.crunchyroll.com',
-                        updatedAt: Date.now() - 50000000
-                    },
-                    {
-                        id: 'demo-3',
-                        title: 'Chainsaw Man',
-                        category: 'manga',
-                        status: 'active',
-                        currentProgress: 120,
-                        totalProgress: 0,
-                        rating: 9.0,
-                        season: 'Part 2',
-                        coverUrl: '',
-                        externalUrl: 'https://mangaplus.shueisha.co.jp',
-                        updatedAt: Date.now() - 20000000
                     }
                 ];
             }
@@ -741,7 +705,6 @@
                     }
                 });
 
-                // Close platform dropdowns on click outside
                 window.addEventListener('click', (e) => {
                     if (!e.target.closest('.platform-dropdown-btn') && !e.target.closest('.platform-dropdown-menu')) {
                         document.querySelectorAll('.platform-dropdown-menu').forEach(menu => menu.classList.add('hidden'));
@@ -749,7 +712,6 @@
                 });
             }
 
-            // HTML Escaping Utility
             escapeHTML(str) {
                 if (!str) return '';
                 return String(str)
@@ -760,6 +722,358 @@
                     .replace(/'/g, '&#039;');
             }
 
+            // Dual-Title Resolution Helper
+            getEntryTitle(entry) {
+                if (!entry) return 'Untitled';
+                if (this.titleDisplayMode === 'english') {
+                    return entry.titleEnglish || entry.title || entry.titleRomanji || 'Untitled';
+                } else {
+                    return entry.titleRomanji || entry.title || entry.titleEnglish || 'Untitled';
+                }
+            }
+
+            setTitleDisplayMode(mode) {
+                this.titleDisplayMode = mode;
+                const engBtn = document.getElementById('title-mode-english');
+                const romBtn = document.getElementById('title-mode-romanji');
+                
+                if (mode === 'english') {
+                    engBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-brand-600 text-white shadow-sm";
+                    romBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-colors";
+                } else {
+                    romBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-cyber-pink text-white shadow-sm";
+                    engBtn.className = "px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-colors";
+                }
+                this.renderGrid();
+            }
+
+            // Form Event Logic (Smart Completed handling & Poster Previews)
+            handleFormStatusChange() {
+                const status = document.getElementById('form-status').value;
+                const totalInput = document.getElementById('form-total-progress');
+                const currentInput = document.getElementById('form-current-progress');
+
+                const totalVal = parseInt(totalInput.value) || 0;
+
+                if (status === 'completed') {
+                    if (totalVal > 0) {
+                        currentInput.value = totalVal;
+                    } else {
+                        this.showToast('Please specify total episodes/chapters to auto-complete progress.', 'info');
+                    }
+                }
+            }
+
+            handleFormTotalChange() {
+                const status = document.getElementById('form-status').value;
+                const totalVal = parseInt(document.getElementById('form-total-progress').value) || 0;
+                if (status === 'completed' && totalVal > 0) {
+                    document.getElementById('form-current-progress').value = totalVal;
+                }
+            }
+
+            updatePosterPreview() {
+                const url = document.getElementById('form-cover-url').value.trim();
+                const img = document.getElementById('poster-preview');
+                if (url) {
+                    img.src = url;
+                    img.classList.remove('hidden');
+                    img.onerror = () => { img.classList.add('hidden'); };
+                } else {
+                    img.classList.add('hidden');
+                }
+            }
+
+            // Kitsu Catalogue API Integration
+            clearCatalogSearch() {
+                if (this.catalogAbortController) {
+                    this.catalogAbortController.abort();
+                    this.catalogAbortController = null;
+                }
+                const input = document.getElementById('catalog-search-input');
+                const results = document.getElementById('catalog-search-results');
+                const status = document.getElementById('catalog-search-status');
+                const dupWarn = document.getElementById('duplicate-warning');
+                if (input) input.value = '';
+                if (results) { results.innerHTML = ''; results.classList.add('hidden'); }
+                if (status) { status.textContent = ''; status.classList.add('hidden'); }
+                if (dupWarn) dupWarn.classList.add('hidden');
+                const button = document.getElementById('catalog-search-button');
+                if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search'; }
+            }
+
+            async searchCatalog() {
+                const query = document.getElementById('catalog-search-input').value.trim();
+                const category = document.getElementById('form-category').value;
+                const resultsEl = document.getElementById('catalog-search-results');
+                const statusEl = document.getElementById('catalog-search-status');
+                const button = document.getElementById('catalog-search-button');
+
+                if (query.length < 2) {
+                    statusEl.textContent = 'Enter at least 2 characters to search.';
+                    statusEl.classList.remove('hidden');
+                    resultsEl.classList.add('hidden');
+                    return;
+                }
+
+                if (this.catalogAbortController) {
+                    this.catalogAbortController.abort();
+                }
+                this.catalogAbortController = new AbortController();
+                const currentRequestId = ++this.searchRequestId;
+
+                button.disabled = true;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Searching';
+                statusEl.textContent = 'Searching Kitsu catalogue…';
+                statusEl.classList.remove('hidden');
+                resultsEl.innerHTML = '';
+                resultsEl.classList.add('hidden');
+
+                const timeoutId = setTimeout(() => {
+                    if (this.catalogAbortController) this.catalogAbortController.abort('timeout');
+                }, 8000);
+
+                try {
+                    const endpoint = category === 'manga' ? 'manga' : 'anime';
+                    const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
+                    
+                    const response = await fetch(url, { 
+                        headers: { 'Accept': 'application/vnd.api+json' },
+                        signal: this.catalogAbortController.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    if (currentRequestId !== this.searchRequestId) return;
+
+                    if (!response.ok) throw new Error('Could not reach Kitsu API right now.');
+                    
+                    const payload = await response.json();
+                    const items = Array.isArray(payload.data) ? payload.data : [];
+
+                    if (!items.length) {
+                        statusEl.textContent = 'No matches found. Try another spelling, or enter manually.';
+                        return;
+                    }
+
+                    statusEl.textContent = `Choose a result (${items.length} shown).`;
+                    resultsEl.classList.remove('hidden');
+
+                    items.forEach(item => {
+                        const attr = item.attributes || {};
+                        const titleEnglish = attr.titles?.en || attr.canonicalTitle || 'Untitled';
+                        const titleRomanji = attr.titles?.en_jp || attr.canonicalTitle || titleEnglish;
+                        const imageUrl = attr.posterImage?.medium || attr.posterImage?.original || '';
+                        const year = attr.startDate ? attr.startDate.slice(0, 4) : '';
+                        const total = category === 'manga' ? attr.chapterCount : attr.episodeCount;
+                        const subtype = attr.subtype ? attr.subtype.toUpperCase() : (category === 'manga' ? 'MANGA' : 'ANIME');
+
+                        // Convert 0-100 Kitsu averageRating to 0.0-10.0 scale
+                        let externalRating = null;
+                        if (attr.averageRating) {
+                            externalRating = parseFloat((parseFloat(attr.averageRating) / 10).toFixed(1));
+                        }
+
+                        // Construct Auto Season / Subtype text
+                        let seasonInfo = subtype;
+                        if (year) seasonInfo += ` (${year})`;
+
+                        const resultButton = document.createElement('button');
+                        resultButton.type = 'button';
+                        resultButton.className = 'w-full flex items-center gap-3 p-2 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-800 hover:border-brand-500/60 text-left transition-colors';
+                        
+                        const poster = document.createElement('img');
+                        poster.className = 'w-12 h-16 object-cover rounded-lg bg-slate-800 shrink-0';
+                        poster.src = imageUrl || SVG_POSTER_FALLBACK;
+                        poster.onerror = () => { poster.src = SVG_POSTER_FALLBACK; };
+
+                        const info = document.createElement('span');
+                        info.className = 'min-w-0 flex-1';
+                        
+                        const titleLine = document.createElement('span');
+                        titleLine.className = 'block text-sm font-semibold text-slate-100 truncate';
+                        titleLine.textContent = titleEnglish;
+
+                        const romLine = document.createElement('span');
+                        romLine.className = 'block text-xs text-brand-300 truncate';
+                        romLine.textContent = titleRomanji !== titleEnglish ? titleRomanji : '';
+
+                        const metaLine = document.createElement('span');
+                        metaLine.className = 'block mt-0.5 text-[11px] text-slate-400';
+                        const countLabel = category === 'manga' ? 'ch' : 'ep';
+                        metaLine.textContent = `${subtype} · ${year || 'N/A'} · ${total ? `${total} ${countLabel}` : 'Ongoing'} ${externalRating ? `· ★ ${externalRating}` : ''}`;
+
+                        info.append(titleLine, romLine, metaLine);
+                        resultButton.append(poster, info);
+
+                        resultButton.addEventListener('click', () => this.selectCatalogResult({
+                            id: item.id,
+                            titleEnglish,
+                            titleRomanji,
+                            imageUrl,
+                            total,
+                            seasonInfo,
+                            externalRating,
+                            category
+                        }));
+                        resultsEl.appendChild(resultButton);
+                    });
+                } catch (error) {
+                    if (error.name === 'AbortError') return;
+                    statusEl.textContent = error.message || 'Error searching catalogue. You can still enter details manually.';
+                } finally {
+                    if (currentRequestId === this.searchRequestId) {
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
+                    }
+                }
+            }
+
+            selectCatalogResult(item) {
+                document.getElementById('form-external-id').value = item.id || '';
+                document.getElementById('form-title-english').value = item.titleEnglish;
+                document.getElementById('form-title-romanji').value = item.titleRomanji;
+                document.getElementById('form-category').value = item.category;
+                
+                if (item.seasonInfo) document.getElementById('form-season').value = item.seasonInfo;
+                if (item.imageUrl) document.getElementById('form-cover-url').value = item.imageUrl;
+                
+                if (Number.isInteger(item.total) && item.total > 0) {
+                    document.getElementById('form-total-progress').value = item.total;
+                }
+
+                if (item.externalRating) {
+                    document.getElementById('form-external-rating').value = item.externalRating;
+                    document.getElementById('form-rating-source').value = 'Kitsu';
+                    document.getElementById('form-rating-updated-at').value = new Date().toISOString();
+                    
+                    document.getElementById('form-external-rating-value').textContent = item.externalRating.toFixed(1);
+                    document.getElementById('form-external-rating-preview').classList.remove('hidden');
+                } else {
+                    document.getElementById('form-external-rating-preview').classList.add('hidden');
+                }
+
+                this.updatePosterPreview();
+                this.toggleCategoryFormLabels();
+
+                // Duplicate Check
+                const currentEntryId = document.getElementById('entry-id').value;
+                const isDuplicate = this.entries.some(e => e.id !== currentEntryId && (
+                    (item.id && e.externalId === item.id) || 
+                    e.titleEnglish?.toLowerCase() === item.titleEnglish.toLowerCase() ||
+                    e.titleRomanji?.toLowerCase() === item.titleRomanji.toLowerCase()
+                ));
+
+                const dupWarn = document.getElementById('duplicate-warning');
+                if (isDuplicate) {
+                    dupWarn.classList.remove('hidden');
+                } else {
+                    dupWarn.classList.add('hidden');
+                }
+
+                const statusEl = document.getElementById('catalog-search-status');
+                statusEl.textContent = `Auto-filled details for "${item.titleEnglish}".`;
+                statusEl.classList.remove('hidden');
+                document.getElementById('catalog-search-results').classList.add('hidden');
+                this.showToast(`Auto-filled details for "${this.escapeHTML(item.titleEnglish)}"`, 'success');
+            }
+
+            // Save / Update Entry
+            saveEntry(e) {
+                e.preventDefault();
+                const id = document.getElementById('entry-id').value;
+                const externalId = document.getElementById('form-external-id').value;
+                const titleEnglish = document.getElementById('form-title-english').value.trim();
+                const titleRomanji = document.getElementById('form-title-romanji').value.trim();
+                const category = document.getElementById('form-category').value;
+                let status = document.getElementById('form-status').value;
+                let currentProgress = parseInt(document.getElementById('form-current-progress').value) || 0;
+                const totalProgress = parseInt(document.getElementById('form-total-progress').value) || 0;
+                const rating = parseFloat(document.getElementById('form-rating').value) || 0;
+                const externalRating = parseFloat(document.getElementById('form-external-rating').value) || 0;
+                const ratingSource = document.getElementById('form-rating-source').value;
+                const ratingUpdatedAt = document.getElementById('form-rating-updated-at').value;
+                const season = document.getElementById('form-season').value.trim();
+                const coverUrl = document.getElementById('form-cover-url').value.trim();
+                const externalUrl = document.getElementById('form-external-url').value.trim();
+
+                const title = titleEnglish || titleRomanji || 'Untitled';
+
+                if (totalProgress > 0 && currentProgress >= totalProgress) {
+                    currentProgress = totalProgress;
+                    status = 'completed';
+                }
+
+                if (id) {
+                    const index = this.entries.findIndex(item => item.id === id);
+                    if (index !== -1) {
+                        this.entries[index] = {
+                            ...this.entries[index],
+                            externalId, title, titleEnglish, titleRomanji, category, status, 
+                            currentProgress, totalProgress, rating, externalRating, ratingSource, 
+                            ratingUpdatedAt, season, coverUrl, externalUrl,
+                            updatedAt: Date.now()
+                        };
+                        this.showToast(`Updated "${this.escapeHTML(title)}"`, 'success');
+                    }
+                } else {
+                    const newEntry = {
+                        id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                        externalId, title, titleEnglish, titleRomanji, category, status, 
+                        currentProgress, totalProgress, rating, externalRating, ratingSource, 
+                        ratingUpdatedAt, season, coverUrl, externalUrl,
+                        updatedAt: Date.now()
+                    };
+                    this.entries.unshift(newEntry);
+                    this.showToast(`Added "${this.escapeHTML(title)}"`, 'success');
+                }
+
+                this.saveEntriesToStorage();
+                this.closeModal('entry-modal');
+                this.render();
+            }
+
+            // Quick Actions & Controls
+            incrementProgress(id, e) {
+                if (e) e.stopPropagation();
+                const entry = this.entries.find(item => item.id === id);
+                if (!entry) return;
+
+                entry.currentProgress += 1;
+                entry.updatedAt = Date.now();
+
+                const isAnime = entry.category === 'anime';
+                const unit = isAnime ? 'Episode' : 'Chapter';
+
+                if (entry.totalProgress > 0 && entry.currentProgress >= entry.totalProgress) {
+                    entry.currentProgress = entry.totalProgress;
+                    entry.status = 'completed';
+                    this.showToast(`🎉 Completed "${this.escapeHTML(this.getEntryTitle(entry))}"!`, 'success');
+                } else {
+                    this.showToast(`Updated "${this.escapeHTML(this.getEntryTitle(entry))}" to ${unit} ${entry.currentProgress}`, 'info');
+                }
+
+                this.saveEntriesToStorage();
+                this.render();
+            }
+
+            deleteEntry(id, e) {
+                if (e) e.stopPropagation();
+                const entry = this.entries.find(item => item.id === id);
+                if (!entry) return;
+
+                this.showConfirmDialog(
+                    'Delete Media Entry',
+                    `Are you sure you want to delete "${this.escapeHTML(this.getEntryTitle(entry))}"?`,
+                    () => {
+                        this.entries = this.entries.filter(item => item.id !== id);
+                        this.saveEntriesToStorage();
+                        this.showToast(`Removed "${this.escapeHTML(this.getEntryTitle(entry))}"`, 'info');
+                        this.render();
+                    }
+                );
+            }
+
+            // Platforms & Links UI
             openPlatformFormModal(platformId = null) {
                 const form = document.getElementById('platform-form');
                 form.reset();
@@ -787,15 +1101,6 @@
                 this.openModal('platform-form-modal');
             }
 
-            validateURL(url) {
-                try {
-                    const parsed = new URL(url);
-                    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-                } catch {
-                    return false;
-                }
-            }
-
             savePlatform(e) {
                 e.preventDefault();
                 const id = document.getElementById('pf-id').value;
@@ -807,13 +1112,12 @@
                 const description = document.getElementById('pf-description').value.trim();
                 const enabled = document.getElementById('pf-enabled').checked;
 
-                const urlError = document.getElementById('pf-url-error');
-
-                if (!this.validateURL(url)) {
-                    urlError.classList.remove('hidden');
+                try {
+                    new URL(url);
+                } catch {
+                    document.getElementById('pf-url-error').classList.remove('hidden');
                     return;
                 }
-                urlError.classList.add('hidden');
 
                 if (id) {
                     const index = this.platforms.findIndex(p => p.id === id);
@@ -827,7 +1131,7 @@
                         name, url, category, icon: icon || 'fa-globe', iconUrl, description, enabled
                     };
                     this.platforms.push(newPf);
-                    this.showToast(`Added new platform "${this.escapeHTML(name)}"`, 'success');
+                    this.showToast(`Added platform "${this.escapeHTML(name)}"`, 'success');
                 }
 
                 this.savePlatformsToStorage();
@@ -843,7 +1147,6 @@
                     this.savePlatformsToStorage();
                     this.renderPlatformsList();
                     this.renderGrid();
-                    this.showToast(`${this.escapeHTML(pf.name)} ${pf.enabled ? 'Enabled' : 'Disabled'}`, 'info');
                 }
             }
 
@@ -853,52 +1156,28 @@
 
                 this.showConfirmDialog(
                     'Delete Platform',
-                    `Are you sure you want to delete "${this.escapeHTML(pf.name)}"? Title-specific links added in entries will remain preserved.`,
+                    `Delete "${this.escapeHTML(pf.name)}"?`,
                     () => {
                         this.platforms = this.platforms.filter(p => p.id !== id);
-                        
-                        if (this.defaultPlatforms.anime === id) this.defaultPlatforms.anime = '';
-                        if (this.defaultPlatforms.manga === id) this.defaultPlatforms.manga = '';
-                        this.saveDefaultsToStorage();
-
                         this.savePlatformsToStorage();
                         this.renderPlatformsList();
                         this.renderGrid();
-                        this.showToast(`Deleted platform "${this.escapeHTML(pf.name)}"`, 'info');
                     }
                 );
-            }
-
-            movePlatform(id, direction) {
-                const index = this.platforms.findIndex(p => p.id === id);
-                if (index === -1) return;
-
-                const targetIndex = index + direction;
-                if (targetIndex < 0 || targetIndex >= this.platforms.length) return;
-
-                const temp = this.platforms[index];
-                this.platforms[index] = this.platforms[targetIndex];
-                this.platforms[targetIndex] = temp;
-
-                this.savePlatformsToStorage();
-                this.renderPlatformsList();
             }
 
             saveDefaultPlatforms() {
                 this.defaultPlatforms.anime = document.getElementById('default-anime-platform').value;
                 this.defaultPlatforms.manga = document.getElementById('default-manga-platform').value;
                 this.saveDefaultsToStorage();
-                this.showToast('Default platform preferences updated', 'success');
+                this.showToast('Default platform choices saved', 'success');
             }
 
             renderPlatformsList() {
                 const container = document.getElementById('platforms-list-container');
                 const search = (document.getElementById('platform-search')?.value || '').toLowerCase();
 
-                const filtered = this.platforms.filter(p => 
-                    p.name.toLowerCase().includes(search) || 
-                    (p.description && p.description.toLowerCase().includes(search))
-                );
+                const filtered = this.platforms.filter(p => p.name.toLowerCase().includes(search));
 
                 const animeSelect = document.getElementById('default-anime-platform');
                 const mangaSelect = document.getElementById('default-manga-platform');
@@ -906,65 +1185,23 @@
                 const animePlatforms = this.platforms.filter(p => p.enabled && (p.category === 'anime' || p.category === 'both'));
                 const mangaPlatforms = this.platforms.filter(p => p.enabled && (p.category === 'manga' || p.category === 'both'));
 
-                animeSelect.innerHTML = `<option value="">None (Custom URLs only)</option>` + 
-                    animePlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.anime === p.id ? 'selected' : ''}>${this.escapeHTML(p.name)}</option>`).join('');
+                animeSelect.innerHTML = `<option value="">None</option>` + animePlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.anime === p.id ? 'selected' : ''}>${this.escapeHTML(p.name)}</option>`).join('');
+                mangaSelect.innerHTML = `<option value="">None</option>` + mangaPlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.manga === p.id ? 'selected' : ''}>${this.escapeHTML(p.name)}</option>`).join('');
 
-                mangaSelect.innerHTML = `<option value="">None (Custom URLs only)</option>` + 
-                    mangaPlatforms.map(p => `<option value="${p.id}" ${this.defaultPlatforms.manga === p.id ? 'selected' : ''}>${this.escapeHTML(p.name)}</option>`).join('');
-
-                if (filtered.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-8 text-slate-500 text-xs bg-slate-950/40 rounded-xl border border-slate-800">
-                            No custom platforms found matching query.
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = filtered.map((pf, idx) => `
-                    <div class="glass-card bg-slate-950/90 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border ${pf.enabled ? 'border-slate-800' : 'border-slate-900 opacity-60'}">
-                        
+                container.innerHTML = filtered.map(pf => `
+                    <div class="glass-card bg-slate-950/90 rounded-xl p-3.5 flex items-center justify-between gap-3 border ${pf.enabled ? 'border-slate-800' : 'border-slate-900 opacity-60'}">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-cyber-cyan text-base overflow-hidden flex-shrink-0">
-                                ${pf.iconUrl 
-                                    ? `<img src="${this.escapeHTML(pf.iconUrl)}" alt="${this.escapeHTML(pf.name)}" class="w-full h-full object-cover">`
-                                    : `<i class="fa-solid ${this.escapeHTML(pf.icon || 'fa-globe')}"></i>`
-                                }
-                            </div>
+                            <i class="fa-solid ${this.escapeHTML(pf.icon || 'fa-globe')} text-cyber-cyan text-base"></i>
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h4 class="text-sm font-bold text-white">${this.escapeHTML(pf.name)}</h4>
-                                    <span class="px-2 py-0.5 text-[10px] font-semibold rounded-md ${pf.category === 'anime' ? 'bg-brand-500/20 text-brand-300' : pf.category === 'manga' ? 'bg-pink-500/20 text-cyber-pink' : 'bg-purple-500/20 text-purple-300'}">
-                                        ${pf.category === 'both' ? 'Anime & Manga' : pf.category.toUpperCase()}
-                                    </span>
-                                </div>
-                                <a href="${this.escapeHTML(pf.url)}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-400 hover:text-cyber-cyan truncate max-w-xs block mt-0.5">${this.escapeHTML(pf.url)}</a>
+                                <h4 class="text-sm font-bold text-white">${this.escapeHTML(pf.name)}</h4>
+                                <a href="${this.escapeHTML(pf.url)}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-400 hover:text-cyber-cyan truncate max-w-xs block">${this.escapeHTML(pf.url)}</a>
                             </div>
                         </div>
-
-                        <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-2 border-t sm:border-t-0 border-slate-800/80 pt-2 sm:pt-0">
-                            <div class="flex items-center gap-1">
-                                <button onclick="app.movePlatform('${pf.id}', -1)" ${idx === 0 ? 'disabled class="opacity-30 p-1.5 text-slate-600"' : 'class="p-1.5 text-slate-400 hover:text-white"'} title="Move Up">
-                                    <i class="fa-solid fa-chevron-up text-xs"></i>
-                                </button>
-                                <button onclick="app.movePlatform('${pf.id}', 1)" ${idx === filtered.length - 1 ? 'disabled class="opacity-30 p-1.5 text-slate-600"' : 'class="p-1.5 text-slate-400 hover:text-white"'} title="Move Down">
-                                    <i class="fa-solid fa-chevron-down text-xs"></i>
-                                </button>
-                            </div>
-
-                            <button onclick="app.togglePlatformEnabled('${pf.id}')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all ${pf.enabled ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-400'}">
-                                ${pf.enabled ? 'Enabled' : 'Disabled'}
-                            </button>
-
-                            <button onclick="app.openPlatformFormModal('${pf.id}')" class="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg text-xs" title="Edit Platform">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-
-                            <button onclick="app.confirmDeletePlatform('${pf.id}')" class="p-1.5 text-rose-400 hover:text-rose-300 bg-rose-950/30 border border-rose-900/40 rounded-lg text-xs" title="Delete Platform">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="app.togglePlatformEnabled('${pf.id}')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${pf.enabled ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-400'}">${pf.enabled ? 'Enabled' : 'Disabled'}</button>
+                            <button onclick="app.openPlatformFormModal('${pf.id}')" class="p-1.5 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg text-xs"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="app.confirmDeletePlatform('${pf.id}')" class="p-1.5 text-rose-400 hover:text-rose-300 bg-rose-950/30 border border-rose-900/40 rounded-lg text-xs"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
-
                     </div>
                 `).join('');
             }
@@ -989,7 +1226,7 @@
                 if (defaultPlatform) {
                     window.open(defaultPlatform.url, '_blank', 'noopener,noreferrer');
                 } else {
-                    this.showToast('No default platform configured. Please set one in Custom Links.', 'info');
+                    this.showToast('No default platform set. Manage links in Custom Links.', 'info');
                     this.openModal('platforms-modal');
                 }
             }
@@ -1006,26 +1243,34 @@
                 menu.classList.toggle('hidden');
             }
 
+            // Modal & Confirmation Handlers
             openModal(modalId, entryId = null) {
                 const modal = document.getElementById(modalId);
                 const content = document.getElementById(modalId + '-content');
                 if (!modal || !content) return;
 
-                if (modalId === 'platforms-modal') {
-                    this.renderPlatformsList();
-                }
+                if (modalId === 'platforms-modal') this.renderPlatformsList();
 
                 if (modalId === 'entry-modal') {
                     const form = document.getElementById('entry-form');
                     form.reset();
                     document.getElementById('entry-id').value = '';
+                    document.getElementById('form-external-id').value = '';
+                    document.getElementById('form-external-rating').value = '';
+                    document.getElementById('form-rating-source').value = '';
+                    document.getElementById('form-rating-updated-at').value = '';
+                    document.getElementById('form-external-rating-preview').classList.add('hidden');
+                    this.updatePosterPreview();
                     this.clearCatalogSearch();
+
                     document.getElementById('modal-title').querySelector('span').textContent = entryId ? 'Edit Media' : 'Add New Media';
                     if (entryId) {
                         const entry = this.entries.find(item => item.id === entryId);
                         if (entry) {
                             document.getElementById('entry-id').value = entry.id;
-                            document.getElementById('form-title').value = entry.title || '';
+                            document.getElementById('form-external-id').value = entry.externalId || '';
+                            document.getElementById('form-title-english').value = entry.titleEnglish || entry.title || '';
+                            document.getElementById('form-title-romanji').value = entry.titleRomanji || entry.title || '';
                             document.getElementById('form-category').value = entry.category || 'anime';
                             document.getElementById('form-status').value = entry.status || 'active';
                             document.getElementById('form-current-progress').value = entry.currentProgress || 0;
@@ -1034,6 +1279,15 @@
                             document.getElementById('form-season').value = entry.season || '';
                             document.getElementById('form-cover-url').value = entry.coverUrl || '';
                             document.getElementById('form-external-url').value = entry.externalUrl || '';
+
+                            if (entry.externalRating) {
+                                document.getElementById('form-external-rating').value = entry.externalRating;
+                                document.getElementById('form-rating-source').value = entry.ratingSource || 'Kitsu';
+                                document.getElementById('form-rating-updated-at').value = entry.ratingUpdatedAt || '';
+                                document.getElementById('form-external-rating-value').textContent = entry.externalRating.toFixed(1);
+                                document.getElementById('form-external-rating-preview').classList.remove('hidden');
+                            }
+                            this.updatePosterPreview();
                         }
                     } else {
                         document.getElementById('form-category').value = this.activeCategory || 'anime';
@@ -1074,6 +1328,128 @@
                 this.openModal('confirm-modal');
             }
 
+            // Backup & Import / Export
+            exportJSON() {
+                const backupData = {
+                    version: '2.8',
+                    exportedAt: new Date().toISOString(),
+                    entries: this.entries,
+                    platforms: this.platforms,
+                    defaultPlatforms: this.defaultPlatforms
+                };
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `anitrack_backup_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                this.showToast('Full library backup downloaded!', 'success');
+            }
+
+            importJSON(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        let validEntries = [];
+                        
+                        if (Array.isArray(imported)) {
+                            validEntries = imported;
+                        } else if (imported && imported.entries && Array.isArray(imported.entries)) {
+                            validEntries = imported.entries;
+                            if (imported.platforms) this.platforms = imported.platforms;
+                            if (imported.defaultPlatforms) this.defaultPlatforms = imported.defaultPlatforms;
+                        } else {
+                            throw new Error('Invalid schema');
+                        }
+
+                        this.entries = validEntries.filter(item => item && typeof item === 'object');
+                        this.saveEntriesToStorage();
+                        this.savePlatformsToStorage();
+                        this.saveDefaultsToStorage();
+
+                        this.showToast('Successfully restored library backup!', 'success');
+                        this.closeModal('data-modal');
+                        this.render();
+                    } catch (err) {
+                        this.showToast('Invalid JSON file format.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            }
+
+            confirmReset() {
+                this.showConfirmDialog(
+                    'Reset Storage Library',
+                    'DANGER: This will permanently wipe all media entries, settings, and custom link configurations. Continue?',
+                    () => {
+                        this.entries = [];
+                        this.platforms = this.getDefaultPlatforms();
+                        this.defaultPlatforms = { anime: '', manga: '' };
+                        this.saveEntriesToStorage();
+                        this.savePlatformsToStorage();
+                        this.saveDefaultsToStorage();
+                        this.showToast('Library wiped to clean state', 'info');
+                        this.closeModal('data-modal');
+                        this.render();
+                    }
+                );
+            }
+
+            importMAL(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const xmlText = event.target.result;
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                        let importedCount = 0;
+
+                        xmlDoc.querySelectorAll('anime').forEach(node => {
+                            const title = node.querySelector('series_title')?.textContent || '';
+                            if (!title) return;
+
+                            const watchedEp = parseInt(node.querySelector('my_watched_episodes')?.textContent || '0');
+                            const totalEp = parseInt(node.querySelector('series_episodes')?.textContent || '0');
+                            const score = parseFloat(node.querySelector('my_score')?.textContent || '0');
+                            const statusRaw = node.querySelector('my_status')?.textContent || '';
+
+                            let status = 'active';
+                            if (statusRaw.toLowerCase().includes('completed') || (totalEp > 0 && watchedEp >= totalEp)) {
+                                status = 'completed';
+                            }
+
+                            this.entries.push({
+                                id: 'mal-a-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                                title, titleEnglish: title, titleRomanji: title, category: 'anime', status,
+                                currentProgress: watchedEp, totalProgress: totalEp,
+                                rating: score, season: '', coverUrl: '', externalUrl: '', updatedAt: Date.now()
+                            });
+                            importedCount++;
+                        });
+
+                        this.saveEntriesToStorage();
+                        this.showToast(`Imported ${importedCount} titles from MAL!`, 'success');
+                        this.closeModal('data-modal');
+                        this.render();
+                    } catch (err) {
+                        this.showToast('Failed to parse XML file.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            }
+
+            // Filters, Sorts & Grid Render
             setCategory(category) {
                 this.activeCategory = category;
                 this.renderLimit = this.renderBatchSize;
@@ -1112,373 +1488,10 @@
 
             toggleCategoryFormLabels() {
                 const cat = document.getElementById('form-category').value;
-                const activeLabel = cat === 'anime' ? 'Watching' : 'Reading';
-                const curLabel = cat === 'anime' ? 'Watched Episodes' : 'Read Chapters';
-                const totLabel = cat === 'anime' ? 'Total Episodes (0 = ∞)' : 'Total Chapters (0 = ∞)';
-                
-                document.getElementById('opt-status-active').textContent = activeLabel;
-                document.getElementById('lbl-progress-current').textContent = curLabel;
-                document.getElementById('lbl-progress-total').textContent = totLabel;
+                document.getElementById('opt-status-active').textContent = cat === 'anime' ? 'Watching' : 'Reading';
+                document.getElementById('lbl-progress-current').textContent = cat === 'anime' ? 'Watched Episodes' : 'Read Chapters';
+                document.getElementById('lbl-progress-total').textContent = cat === 'anime' ? 'Total Episodes (0 = ∞)' : 'Total Chapters (0 = ∞)';
                 document.getElementById('status-tab-active-label').textContent = this.activeCategory === 'anime' ? 'Watching' : 'Reading';
-            }
-
-            // Kitsu Catalogue API Integration with Timeout & Abort Controller
-            clearCatalogSearch() {
-                if (this.catalogAbortController) {
-                    this.catalogAbortController.abort();
-                    this.catalogAbortController = null;
-                }
-                const input = document.getElementById('catalog-search-input');
-                const results = document.getElementById('catalog-search-results');
-                const status = document.getElementById('catalog-search-status');
-                if (input) input.value = '';
-                if (results) { results.innerHTML = ''; results.classList.add('hidden'); }
-                if (status) { status.textContent = ''; status.classList.add('hidden'); }
-                const button = document.getElementById('catalog-search-button');
-                if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search'; }
-            }
-
-            async searchCatalog() {
-                const query = document.getElementById('catalog-search-input').value.trim();
-                const category = document.getElementById('form-category').value;
-                const resultsEl = document.getElementById('catalog-search-results');
-                const statusEl = document.getElementById('catalog-search-status');
-                const button = document.getElementById('catalog-search-button');
-
-                if (query.length < 2) {
-                    statusEl.textContent = 'Enter at least 2 characters to search.';
-                    statusEl.classList.remove('hidden');
-                    resultsEl.classList.add('hidden');
-                    return;
-                }
-
-                // Cancel pending requests
-                if (this.catalogAbortController) {
-                    this.catalogAbortController.abort();
-                }
-                this.catalogAbortController = new AbortController();
-                const currentRequestId = ++this.searchRequestId;
-
-                button.disabled = true;
-                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Searching';
-                statusEl.textContent = 'Searching Kitsu catalogue…';
-                statusEl.classList.remove('hidden');
-                resultsEl.innerHTML = '';
-                resultsEl.classList.add('hidden');
-
-                // Set 8-second request timeout
-                const timeoutId = setTimeout(() => {
-                    if (this.catalogAbortController) {
-                        this.catalogAbortController.abort('timeout');
-                    }
-                }, 8000);
-
-                try {
-                    const endpoint = category === 'manga' ? 'manga' : 'anime';
-                    const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
-                    
-                    const response = await fetch(url, { 
-                        headers: { 'Accept': 'application/vnd.api+json' },
-                        signal: this.catalogAbortController.signal
-                    });
-                    
-                    clearTimeout(timeoutId);
-
-                    if (currentRequestId !== this.searchRequestId) return; // Stale request check
-
-                    if (response.status === 429) {
-                        throw new Error('Too many requests. Please wait a few seconds and try again.');
-                    }
-                    if (!response.ok) {
-                        throw new Error('Could not reach Kitsu API right now. Please try again later.');
-                    }
-                    
-                    const payload = await response.json();
-                    const items = Array.isArray(payload.data) ? payload.data : [];
-
-                    if (!items.length) {
-                        statusEl.textContent = 'No matches found. Try another spelling, or enter the title manually.';
-                        return;
-                    }
-
-                    statusEl.textContent = `Choose a result (${items.length} shown).`;
-                    resultsEl.classList.remove('hidden');
-
-                    items.forEach(item => {
-                        const attr = item.attributes || {};
-                        const title = attr.canonicalTitle || attr.titles?.en || attr.titles?.en_jp || 'Untitled';
-                        const imageUrl = attr.posterImage?.medium || attr.posterImage?.original || '';
-                        const year = attr.startDate ? attr.startDate.slice(0, 4) : 'Year unknown';
-                        const total = category === 'manga' ? attr.chapterCount : attr.episodeCount;
-                        const type = category === 'manga' ? 'Manga' : 'Anime';
-
-                        const resultButton = document.createElement('button');
-                        resultButton.type = 'button';
-                        resultButton.className = 'w-full flex items-center gap-3 p-2 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-800 hover:border-brand-500/60 text-left transition-colors';
-                        resultButton.setAttribute('aria-label', `Select ${title}`);
-
-                        const poster = document.createElement('img');
-                        poster.className = 'w-12 h-16 object-cover rounded-lg bg-slate-800 shrink-0';
-                        poster.alt = '';
-                        poster.loading = 'lazy';
-                        poster.src = imageUrl || SVG_POSTER_FALLBACK;
-                        poster.onerror = () => { poster.onerror = null; poster.src = SVG_POSTER_FALLBACK; };
-
-                        const info = document.createElement('span');
-                        info.className = 'min-w-0 flex-1';
-                        const titleLine = document.createElement('span');
-                        titleLine.className = 'block text-sm font-semibold text-slate-100';
-                        titleLine.textContent = title;
-                        const metaLine = document.createElement('span');
-                        metaLine.className = 'block mt-1 text-xs text-slate-400';
-                        const countLabel = category === 'manga' ? 'chapters' : 'episodes';
-                        metaLine.textContent = `${type} · ${year} · ${total ? `${total} ${countLabel}` : `unknown ${countLabel}`}`;
-                        
-                        info.append(titleLine, metaLine);
-                        const selectIcon = document.createElement('span');
-                        selectIcon.className = 'text-slate-500';
-                        selectIcon.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
-                        
-                        resultButton.append(poster, info, selectIcon);
-                        resultButton.addEventListener('click', () => this.selectCatalogResult({ title, imageUrl, total, year, category }));
-                        resultsEl.appendChild(resultButton);
-                    });
-                } catch (error) {
-                    if (error.name === 'AbortError') {
-                        if (error === 'timeout') {
-                            statusEl.textContent = 'Request timed out. Check your connection or add manually.';
-                        }
-                        return; // Ignored manual aborts
-                    }
-                    statusEl.textContent = error.message || 'Something went wrong while searching. You can still add manually.';
-                } finally {
-                    if (currentRequestId === this.searchRequestId) {
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
-                    }
-                }
-            }
-
-            selectCatalogResult(item) {
-                document.getElementById('form-title').value = item.title;
-                document.getElementById('form-category').value = item.category;
-                if (item.imageUrl) document.getElementById('form-cover-url').value = item.imageUrl;
-                if (Number.isInteger(item.total) && item.total > 0) {
-                    document.getElementById('form-total-progress').value = item.total;
-                }
-                this.toggleCategoryFormLabels();
-                const statusEl = document.getElementById('catalog-search-status');
-                statusEl.textContent = `Selected “${item.title}”. Check the details below, then save your entry.`;
-                statusEl.classList.remove('hidden');
-                document.getElementById('catalog-search-results').classList.add('hidden');
-                this.showToast(`Loaded details for "${this.escapeHTML(item.title)}"`, 'success');
-            }
-
-            saveEntry(e) {
-                e.preventDefault();
-                const id = document.getElementById('entry-id').value;
-                const title = document.getElementById('form-title').value.trim();
-                const category = document.getElementById('form-category').value;
-                let status = document.getElementById('form-status').value;
-                let currentProgress = parseInt(document.getElementById('form-current-progress').value) || 0;
-                const totalProgress = parseInt(document.getElementById('form-total-progress').value) || 0;
-                const rating = parseFloat(document.getElementById('form-rating').value) || 0;
-                const season = document.getElementById('form-season').value.trim();
-                const coverUrl = document.getElementById('form-cover-url').value.trim();
-                const externalUrl = document.getElementById('form-external-url').value.trim();
-
-                if (totalProgress > 0 && currentProgress >= totalProgress) {
-                    currentProgress = totalProgress;
-                    status = 'completed';
-                }
-
-                if (id) {
-                    const index = this.entries.findIndex(item => item.id === id);
-                    if (index !== -1) {
-                        this.entries[index] = {
-                            ...this.entries[index],
-                            title, category, status, currentProgress, totalProgress, rating, season, coverUrl, externalUrl,
-                            updatedAt: Date.now()
-                        };
-                        this.showToast(`Updated "${this.escapeHTML(title)}"`, 'success');
-                    }
-                } else {
-                    const newEntry = {
-                        id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-                        title, category, status, currentProgress, totalProgress, rating, season, coverUrl, externalUrl,
-                        updatedAt: Date.now()
-                    };
-                    this.entries.unshift(newEntry);
-                    this.showToast(`Added "${this.escapeHTML(title)}"`, 'success');
-                }
-
-                this.saveEntriesToStorage();
-                this.closeModal('entry-modal');
-                this.render();
-            }
-
-            incrementProgress(id, e) {
-                if (e) e.stopPropagation();
-                const entry = this.entries.find(item => item.id === id);
-                if (!entry) return;
-
-                entry.currentProgress += 1;
-                entry.updatedAt = Date.now();
-
-                const isAnime = entry.category === 'anime';
-                const unit = isAnime ? 'Episode' : 'Chapter';
-
-                if (entry.totalProgress > 0 && entry.currentProgress >= entry.totalProgress) {
-                    entry.currentProgress = entry.totalProgress;
-                    entry.status = 'completed';
-                    this.showToast(`🎉 Completed "${this.escapeHTML(entry.title)}"!`, 'success');
-                } else {
-                    this.showToast(`Updated "${this.escapeHTML(entry.title)}" to ${unit} ${entry.currentProgress}`, 'info');
-                }
-
-                this.saveEntriesToStorage();
-                this.render();
-            }
-
-            deleteEntry(id, e) {
-                if (e) e.stopPropagation();
-                const entry = this.entries.find(item => item.id === id);
-                if (!entry) return;
-
-                this.showConfirmDialog(
-                    'Delete Media Entry',
-                    `Are you sure you want to delete "${this.escapeHTML(entry.title)}"?`,
-                    () => {
-                        this.entries = this.entries.filter(item => item.id !== id);
-                        this.saveEntriesToStorage();
-                        this.showToast(`Removed "${this.escapeHTML(entry.title)}"`, 'info');
-                        this.render();
-                    }
-                );
-            }
-
-            // Data Backups & JSON Validation
-            exportJSON() {
-                const backupData = {
-                    version: '2.7',
-                    exportedAt: new Date().toISOString(),
-                    entries: this.entries,
-                    platforms: this.platforms,
-                    defaultPlatforms: this.defaultPlatforms
-                };
-
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", `anitrack_backup_${new Date().toISOString().slice(0,10)}.json`);
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
-                this.showToast('Full library backup downloaded!', 'success');
-            }
-
-            importJSON(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const imported = JSON.parse(event.target.result);
-                        let validEntries = [];
-                        
-                        if (Array.isArray(imported)) {
-                            validEntries = imported;
-                        } else if (imported && imported.entries && Array.isArray(imported.entries)) {
-                            validEntries = imported.entries;
-                            if (imported.platforms) this.platforms = imported.platforms;
-                            if (imported.defaultPlatforms) this.defaultPlatforms = imported.defaultPlatforms;
-                        } else {
-                            throw new Error('Invalid backup schema');
-                        }
-
-                        // Basic entry shape validation
-                        this.entries = validEntries.filter(item => item && typeof item === 'object' && item.title);
-
-                        this.saveEntriesToStorage();
-                        this.savePlatformsToStorage();
-                        this.saveDefaultsToStorage();
-
-                        this.showToast('Successfully restored library backup!', 'success');
-                        this.closeModal('data-modal');
-                        this.render();
-                    } catch (err) {
-                        this.showToast('Invalid JSON file format.', 'error');
-                    }
-                };
-                reader.readAsText(file);
-                e.target.value = '';
-            }
-
-            confirmReset() {
-                this.showConfirmDialog(
-                    'Reset Storage Library',
-                    'DANGER: This will permanently wipe all media entries, settings, and custom link configurations. Continue?',
-                    () => {
-                        this.entries = [];
-                        this.platforms = this.getDefaultPlatforms();
-                        this.defaultPlatforms = { anime: '', manga: '' };
-                        this.saveEntriesToStorage();
-                        this.savePlatformsToStorage();
-                        this.saveDefaultsToStorage();
-                        this.showToast('Library wiped to clean state', 'info');
-                        this.closeModal('data-modal');
-                        this.render();
-                    }
-                );
-            }
-
-            // MAL XML Parser
-            importMAL(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const xmlText = event.target.result;
-                        const parser = new DOMParser();
-                        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-                        let importedCount = 0;
-
-                        xmlDoc.querySelectorAll('anime').forEach(node => {
-                            const title = node.querySelector('series_title')?.textContent || '';
-                            if (!title) return;
-
-                            const watchedEp = parseInt(node.querySelector('my_watched_episodes')?.textContent || '0');
-                            const totalEp = parseInt(node.querySelector('series_episodes')?.textContent || '0');
-                            const score = parseFloat(node.querySelector('my_score')?.textContent || '0');
-                            const statusRaw = node.querySelector('my_status')?.textContent || '';
-
-                            let status = 'active';
-                            if (statusRaw.toLowerCase().includes('completed') || (totalEp > 0 && watchedEp >= totalEp)) {
-                                status = 'completed';
-                            }
-
-                            this.entries.push({
-                                id: 'mal-a-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-                                title, category: 'anime', status,
-                                currentProgress: watchedEp, totalProgress: totalEp,
-                                rating: score, season: '', coverUrl: '', externalUrl: '', updatedAt: Date.now()
-                            });
-                            importedCount++;
-                        });
-
-                        this.saveEntriesToStorage();
-                        this.showToast(`Imported ${importedCount} titles from MAL!`, 'success');
-                        this.closeModal('data-modal');
-                        this.render();
-                    } catch (err) {
-                        this.showToast('Failed to parse XML file.', 'error');
-                    }
-                };
-                reader.readAsText(file);
-                e.target.value = '';
             }
 
             render() {
@@ -1494,7 +1507,6 @@
                 const activeCnt = this.entries.filter(i => i.status === 'active').length;
                 const completedCnt = this.entries.filter(i => i.status === 'completed').length;
                 
-                // Unrated entries strictly excluded from calculation
                 const ratedEntries = this.entries.filter(i => typeof i.rating === 'number' && i.rating > 0);
                 const avgRating = ratedEntries.length > 0 
                     ? (ratedEntries.reduce((acc, i) => acc + i.rating, 0) / ratedEntries.length).toFixed(1)
@@ -1541,14 +1553,20 @@
                     if (this.activeStatus !== 'all' && item.status !== this.activeStatus) return false;
 
                     if (this.searchQuery) {
+                        const engMatch = item.titleEnglish && item.titleEnglish.toLowerCase().includes(this.searchQuery);
+                        const romMatch = item.titleRomanji && item.titleRomanji.toLowerCase().includes(this.searchQuery);
                         const titleMatch = item.title && item.title.toLowerCase().includes(this.searchQuery);
                         const seasonMatch = item.season && item.season.toLowerCase().includes(this.searchQuery);
-                        if (!titleMatch && !seasonMatch) return false;
+                        if (!engMatch && !romMatch && !titleMatch && !seasonMatch) return false;
                     }
                     return true;
                 }).sort((a, b) => {
-                    if (this.sortBy === 'title') return (a.title || '').localeCompare(b.title || '');
+                    const titleA = this.getEntryTitle(a);
+                    const titleB = this.getEntryTitle(b);
+
+                    if (this.sortBy === 'title') return titleA.localeCompare(titleB);
                     if (this.sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+                    if (this.sortBy === 'externalRating') return (b.externalRating || 0) - (a.externalRating || 0);
                     if (this.sortBy === 'progress') {
                         const pctA = a.totalProgress > 0 ? (a.currentProgress / a.totalProgress) : 0;
                         const pctB = b.totalProgress > 0 ? (b.currentProgress / b.totalProgress) : 0;
@@ -1604,6 +1622,7 @@
 
                 const cover = item.coverUrl || SVG_POSTER_FALLBACK;
                 const isCompleted = item.status === 'completed';
+                const displayTitle = this.getEntryTitle(item);
 
                 const applicablePlatforms = this.platforms.filter(p => p.enabled && (p.category === item.category || p.category === 'both'));
 
@@ -1612,16 +1631,24 @@
                         
                         <!-- Poster Container (2:3 Aspect Ratio) -->
                         <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
-                            <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90"></div>
                             
-                            <!-- Rating Indicator -->
-                            ${item.rating > 0 ? `
-                                <div class="absolute top-2 left-2 bg-slate-950/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-black text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md">
-                                    <i class="fa-solid fa-star text-[9px] sm:text-[10px]"></i>
-                                    <span>${item.rating.toFixed(1)}</span>
-                                </div>
-                            ` : ''}
+                            <!-- Rating Badges (Personal Score & Community Score) -->
+                            <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                ${item.rating > 0 ? `
+                                    <div class="bg-slate-950/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Personal Rating">
+                                        <i class="fa-solid fa-star text-[9px]"></i>
+                                        <span>${item.rating.toFixed(1)}</span>
+                                    </div>
+                                ` : ''}
+                                ${item.externalRating > 0 ? `
+                                    <div class="bg-slate-950/80 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-bold text-cyber-cyan border border-cyber-cyan/30 flex items-center gap-1 shadow-md" title="Community Score (${this.escapeHTML(item.ratingSource || 'Kitsu')})">
+                                        <i class="fa-solid fa-globe text-[8px]"></i>
+                                        <span>${item.externalRating.toFixed(1)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
 
                             <!-- Status Badge -->
                             <div class="absolute top-2 right-2 shadow-md">
@@ -1644,7 +1671,7 @@
                             <!-- Title & Season Badge -->
                             <div class="absolute bottom-2 left-2 right-2 z-10">
                                 ${item.season ? `<p class="text-[9px] sm:text-[10px] font-semibold text-brand-300 uppercase tracking-wider truncate mb-0.5">${this.escapeHTML(item.season)}</p>` : ''}
-                                <h4 class="text-xs sm:text-sm font-bold text-white truncate leading-tight" title="${this.escapeHTML(item.title)}">${this.escapeHTML(item.title)}</h4>
+                                <h4 class="text-xs sm:text-sm font-bold text-white truncate leading-tight" title="${this.escapeHTML(displayTitle)}">${this.escapeHTML(displayTitle)}</h4>
                             </div>
                         </div>
 
