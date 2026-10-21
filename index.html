@@ -103,13 +103,12 @@
                     <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.1</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.2</span>
                     </div>
                 </div>
 
                 <!-- Action Controls -->
                 <div class="flex items-center space-x-1.5 sm:space-x-3">
-                    <!-- Install App PWA Button -->
                     <button id="pwa-install-btn" onclick="app.installPWA()" class="hidden bg-slate-900 hover:bg-slate-800 text-cyber-cyan border border-cyber-cyan/40 p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-lg shadow-cyan-500/10">
                         <i class="fa-solid fa-download"></i>
                         <span class="hidden sm:inline">Install App</span>
@@ -136,7 +135,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-24 sm:pb-8">
         
-        <!-- Dashboard Header Stats (3 primary cards: Total, Active, Completed) -->
+        <!-- Dashboard Header Stats -->
         <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
             <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between border-l-4 border-l-brand-500">
                 <div>
@@ -321,6 +320,9 @@
                         <select id="form-status" onchange="app.handleFormStatusChange()" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none cursor-pointer">
                             <option value="active" id="opt-status-active">Watching</option>
                             <option value="completed">Completed</option>
+                            <option value="on-hold">On Hold</option>
+                            <option value="dropped">Dropped</option>
+                            <option value="plan-to-watch">Plan to Watch</option>
                         </select>
                     </div>
                 </div>
@@ -341,7 +343,7 @@
                     <input type="text" id="form-season" placeholder="e.g. Season 2, Hashira Training Arc" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
                 </div>
 
-                <!-- Internet (External Community) Rating Badge Preview -->
+                <!-- Internet Rating Badge Preview -->
                 <div id="form-external-rating-preview" class="hidden p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
                     <span class="text-slate-400">Internet Rating (<span id="form-rating-source-text">Kitsu</span>):</span>
                     <span class="font-bold text-cyber-cyan"><i class="fa-solid fa-star text-amber-400 mr-1"></i><span id="form-external-rating-value">0.0</span> / 10</span>
@@ -492,9 +494,9 @@
         </div>
     </div>
 
-    <!-- Modal 4: Generic Confirmation Dialog Modal -->
-    <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="glass-card bg-slate-900/95 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl p-6 space-y-4 text-center transform scale-95 transition-transform duration-200" id="confirm-modal-content">
+    <!-- Modal 4: Generic Confirmation Dialog Modal (Fixed with z-[9999] stacking & isolation) -->
+    <div id="confirm-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl p-6 space-y-4 text-center transform scale-95 transition-transform duration-200" id="confirm-modal-content">
             <div class="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto text-xl">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
@@ -509,9 +511,9 @@
         </div>
     </div>
 
-    <!-- Modal 5: Data & Backup Import/Export Modal -->
+    <!-- Modal 5: Data & Backup Import/Export & MAL XML Modal -->
     <div id="data-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="glass-card bg-slate-900/95 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="data-modal-content">
+        <div class="glass-card bg-slate-900/95 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="data-modal-content">
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-database text-cyber-cyan"></i>
@@ -522,20 +524,31 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-5">
+            <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
                 <div class="p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl text-[11px] text-brand-300 leading-relaxed">
                     <i class="fa-solid fa-circle-info mr-1"></i>
-                    <strong>Note:</strong> Data is saved in browser local storage. Use JSON Export to backup or transfer between devices.
+                    <strong>Note:</strong> Data is saved in browser local storage. Use JSON Export to backup your collection before importing XML.
                 </div>
 
-                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2.5">
+                <!-- MyAnimeList Import Section with Duplicate Strategy -->
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-3">
                     <div class="flex items-center gap-2 text-sm font-semibold text-brand-400">
                         <i class="fa-solid fa-file-code"></i>
-                        <span>Import MyAnimeList (MAL)</span>
+                        <span>Import MyAnimeList (MAL) XML</span>
                     </div>
-                    <p class="text-xs text-slate-400">Upload your exported MyAnimeList XML file to merge your watchlist automatically.</p>
-                    <label class="block">
-                        <span class="sr-only">Choose MAL File</span>
+                    <p class="text-xs text-slate-400">Upload your exported MyAnimeList XML file. Maps IDs, titles, types, dates, statuses, progress, and internet scores.</p>
+                    
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Duplicate Strategy</label>
+                        <select id="mal-duplicate-strategy" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-2 outline-none cursor-pointer">
+                            <option value="skip">Skip duplicates (Keep existing)</option>
+                            <option value="update">Update existing entries with XML data</option>
+                            <option value="import">Import as new entries</option>
+                        </select>
+                    </div>
+
+                    <label class="block pt-1">
+                        <span class="sr-only">Choose MAL XML File</span>
                         <input type="file" id="mal-file-input" accept=".xml" onchange="app.importMAL(event)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-500/20 file:text-brand-300 hover:file:bg-brand-500/30 cursor-pointer">
                     </label>
                 </div>
@@ -1357,9 +1370,27 @@
                 this.openModal('confirm-modal');
             }
 
+            confirmReset() {
+                this.showConfirmDialog(
+                    'Reset Storage Library',
+                    'DANGER: Permanently wipe all media entries and settings? It is recommended to export a JSON backup first.',
+                    () => {
+                        this.entries = [];
+                        this.platforms = this.getDefaultPlatforms();
+                        this.defaultPlatforms = { anime: '', manga: '' };
+                        this.saveEntriesToStorage();
+                        this.savePlatformsToStorage();
+                        this.saveDefaultsToStorage();
+                        this.showToast('Library wiped to clean state', 'info');
+                        this.closeModal('data-modal');
+                        this.render();
+                    }
+                );
+            }
+
             exportJSON() {
                 const backupData = {
-                    version: '3.1',
+                    version: '3.2',
                     exportedAt: new Date().toISOString(),
                     entries: this.entries,
                     platforms: this.platforms,
@@ -1412,66 +1443,135 @@
                 e.target.value = '';
             }
 
-            confirmReset() {
-                this.showConfirmDialog(
-                    'Reset Storage Library',
-                    'DANGER: Permanently wipe all media entries and settings? Continue?',
-                    () => {
-                        this.entries = [];
-                        this.platforms = this.getDefaultPlatforms();
-                        this.defaultPlatforms = { anime: '', manga: '' };
-                        this.saveEntriesToStorage();
-                        this.savePlatformsToStorage();
-                        this.saveDefaultsToStorage();
-                        this.showToast('Library wiped to clean state', 'info');
-                        this.closeModal('data-modal');
-                        this.render();
-                    }
-                );
-            }
-
+            // Advanced MyAnimeList (MAL) XML Importer with DOMParser & Duplicate Strategy
             importMAL(e) {
                 const file = e.target.files[0];
                 if (!file) return;
 
+                const strategy = document.getElementById('mal-duplicate-strategy')?.value || 'skip';
                 const reader = new FileReader();
+
                 reader.onload = (event) => {
                     try {
                         const xmlText = event.target.result;
                         const parser = new DOMParser();
                         const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-                        let importedCount = 0;
+                        
+                        const parseError = xmlDoc.querySelector('parsererror');
+                        if (parseError) throw new Error('Invalid XML format');
 
-                        xmlDoc.querySelectorAll('anime').forEach(node => {
-                            const title = node.querySelector('series_title')?.textContent || '';
-                            if (!title) return;
+                        let addedCount = 0;
+                        let updatedCount = 0;
+                        let skippedCount = 0;
 
-                            const watchedEp = parseInt(node.querySelector('my_watched_episodes')?.textContent || '0');
-                            const totalEp = parseInt(node.querySelector('series_episodes')?.textContent || '0');
-                            const statusRaw = node.querySelector('my_status')?.textContent || '';
+                        // Helper text extractor
+                        const getNodeText = (parent, tag) => {
+                            const el = parent.querySelector(tag);
+                            return el ? el.textContent.trim() : '';
+                        };
 
-                            let status = 'active';
-                            if (statusRaw.toLowerCase().includes('completed') || (totalEp > 0 && watchedEp >= totalEp)) {
-                                status = 'completed';
-                            }
+                        // Process Anime & Manga nodes
+                        const processEntries = (nodes, category) => {
+                            nodes.forEach(node => {
+                                const title = getNodeText(node, category === 'anime' ? 'series_title' : 'manga_title');
+                                if (!title) return;
 
-                            this.entries.push({
-                                id: 'mal-a-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-                                title, titleEnglish: title, titleRomanji: title, category: 'anime', status,
-                                currentProgress: watchedEp, totalProgress: totalEp,
-                                season: '', coverUrl: '', externalUrl: '', updatedAt: Date.now()
+                                const externalId = getNodeText(node, category === 'anime' ? 'series_animedb_id' : 'manga_mangadb_id');
+                                const statusRaw = getNodeText(node, category === 'anime' ? 'my_status' : 'my_status').toLowerCase();
+                                const currentProg = parseInt(getNodeText(node, category === 'anime' ? 'my_watched_episodes' : 'my_read_chapters')) || 0;
+                                const totalProg = parseInt(getNodeText(node, category === 'anime' ? 'series_episodes' : 'manga_volumes')) || 0;
+                                const score = parseFloat(getNodeText(node, category === 'anime' ? 'my_score' : 'my_score')) || 0;
+                                const type = getNodeText(node, category === 'anime' ? 'series_type' : 'manga_publishing_status');
+                                const startDate = getNodeText(node, 'my_start_date');
+                                const finishDate = getNodeText(node, 'my_finish_date');
+
+                                // Map MAL Status to AniTrack Status
+                                let status = 'active';
+                                if (statusRaw.includes('completed') || (totalProg > 0 && currentProg >= totalProg)) {
+                                    status = 'completed';
+                                } else if (statusRaw.includes('onhold') || statusRaw.includes('on-hold')) {
+                                    status = 'on-hold';
+                                } else if (statusRaw.includes('dropped')) {
+                                    status = 'dropped';
+                                } else if (statusRaw.includes('plantowatch') || statusRaw.includes('plan to watch') || statusRaw.includes('plan to read')) {
+                                    status = 'plan-to-watch';
+                                }
+
+                                // Map Score to External Rating (MAL scale is 1-10)
+                                let externalRating = score > 0 ? score : 0;
+                                let ratingSource = externalRating > 0 ? 'MyAnimeList' : '';
+
+                                // Format Season / Subtype / Dates
+                                let season = type ? type.toUpperCase() : (category === 'anime' ? 'TV' : 'MANGA');
+                                if (startDate && startDate !== '0000-00-00') {
+                                    season += ` (${startDate.slice(0, 4)})`;
+                                }
+
+                                const entryData = {
+                                    externalId,
+                                    title,
+                                    titleEnglish: title,
+                                    titleRomanji: title,
+                                    category,
+                                    status,
+                                    currentProgress: currentProg,
+                                    totalProgress: totalProg,
+                                    externalRating,
+                                    ratingSource,
+                                    ratingUpdatedAt: externalRating > 0 ? new Date().toISOString() : '',
+                                    season,
+                                    coverUrl: '',
+                                    externalUrl: '',
+                                    startDate,
+                                    finishDate,
+                                    updatedAt: Date.now()
+                                };
+
+                                // Check Duplicate
+                                const existingIndex = this.entries.findIndex(item => 
+                                    (externalId && item.externalId === externalId) || 
+                                    item.title?.toLowerCase() === title.toLowerCase()
+                                );
+
+                                if (existingIndex !== -1) {
+                                    if (strategy === 'skip') {
+                                        skippedCount++;
+                                    } else if (strategy === 'update') {
+                                        this.entries[existingIndex] = {
+                                            ...this.entries[existingIndex],
+                                            ...entryData,
+                                            id: this.entries[existingIndex].id // retain original internal ID
+                                        };
+                                        updatedCount++;
+                                    } else if (strategy === 'import') {
+                                        this.entries.unshift({
+                                            ...entryData,
+                                            id: category + '-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6)
+                                        });
+                                        addedCount++;
+                                    }
+                                } else {
+                                    this.entries.unshift({
+                                        ...entryData,
+                                        id: category + '-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6)
+                                    });
+                                    addedCount++;
+                                }
                             });
-                            importedCount++;
-                        });
+                        };
+
+                        processEntries(xmlDoc.querySelectorAll('anime'), 'anime');
+                        processEntries(xmlDoc.querySelectorAll('manga'), 'manga');
 
                         this.saveEntriesToStorage();
-                        this.showToast(`Imported ${importedCount} titles from MAL!`, 'success');
+                        this.showToast(`MAL Import Complete: Added ${addedCount}, Updated ${updatedCount}, Skipped ${skippedCount}`, 'success');
                         this.closeModal('data-modal');
                         this.render();
                     } catch (err) {
-                        this.showToast('Failed to parse XML file.', 'error');
+                        this.showToast('Failed to parse MyAnimeList XML file.', 'error');
                     }
                 };
+
                 reader.readAsText(file);
                 e.target.value = '';
             }
@@ -1530,7 +1630,7 @@
                 const total = this.entries.length;
                 const animeCnt = this.entries.filter(i => i.category === 'anime').length;
                 const mangaCnt = this.entries.filter(i => i.category === 'manga').length;
-                const activeCnt = this.entries.filter(i => i.status === 'active').length;
+                const activeCnt = this.entries.filter(i => i.status === 'active' || i.status === 'on-hold' || i.status === 'plan-to-watch').length;
                 const completedCnt = this.entries.filter(i => i.status === 'completed').length;
 
                 document.getElementById('stat-total').textContent = total;
@@ -1570,7 +1670,11 @@
             getFilteredEntries() {
                 return this.entries.filter(item => {
                     if (item.category !== this.activeCategory) return false;
-                    if (this.activeStatus !== 'all' && item.status !== this.activeStatus) return false;
+                    if (this.activeStatus === 'active') {
+                        if (item.status === 'completed') return false;
+                    } else if (this.activeStatus === 'completed') {
+                        if (item.status !== 'completed') return false;
+                    }
 
                     if (this.searchQuery) {
                         const engMatch = item.titleEnglish && item.titleEnglish.toLowerCase().includes(this.searchQuery);
@@ -1653,7 +1757,7 @@
                             <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90"></div>
                             
-                            <!-- Internet (External Community) Rating Badge -->
+                            <!-- Internet Rating Badge -->
                             <div class="absolute top-2 left-2 flex flex-col gap-1">
                                 ${item.externalRating > 0 ? `
                                     <div class="bg-slate-950/80 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-bold text-cyber-cyan border border-cyber-cyan/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Kitsu')})">
