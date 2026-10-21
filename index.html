@@ -1753,17 +1753,32 @@
                             <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent opacity-95"></div>
                             
-                            <!-- Rating Badge (Yellow star symbol) -->
-                            <div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                            <!-- Rating Badge + 3-Dot Menu Stacked (Top-Left) -->
+                            <div class="absolute top-2 left-2 flex flex-col items-start gap-1.5 z-30">
                                 ${item.externalRating > 0 ? `
                                     <div class="bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Kitsu')})">
                                         <i class="fa-solid fa-star text-[9px]"></i>
                                         <span>${item.externalRating.toFixed(1)}</span>
                                     </div>
                                 ` : ''}
+
+                                <!-- 3-Dot Card Menu Trigger & Dropdown Below Rating -->
+                                <div class="relative">
+                                    <button onclick="app.toggleCardMenu('${item.id}', event)" aria-label="Card options" class="card-action-btn w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                                        <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+                                    </button>
+                                    <div id="card-menu-${item.id}" class="card-action-menu hidden absolute left-0 top-full mt-1.5 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-40 text-left">
+                                        <button onclick="app.openModal('entry-modal', '${item.id}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
+                                            <i class="fa-solid fa-pen-to-square text-brand-400"></i> Edit
+                                        </button>
+                                        <button onclick="app.deleteEntry('${item.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 flex items-center gap-2 transition-colors">
+                                            <i class="fa-solid fa-trash-can text-rose-400"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Clear Status Badge -->
+                            <!-- Clear Status Badge (Top-Right) -->
                             <div class="absolute top-2 right-2 z-10 shadow-lg">
                                 ${isCompleted 
                                     ? `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-emerald-500 text-slate-950 border border-emerald-300 shadow">Completed</span>`
@@ -1771,25 +1786,10 @@
                                 }
                             </div>
 
-                            <!-- 3-Dot Card Menu Trigger & Popover -->
-                            <div class="absolute bottom-2 right-2 z-30">
-                                <button onclick="app.toggleCardMenu('${item.id}', event)" aria-label="Card options" class="card-action-btn w-8 h-8 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-                                    <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
-                                </button>
-                                <div id="card-menu-${item.id}" class="card-action-menu hidden absolute right-0 bottom-full mb-1.5 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-40 text-left">
-                                    <button onclick="app.openModal('entry-modal', '${item.id}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
-                                        <i class="fa-solid fa-pen-to-square text-brand-400"></i> Edit
-                                    </button>
-                                    <button onclick="app.deleteEntry('${item.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 flex items-center gap-2 transition-colors">
-                                        <i class="fa-solid fa-trash-can text-rose-400"></i> Delete
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Title & Season Badge (Fixed truncation with multi-line wrap) -->
-                            <div class="absolute bottom-2 left-2 right-12 z-10 pointer-events-none">
+                            <!-- Title & Season Badge (Fully Wrapped Text) -->
+                            <div class="absolute bottom-2 left-2 right-2 z-10 pointer-events-none">
                                 ${item.season ? `<p class="text-[9px] font-semibold text-brand-300 uppercase tracking-wider truncate mb-0.5">${this.escapeHTML(item.season)}</p>` : ''}
-                                <h4 class="text-xs sm:text-sm font-bold text-white leading-tight line-clamp-2" title="${this.escapeHTML(displayTitle)}">${this.escapeHTML(displayTitle)}</h4>
+                                <h4 class="text-xs sm:text-sm font-bold text-white leading-snug break-words" title="${this.escapeHTML(displayTitle)}">${this.escapeHTML(displayTitle)}</h4>
                             </div>
                         </div>
 
