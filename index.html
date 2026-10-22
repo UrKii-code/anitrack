@@ -276,15 +276,14 @@
             <form id="entry-form" onsubmit="app.saveEntry(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                 <input type="hidden" id="entry-id">
                 <input type="hidden" id="form-external-id">
-                <input type="hidden" id="form-external-rating">
                 <input type="hidden" id="form-rating-source">
                 <input type="hidden" id="form-rating-updated-at">
 
-                <!-- Multi-Source Catalogue Search Bar -->
+                <!-- Catalogue Search Bar -->
                 <div class="space-y-2 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Search Catalogue (Kitsu & AniList Auto-Fill)</label>
+                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Search Catalogue (Kitsu & Jikan Auto-Fill)</label>
                     <div class="flex gap-2">
-                        <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Solo Leveling" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
+                        <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Cowboy Bebop" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
                         <button type="button" id="catalog-search-button" onclick="app.searchCatalog()" class="shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
                     </div>
                     <div id="catalog-search-status" class="hidden text-xs text-slate-400" role="status" aria-live="polite"></div>
@@ -299,11 +298,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">English Title</label>
-                        <input type="text" id="form-title-english" placeholder="e.g. Solo Leveling" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                        <input type="text" id="form-title-english" placeholder="e.g. Cowboy Bebop" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Romanji Title</label>
-                        <input type="text" id="form-title-romanji" placeholder="e.g. Ore-dake Level-up na Ken" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                        <input type="text" id="form-title-romanji" placeholder="e.g. Cowboy Bebop" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
                     </div>
                 </div>
 
@@ -337,13 +336,16 @@
 
                 <div>
                     <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1.5">Season / Arc / Subtype</label>
-                    <input type="text" id="form-season" placeholder="e.g. Season 2, Hashira Training Arc" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                    <input type="text" id="form-season" placeholder="e.g. Season 2, TV" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
                 </div>
 
-                <!-- Internet Rating Badge Preview -->
-                <div id="form-external-rating-preview" class="hidden p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Internet Rating (<span id="form-rating-source-text">Kitsu</span>):</span>
-                    <span class="font-bold text-amber-400"><i class="fa-solid fa-star mr-1"></i><span id="form-external-rating-value">0.0</span> / 10</span>
+                <!-- Manual / Auto Internet Rating Field -->
+                <div class="space-y-1.5 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                    <label class="block text-xs font-medium text-amber-400 uppercase tracking-wider">
+                        <i class="fa-solid fa-star mr-1"></i> Internet Rating (0.0 - 10.0)
+                    </label>
+                    <input type="number" id="form-external-rating" min="0" max="10" step="0.1" placeholder="e.g. 8.5" class="w-full bg-slate-900 border border-slate-800 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                    <p class="text-[10px] text-slate-400">Auto-filled from catalogue or manually editable anytime.</p>
                 </div>
 
                 <!-- Cover Image URL & Live Preview -->
@@ -508,7 +510,7 @@
         </div>
     </div>
 
-    <!-- Modal 5: Data & Backup Import/Export Modal -->
+    <!-- Modal 5: Data & Backup Import/Export Modal with Filter Options -->
     <div id="data-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
         <div class="glass-card bg-slate-900/95 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="data-modal-content">
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
@@ -550,14 +552,34 @@
                     </label>
                 </div>
 
+                <!-- JSON Backup & Restore with Scope Filters -->
                 <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-3">
                     <div class="flex items-center gap-2 text-sm font-semibold text-cyber-cyan">
                         <i class="fa-solid fa-arrows-rotate"></i>
                         <span>JSON Backup & Restore</span>
                     </div>
-                    <p class="text-xs text-slate-400">Export your complete library and custom link settings into a JSON backup file.</p>
+                    <p class="text-xs text-slate-400">Export your library with filters or restore from backup.</p>
                     
                     <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Category Scope</label>
+                            <select id="export-category-filter" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-lg px-2.5 py-1.5 outline-none">
+                                <option value="all">Anime & Manga</option>
+                                <option value="anime">Anime Only</option>
+                                <option value="manga">Manga Only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-semibold text-slate-400 mb-1">Status Scope</label>
+                            <select id="export-status-filter" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-lg px-2.5 py-1.5 outline-none">
+                                <option value="all">Complete / All</option>
+                                <option value="active">Watching / Reading Only</option>
+                                <option value="completed">Completed Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
                         <button onclick="app.exportJSON()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all">
                             <i class="fa-solid fa-download"></i> Export JSON
                         </button>
@@ -689,18 +711,18 @@
                 return [
                     {
                         id: 'demo-1',
-                        title: 'Cyberpunk: Edgerunners',
-                        titleEnglish: 'Cyberpunk: Edgerunners',
-                        titleRomanji: 'Cyberpunk: Edgerunners',
+                        title: 'Cowboy Bebop',
+                        titleEnglish: 'Cowboy Bebop',
+                        titleRomanji: 'Cowboy Bebop',
                         category: 'anime',
                         status: 'completed',
-                        currentProgress: 10,
-                        totalProgress: 10,
-                        externalRating: 8.6,
+                        currentProgress: 26,
+                        totalProgress: 26,
+                        externalRating: 8.7,
                         ratingSource: 'Kitsu',
-                        season: 'Season 1',
+                        season: 'TV',
                         coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80',
-                        externalUrl: 'https://www.netflix.com',
+                        externalUrl: 'https://www.crunchyroll.com',
                         updatedAt: Date.now() - 100000000
                     }
                 ];
@@ -855,7 +877,7 @@
                 if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search'; }
             }
 
-            // Multi-source Catalogue Search (Kitsu first, then AniList fallback)
+            // Multi-source Catalogue Search (Kitsu primary, Jikan fallback)
             async searchCatalog() {
                 if (!navigator.onLine) {
                     this.showToast('Catalogue search requires an active internet connection.', 'error');
@@ -895,7 +917,7 @@
                 try {
                     // 1. Try Kitsu First
                     const endpoint = category === 'manga' ? 'manga' : 'anime';
-                    const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
+                    const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=5`;
                     
                     const response = await fetch(url, { 
                         headers: { 'Accept': 'application/vnd.api+json' },
@@ -939,61 +961,36 @@
                     console.warn('Kitsu search failed or timed out, trying fallback...', err);
                 }
 
-                // 2. Fallback or Supplementary Search with AniList if Kitsu failed or yielded low results
-                if (unifiedResults.length < 3 && currentRequestId === this.searchRequestId) {
+                // 2. Fallback to Jikan v4 API if Kitsu yields no results or times out
+                if (unifiedResults.length === 0 && currentRequestId === this.searchRequestId) {
                     try {
-                        statusEl.textContent = 'Searching AniList fallback source…';
-                        const anilistQuery = `
-                            query ($search: String, $type: MediaType) {
-                              Page (perPage: 5) {
-                                media (search: $search, type: $type) {
-                                  id
-                                  title { english romaji native }
-                                  coverImage { large }
-                                  episodes
-                                  chapters
-                                  seasonYear
-                                  format
-                                  averageScore
-                                }
-                              }
-                            }
-                        `;
-                        const alResponse = await fetch('https://graphql.anilist.co', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({
-                                query: anilistQuery,
-                                variables: { search: query, type: category === 'manga' ? 'MANGA' : 'ANIME' }
-                            }),
+                        statusEl.textContent = 'Searching Jikan fallback source…';
+                        const jikanEndpoint = category === 'manga' ? 'https://api.jikan.moe/v4/manga?q=' : 'https://api.jikan.moe/v4/anime?q=';
+                        const jikanRes = await fetch(`${jikanEndpoint}${encodeURIComponent(query)}&limit=5`, {
                             signal: this.catalogAbortController.signal
                         });
 
-                        if (alResponse.ok) {
-                            const alData = await alResponse.json();
-                            const mediaList = alData?.data?.Page?.media || [];
-                            mediaList.forEach(m => {
-                                const titleEnglish = m.title?.english || m.title?.romaji || 'Untitled';
-                                const titleRomanji = m.title?.romaji || m.title?.english || 'Untitled';
-                                
-                                // Avoid exact duplicate entries from Kitsu
-                                if (unifiedResults.some(r => r.titleEnglish.toLowerCase() === titleEnglish.toLowerCase())) return;
+                        if (jikanRes.ok) {
+                            const jikanData = await jikanRes.json();
+                            const jikanItems = Array.isArray(jikanData.data) ? jikanData.data : [];
+                            jikanItems.forEach(item => {
+                                const titleEnglish = item.title_english || item.title || 'Untitled';
+                                const titleRomanji = item.title_japanese || item.title || titleEnglish;
+                                const imageUrl = item.images?.jpg?.large_image_url || item.images?.jpg?.image_url || '';
+                                const total = category === 'manga' ? (item.chapters || 0) : (item.episodes || 0);
+                                const year = item.aired?.prop?.from?.year ? String(item.aired.prop.from.year) : (item.published?.prop?.from?.year ? String(item.published.prop.from.year) : '');
+                                const type = item.type || (category === 'manga' ? 'MANGA' : 'ANIME');
 
-                                const imageUrl = m.coverImage?.large || '';
-                                const total = category === 'manga' ? m.chapters : m.episodes;
-                                const year = m.seasonYear ? String(m.seasonYear) : '';
-                                const format = m.format ? m.format : (category === 'manga' ? 'MANGA' : 'ANIME');
-                                
                                 let externalRating = null;
-                                if (m.averageScore) {
-                                    externalRating = parseFloat((m.averageScore / 10).toFixed(1));
+                                if (item.score) {
+                                    externalRating = parseFloat(item.score.toFixed(1));
                                 }
 
-                                let seasonInfo = format;
+                                let seasonInfo = type;
                                 if (year) seasonInfo += ` (${year})`;
 
                                 unifiedResults.push({
-                                    id: 'anilist-' + m.id,
+                                    id: 'jikan-' + item.mal_id,
                                     titleEnglish,
                                     titleRomanji,
                                     imageUrl,
@@ -1001,13 +998,13 @@
                                     seasonInfo,
                                     externalRating,
                                     category,
-                                    source: 'AniList'
+                                    source: 'Jikan'
                                 });
                             });
                         }
-                    } catch (alErr) {
-                        if (alErr.name === 'AbortError') return;
-                        console.warn('AniList fallback search failed', alErr);
+                    } catch (jikanErr) {
+                        if (jikanErr.name === 'AbortError') return;
+                        console.warn('Jikan fallback search failed', jikanErr);
                     }
                 }
 
@@ -1015,7 +1012,7 @@
                 if (currentRequestId !== this.searchRequestId) return;
 
                 if (!unifiedResults.length) {
-                    statusEl.textContent = 'No matches found across Kitsu or AniList. You can enter details manually.';
+                    statusEl.textContent = 'No matches found across Kitsu or Jikan. You can enter details manually.';
                     button.disabled = false;
                     button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
                     return;
@@ -1049,7 +1046,7 @@
                     const metaLine = document.createElement('span');
                     metaLine.className = 'block mt-0.5 text-[11px] text-slate-400';
                     const countLabel = category === 'manga' ? 'ch' : 'ep';
-                    metaLine.textContent = `${item.seasonInfo} · ${item.total ? `${item.total} ${countLabel}` : 'Ongoing'} ${item.externalRating ? `· ★ ${item.externalRating}` : ''} ·`;
+                    metaLine.textContent = `[${item.source}] ${item.seasonInfo} · ${item.total ? `${item.total} ${countLabel}` : 'Ongoing'} ${item.externalRating ? `· ★ ${item.externalRating}` : ''}`;
 
                     info.append(titleLine, romLine, metaLine);
                     resultButton.append(poster, info);
@@ -1079,11 +1076,6 @@
                     document.getElementById('form-external-rating').value = item.externalRating;
                     document.getElementById('form-rating-source').value = item.source || 'Catalog';
                     document.getElementById('form-rating-updated-at').value = new Date().toISOString();
-                    
-                    document.getElementById('form-external-rating-value').textContent = item.externalRating.toFixed(1);
-                    document.getElementById('form-external-rating-preview').classList.remove('hidden');
-                } else {
-                    document.getElementById('form-external-rating-preview').classList.add('hidden');
                 }
 
                 this.updatePosterPreview();
@@ -1118,8 +1110,8 @@
                 let currentProgress = parseInt(document.getElementById('form-current-progress').value) || 0;
                 const totalProgress = parseInt(document.getElementById('form-total-progress').value) || 0;
                 const externalRating = parseFloat(document.getElementById('form-external-rating').value) || 0;
-                const ratingSource = document.getElementById('form-rating-source').value;
-                const ratingUpdatedAt = document.getElementById('form-rating-updated-at').value;
+                const ratingSource = document.getElementById('form-rating-source').value || 'Manual';
+                const ratingUpdatedAt = document.getElementById('form-rating-updated-at').value || new Date().toISOString();
                 const season = document.getElementById('form-season').value.trim();
                 const coverUrl = document.getElementById('form-cover-url').value.trim();
                 const externalUrl = document.getElementById('form-external-url').value.trim();
@@ -1139,8 +1131,8 @@
                             externalId: externalId || this.entries[index].externalId,
                             title, titleEnglish, titleRomanji, category, status, 
                             currentProgress, totalProgress, 
-                            externalRating: externalRating > 0 ? externalRating : this.entries[index].externalRating,
-                            ratingSource: ratingSource || this.entries[index].ratingSource, 
+                            externalRating,
+                            ratingSource, 
                             ratingUpdatedAt, season, coverUrl, externalUrl,
                             updatedAt: Date.now()
                         };
@@ -1398,7 +1390,6 @@
                     document.getElementById('form-external-rating').value = '';
                     document.getElementById('form-rating-source').value = '';
                     document.getElementById('form-rating-updated-at').value = '';
-                    document.getElementById('form-external-rating-preview').classList.add('hidden');
                     this.updatePosterPreview();
                     this.clearCatalogSearch();
 
@@ -1422,8 +1413,6 @@
                                 document.getElementById('form-external-rating').value = entry.externalRating;
                                 document.getElementById('form-rating-source').value = entry.ratingSource || 'Kitsu';
                                 document.getElementById('form-rating-updated-at').value = entry.ratingUpdatedAt || '';
-                                document.getElementById('form-external-rating-value').textContent = entry.externalRating.toFixed(1);
-                                document.getElementById('form-external-rating-preview').classList.remove('hidden');
                             }
                             this.updatePosterPreview();
                         }
@@ -1485,10 +1474,20 @@
             }
 
             exportJSON() {
+                const catFilter = document.getElementById('export-category-filter')?.value || 'all';
+                const statusFilter = document.getElementById('export-status-filter')?.value || 'all';
+
+                let filteredEntries = this.entries.filter(item => {
+                    if (catFilter !== 'all' && item.category !== catFilter) return false;
+                    if (statusFilter !== 'all' && item.status !== statusFilter) return false;
+                    return true;
+                });
+
                 const backupData = {
                     version: '3.4',
                     exportedAt: new Date().toISOString(),
-                    entries: this.entries,
+                    filterScope: { category: catFilter, status: statusFilter },
+                    entries: filteredEntries,
                     platforms: this.platforms,
                     defaultPlatforms: this.defaultPlatforms
                 };
@@ -1496,11 +1495,11 @@
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
                 const downloadAnchor = document.createElement('a');
                 downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", `anitrack_backup_${new Date().toISOString().slice(0,10)}.json`);
+                downloadAnchor.setAttribute("download", `anitrack_backup_${catFilter}_${statusFilter}_${new Date().toISOString().slice(0,10)}.json`);
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
-                this.showToast('Full library backup downloaded!', 'success');
+                this.showToast('Filtered library backup downloaded!', 'success');
             }
 
             importJSON(e) {
