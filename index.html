@@ -103,7 +103,7 @@
                     <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.3</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.4</span>
                     </div>
                 </div>
 
@@ -280,11 +280,11 @@
                 <input type="hidden" id="form-rating-source">
                 <input type="hidden" id="form-rating-updated-at">
 
-                <!-- Catalogue Search Bar -->
+                <!-- Multi-Source Catalogue Search Bar -->
                 <div class="space-y-2 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Search Kitsu Catalogue (Auto-Fill)</label>
+                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Search Catalogue (Kitsu & AniList Auto-Fill)</label>
                     <div class="flex gap-2">
-                        <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Demon Slayer" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
+                        <input type="search" id="catalog-search-input" placeholder="Search titles, e.g. Solo Leveling" class="min-w-0 flex-1 bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchCatalog();}">
                         <button type="button" id="catalog-search-button" onclick="app.searchCatalog()" class="shrink-0 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
                     </div>
                     <div id="catalog-search-status" class="hidden text-xs text-slate-400" role="status" aria-live="polite"></div>
@@ -299,11 +299,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">English Title</label>
-                        <input type="text" id="form-title-english" placeholder="e.g. Demon Slayer" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                        <input type="text" id="form-title-english" placeholder="e.g. Solo Leveling" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Romanji Title</label>
-                        <input type="text" id="form-title-romanji" placeholder="e.g. Kimetsu no Yaiba" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
+                        <input type="text" id="form-title-romanji" placeholder="e.g. Ore-dake Level-up na Ken" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-600 outline-none">
                     </div>
                 </div>
 
@@ -855,6 +855,7 @@
                 if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search'; }
             }
 
+            // Multi-source Catalogue Search (Kitsu first, then AniList fallback)
             async searchCatalog() {
                 if (!navigator.onLine) {
                     this.showToast('Catalogue search requires an active internet connection.', 'error');
@@ -889,7 +890,10 @@
                     if (this.catalogAbortController) this.catalogAbortController.abort('timeout');
                 }, 8000);
 
+                let unifiedResults = [];
+
                 try {
+                    // 1. Try Kitsu First
                     const endpoint = category === 'manga' ? 'manga' : 'anime';
                     const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
                     
@@ -898,88 +902,164 @@
                         signal: this.catalogAbortController.signal
                     });
                     
-                    clearTimeout(timeoutId);
-                    if (currentRequestId !== this.searchRequestId) return;
+                    if (response.ok) {
+                        const payload = await response.json();
+                        const items = Array.isArray(payload.data) ? payload.data : [];
+                        items.forEach(item => {
+                            const attr = item.attributes || {};
+                            const titleEnglish = attr.titles?.en || attr.canonicalTitle || 'Untitled';
+                            const titleRomanji = attr.titles?.en_jp || attr.canonicalTitle || titleEnglish;
+                            const imageUrl = attr.posterImage?.medium || attr.posterImage?.original || '';
+                            const year = attr.startDate ? attr.startDate.slice(0, 4) : '';
+                            const total = category === 'manga' ? attr.chapterCount : attr.episodeCount;
+                            const subtype = attr.subtype ? attr.subtype.toUpperCase() : (category === 'manga' ? 'MANGA' : 'ANIME');
 
-                    if (!response.ok) throw new Error('Could not reach Kitsu API right now.');
-                    
-                    const payload = await response.json();
-                    const items = Array.isArray(payload.data) ? payload.data : [];
+                            let externalRating = null;
+                            if (attr.averageRating) {
+                                externalRating = parseFloat((parseFloat(attr.averageRating) / 10).toFixed(1));
+                            }
 
-                    if (!items.length) {
-                        statusEl.textContent = 'No matches found. Try another spelling, or enter manually.';
-                        return;
+                            let seasonInfo = subtype;
+                            if (year) seasonInfo += ` (${year})`;
+
+                            unifiedResults.push({
+                                id: 'kitsu-' + item.id,
+                                titleEnglish,
+                                titleRomanji,
+                                imageUrl,
+                                total: total || 0,
+                                seasonInfo,
+                                externalRating,
+                                category,
+                                source: 'Kitsu'
+                            });
+                        });
                     }
+                } catch (err) {
+                    console.warn('Kitsu search failed or timed out, trying fallback...', err);
+                }
 
-                    statusEl.textContent = `Choose a result (${items.length} shown).`;
-                    resultsEl.classList.remove('hidden');
+                // 2. Fallback or Supplementary Search with AniList if Kitsu failed or yielded low results
+                if (unifiedResults.length < 3 && currentRequestId === this.searchRequestId) {
+                    try {
+                        statusEl.textContent = 'Searching AniList fallback source…';
+                        const anilistQuery = `
+                            query ($search: String, $type: MediaType) {
+                              Page (perPage: 5) {
+                                media (search: $search, type: $type) {
+                                  id
+                                  title { english romaji native }
+                                  coverImage { large }
+                                  episodes
+                                  chapters
+                                  seasonYear
+                                  format
+                                  averageScore
+                                }
+                              }
+                            }
+                        `;
+                        const alResponse = await fetch('https://graphql.anilist.co', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify({
+                                query: anilistQuery,
+                                variables: { search: query, type: category === 'manga' ? 'MANGA' : 'ANIME' }
+                            }),
+                            signal: this.catalogAbortController.signal
+                        });
 
-                    items.forEach(item => {
-                        const attr = item.attributes || {};
-                        const titleEnglish = attr.titles?.en || attr.canonicalTitle || 'Untitled';
-                        const titleRomanji = attr.titles?.en_jp || attr.canonicalTitle || titleEnglish;
-                        const imageUrl = attr.posterImage?.medium || attr.posterImage?.original || '';
-                        const year = attr.startDate ? attr.startDate.slice(0, 4) : '';
-                        const total = category === 'manga' ? attr.chapterCount : attr.episodeCount;
-                        const subtype = attr.subtype ? attr.subtype.toUpperCase() : (category === 'manga' ? 'MANGA' : 'ANIME');
+                        if (alResponse.ok) {
+                            const alData = await alResponse.json();
+                            const mediaList = alData?.data?.Page?.media || [];
+                            mediaList.forEach(m => {
+                                const titleEnglish = m.title?.english || m.title?.romaji || 'Untitled';
+                                const titleRomanji = m.title?.romaji || m.title?.english || 'Untitled';
+                                
+                                // Avoid exact duplicate entries from Kitsu
+                                if (unifiedResults.some(r => r.titleEnglish.toLowerCase() === titleEnglish.toLowerCase())) return;
 
-                        let externalRating = null;
-                        if (attr.averageRating) {
-                            externalRating = parseFloat((parseFloat(attr.averageRating) / 10).toFixed(1));
+                                const imageUrl = m.coverImage?.large || '';
+                                const total = category === 'manga' ? m.chapters : m.episodes;
+                                const year = m.seasonYear ? String(m.seasonYear) : '';
+                                const format = m.format ? m.format : (category === 'manga' ? 'MANGA' : 'ANIME');
+                                
+                                let externalRating = null;
+                                if (m.averageScore) {
+                                    externalRating = parseFloat((m.averageScore / 10).toFixed(1));
+                                }
+
+                                let seasonInfo = format;
+                                if (year) seasonInfo += ` (${year})`;
+
+                                unifiedResults.push({
+                                    id: 'anilist-' + m.id,
+                                    titleEnglish,
+                                    titleRomanji,
+                                    imageUrl,
+                                    total: total || 0,
+                                    seasonInfo,
+                                    externalRating,
+                                    category,
+                                    source: 'AniList'
+                                });
+                            });
                         }
-
-                        let seasonInfo = subtype;
-                        if (year) seasonInfo += ` (${year})`;
-
-                        const resultButton = document.createElement('button');
-                        resultButton.type = 'button';
-                        resultButton.className = 'w-full flex items-center gap-3 p-2 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-800 hover:border-brand-500/60 text-left transition-colors';
-                        
-                        const poster = document.createElement('img');
-                        poster.className = 'w-12 h-16 object-cover rounded-lg bg-slate-800 shrink-0';
-                        poster.src = imageUrl || SVG_POSTER_FALLBACK;
-                        poster.onerror = () => { poster.src = SVG_POSTER_FALLBACK; };
-
-                        const info = document.createElement('span');
-                        info.className = 'min-w-0 flex-1';
-                        
-                        const titleLine = document.createElement('span');
-                        titleLine.className = 'block text-sm font-semibold text-slate-100 truncate';
-                        titleLine.textContent = titleEnglish;
-
-                        const romLine = document.createElement('span');
-                        romLine.className = 'block text-xs text-brand-300 truncate';
-                        romLine.textContent = titleRomanji !== titleEnglish ? titleRomanji : '';
-
-                        const metaLine = document.createElement('span');
-                        metaLine.className = 'block mt-0.5 text-[11px] text-slate-400';
-                        const countLabel = category === 'manga' ? 'ch' : 'ep';
-                        metaLine.textContent = `${subtype} · ${year || 'N/A'} · ${total ? `${total} ${countLabel}` : 'Ongoing'} ${externalRating ? `· ★ ${externalRating}` : ''}`;
-
-                        info.append(titleLine, romLine, metaLine);
-                        resultButton.append(poster, info);
-
-                        resultButton.addEventListener('click', () => this.selectCatalogResult({
-                            id: item.id,
-                            titleEnglish,
-                            titleRomanji,
-                            imageUrl,
-                            total,
-                            seasonInfo,
-                            externalRating,
-                            category
-                        }));
-                        resultsEl.appendChild(resultButton);
-                    });
-                } catch (error) {
-                    if (error.name === 'AbortError') return;
-                    statusEl.textContent = error.message || 'Error searching catalogue. You can still enter details manually.';
-                } finally {
-                    if (currentRequestId === this.searchRequestId) {
-                        button.disabled = false;
-                        button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
+                    } catch (alErr) {
+                        if (alErr.name === 'AbortError') return;
+                        console.warn('AniList fallback search failed', alErr);
                     }
                 }
+
+                clearTimeout(timeoutId);
+                if (currentRequestId !== this.searchRequestId) return;
+
+                if (!unifiedResults.length) {
+                    statusEl.textContent = 'No matches found across Kitsu or AniList. You can enter details manually.';
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
+                    return;
+                }
+
+                statusEl.textContent = `Found ${unifiedResults.length} matching result(s). Select one below:`;
+                statusEl.classList.remove('hidden');
+                resultsEl.classList.remove('hidden');
+
+                unifiedResults.forEach(item => {
+                    const resultButton = document.createElement('button');
+                    resultButton.type = 'button';
+                    resultButton.className = 'w-full flex items-center gap-3 p-2 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-800 hover:border-brand-500/60 text-left transition-colors';
+                    
+                    const poster = document.createElement('img');
+                    poster.className = 'w-12 h-16 object-cover rounded-lg bg-slate-800 shrink-0';
+                    poster.src = item.imageUrl || SVG_POSTER_FALLBACK;
+                    poster.onerror = () => { poster.src = SVG_POSTER_FALLBACK; };
+
+                    const info = document.createElement('span');
+                    info.className = 'min-w-0 flex-1';
+                    
+                    const titleLine = document.createElement('span');
+                    titleLine.className = 'block text-sm font-semibold text-slate-100 truncate';
+                    titleLine.textContent = item.titleEnglish;
+
+                    const romLine = document.createElement('span');
+                    romLine.className = 'block text-xs text-brand-300 truncate';
+                    romLine.textContent = item.titleRomanji !== item.titleEnglish ? item.titleRomanji : '';
+
+                    const metaLine = document.createElement('span');
+                    metaLine.className = 'block mt-0.5 text-[11px] text-slate-400';
+                    const countLabel = category === 'manga' ? 'ch' : 'ep';
+                    metaLine.textContent = `${item.seasonInfo} · ${item.total ? `${item.total} ${countLabel}` : 'Ongoing'} ${item.externalRating ? `· ★ ${item.externalRating}` : ''} ·`;
+
+                    info.append(titleLine, romLine, metaLine);
+                    resultButton.append(poster, info);
+
+                    resultButton.addEventListener('click', () => this.selectCatalogResult(item));
+                    resultsEl.appendChild(resultButton);
+                });
+
+                button.disabled = false;
+                button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
             }
 
             selectCatalogResult(item) {
@@ -997,7 +1077,7 @@
 
                 if (item.externalRating) {
                     document.getElementById('form-external-rating').value = item.externalRating;
-                    document.getElementById('form-rating-source').value = 'Kitsu';
+                    document.getElementById('form-rating-source').value = item.source || 'Catalog';
                     document.getElementById('form-rating-updated-at').value = new Date().toISOString();
                     
                     document.getElementById('form-external-rating-value').textContent = item.externalRating.toFixed(1);
@@ -1021,7 +1101,7 @@
                 else dupWarn.classList.add('hidden');
 
                 const statusEl = document.getElementById('catalog-search-status');
-                statusEl.textContent = `Auto-filled details for "${item.titleEnglish}".`;
+                statusEl.textContent = `Auto-filled details for "${item.titleEnglish}" via ${item.source}.`;
                 statusEl.classList.remove('hidden');
                 document.getElementById('catalog-search-results').classList.add('hidden');
                 this.showToast(`Auto-filled details for "${this.escapeHTML(item.titleEnglish)}"`, 'success');
@@ -1056,8 +1136,11 @@
                     if (index !== -1) {
                         this.entries[index] = {
                             ...this.entries[index],
-                            externalId, title, titleEnglish, titleRomanji, category, status, 
-                            currentProgress, totalProgress, externalRating, ratingSource, 
+                            externalId: externalId || this.entries[index].externalId,
+                            title, titleEnglish, titleRomanji, category, status, 
+                            currentProgress, totalProgress, 
+                            externalRating: externalRating > 0 ? externalRating : this.entries[index].externalRating,
+                            ratingSource: ratingSource || this.entries[index].ratingSource, 
                             ratingUpdatedAt, season, coverUrl, externalUrl,
                             updatedAt: Date.now()
                         };
@@ -1403,7 +1486,7 @@
 
             exportJSON() {
                 const backupData = {
-                    version: '3.3',
+                    version: '3.4',
                     exportedAt: new Date().toISOString(),
                     entries: this.entries,
                     platforms: this.platforms,
@@ -1756,7 +1839,7 @@
                             <!-- Rating Badge + 3-Dot Menu Stacked (Top-Left) -->
                             <div class="absolute top-2 left-2 flex flex-col items-start gap-1.5 z-30">
                                 ${item.externalRating > 0 ? `
-                                    <div class="bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Kitsu')})">
+                                    <div class="bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Catalog')})">
                                         <i class="fa-solid fa-star text-[9px]"></i>
                                         <span>${item.externalRating.toFixed(1)}</span>
                                     </div>
