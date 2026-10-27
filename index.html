@@ -75,6 +75,60 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        /* --- AniTrack v3.7: Hidden Title Hover & Tap Overlay Styles --- */
+        .anime-poster-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .anime-title-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 16px;
+            box-sizing: border-box;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease-in-out, visibility 0.25s ease-in-out;
+            pointer-events: none;
+        }
+
+        .anime-title-overlay .overlay-text {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Desktop Hover & Keyboard Focus States */
+        @media (hover: hover) and (pointer: fine) {
+            .group:hover .anime-title-overlay,
+            .group:focus-within .anime-title-overlay {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+        }
+
+        /* Mobile & Touch Active State */
+        .anime-card-item.active-overlay .anime-title-overlay {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             * {
                 animation-duration: 0.01ms !important;
@@ -105,7 +159,7 @@
                     <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.6</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.7</span>
                     </div>
                 </div>
 
@@ -684,7 +738,6 @@
                     if (storedSource === 'kitsu' || storedSource === 'anilist') {
                         this.preferredApiSource = storedSource;
                     } else if (storedSource === 'jikan') {
-                        // Safe migration from legacy Jikan preference to Kitsu
                         this.preferredApiSource = 'kitsu';
                         localStorage.setItem(this.PREFERRED_SOURCE_KEY, 'kitsu');
                     } else {
@@ -729,7 +782,6 @@
                 localStorage.setItem(this.PREFERRED_SOURCE_KEY, source);
                 this.updateApiSourceUI();
                 
-                // Clear previous results immediately upon switching source
                 const resultsEl = document.getElementById('catalog-search-results');
                 const statusEl = document.getElementById('catalog-search-status');
                 if (resultsEl) { resultsEl.innerHTML = ''; resultsEl.classList.add('hidden'); }
@@ -794,6 +846,11 @@
                     }
                     if (!e.target.closest('.card-action-btn') && !e.target.closest('.card-action-menu')) {
                         document.querySelectorAll('.card-action-menu').forEach(menu => menu.classList.add('hidden'));
+                    }
+                    
+                    // Tap outside active poster on mobile to dismiss title overlays
+                    if (!e.target.closest('.anime-card-item')) {
+                        document.querySelectorAll('.anime-card-item').forEach(card => card.classList.remove('active-overlay'));
                     }
                 });
 
@@ -929,7 +986,6 @@
                 if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search'; }
             }
 
-            // Exclusive Single-Source Catalogue Search (Kitsu or AniList via GraphQL)[span_6](start_span)[span_6](end_span)
             async searchCatalog() {
                 if (!navigator.onLine) {
                     this.showToast('Catalogue search requires an active internet connection.', 'error');
@@ -969,7 +1025,6 @@
 
                 try {
                     if (this.preferredApiSource === 'kitsu') {
-                        // Search Kitsu Only
                         const endpoint = category === 'manga' ? 'manga' : 'anime';
                         const url = `https://kitsu.io/api/edge/${endpoint}?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
                         
@@ -1014,7 +1069,6 @@
                             throw new Error('Kitsu API error');
                         }
                     } else {
-                        // Search AniList GraphQL API Only
                         const gqlQuery = `
                             query ($search: String, $type: MediaType) {
                                 Page (perPage: 6) {
@@ -1071,7 +1125,7 @@
 
                                 let externalRating = null;
                                 if (item.averageScore) {
-                                    externalRating = parseFloat((item.averageScore / 10).toFixed(1)); // AniList uses 0-100 scale, convert to 0-10
+                                    externalRating = parseFloat((item.averageScore / 10).toFixed(1));
                                 }
 
                                 let seasonInfo = format;
@@ -1469,6 +1523,25 @@
                 menu.classList.toggle('hidden');
             }
 
+            // Mobile and Tablet Tap Handling for Title Overlay
+            handlePosterTap(entryId, e) {
+                if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) {
+                    return;
+                }
+                const card = document.getElementById(`anime-card-${entryId}`);
+                if (!card) return;
+
+                const isActive = card.classList.contains('active-overlay');
+                
+                // Accordion behavior: close other cards' overlays first
+                document.querySelectorAll('.anime-card-item').forEach(c => c.classList.remove('active-overlay'));
+
+                if (!isActive) {
+                    card.classList.add('active-overlay');
+                }
+                e.stopPropagation();
+            }
+
             openModal(modalId, entryId = null) {
                 const modal = document.getElementById(modalId);
                 const content = document.getElementById(modalId + '-content');
@@ -1579,7 +1652,7 @@
                 });
 
                 const backupData = {
-                    version: '3.6',
+                    version: '3.7',
                     exportedAt: new Date().toISOString(),
                     filterScope: { category: catFilter, status: statusFilter },
                     entries: filteredEntries,
@@ -1923,12 +1996,12 @@
                 const applicablePlatforms = this.platforms.filter(p => p.enabled && (p.category === item.category || p.category === 'both'));
 
                 return `
-                    <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85">
+                    <div id="anime-card-${item.id}" tabindex="0" class="anime-card-item group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 focus:outline-none focus:ring-2 focus:ring-brand-500">
                         
-                        <!-- Poster Container (2:3 Aspect Ratio) -->
-                        <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+                        <!-- Poster Container (2:3 Aspect Ratio with Tap & Hover Interaction) -->
+                        <div class="anime-poster-wrapper relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="app.handlePosterTap('${item.id}', event)">
                             <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent opacity-95"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 pointer-events-none"></div>
                             
                             <!-- Rating Badge + 3-Dot Menu Stacked (Top-Left) -->
                             <div class="absolute top-2 left-2 flex flex-col items-start gap-1.5 z-30">
@@ -1939,7 +2012,7 @@
                                     </div>
                                 ` : ''}
 
-                                <!-- 3-Dot Card Menu Trigger & Dropdown Below Rating -->
+                                <!-- 3-Dot Card Menu Trigger & Dropdown -->
                                 <div class="relative">
                                     <button onclick="app.toggleCardMenu('${item.id}', event)" aria-label="Card options" class="card-action-btn w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
                                         <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
@@ -1956,17 +2029,19 @@
                             </div>
 
                             <!-- Clear Status Badge (Top-Right) -->
-                            <div class="absolute top-2 right-2 z-10 shadow-lg">
+                            <div class="absolute top-2 right-2 z-30 shadow-lg pointer-events-none">
                                 ${isCompleted 
                                     ? `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-emerald-500 text-slate-950 border border-emerald-300 shadow">Completed</span>`
                                     : `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-cyber-cyan text-slate-950 border border-cyan-300 shadow">${isAnime ? 'Watching' : 'Reading'}</span>`
                                 }
                             </div>
 
-                            <!-- Title & Season Badge (Fully Wrapped Text) -->
-                            <div class="absolute bottom-2 left-2 right-2 z-10 pointer-events-none">
-                                ${item.season ? `<p class="text-[9px] font-semibold text-brand-300 uppercase tracking-wider truncate mb-0.5">${this.escapeHTML(item.season)}</p>` : ''}
-                                <h4 class="text-xs sm:text-sm font-bold text-white leading-snug break-words" title="${this.escapeHTML(displayTitle)}">${this.escapeHTML(displayTitle)}</h4>
+                            <!-- Hidden Title Overlay (Revealed on Desktop Hover & Mobile Tap) -->
+                            <div class="anime-title-overlay">
+                                <div class="space-y-1">
+                                    ${item.season ? `<p class="text-[10px] font-semibold text-brand-300 uppercase tracking-wider">${this.escapeHTML(item.season)}</p>` : ''}
+                                    <span class="overlay-text">${this.escapeHTML(displayTitle)}</span>
+                                </div>
                             </div>
                         </div>
 
