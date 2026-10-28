@@ -76,7 +76,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* --- AniTrack v3.7: Hidden Title Hover & Tap Overlay Styles --- */
+        /* Hidden Title Hover & Tap Overlay Styles */
         .anime-poster-wrapper {
             position: relative;
             overflow: hidden;
@@ -112,7 +112,6 @@
             overflow-wrap: break-word;
         }
 
-        /* Desktop Hover & Keyboard Focus States */
         @media (hover: hover) and (pointer: fine) {
             .group:hover .anime-title-overlay,
             .group:focus-within .anime-title-overlay {
@@ -122,7 +121,6 @@
             }
         }
 
-        /* Mobile & Touch Active State */
         .anime-card-item.active-overlay .anime-title-overlay {
             opacity: 1;
             visibility: visible;
@@ -156,10 +154,10 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3 cursor-pointer" onclick="app.resetFilters()" role="button" aria-label="Reset filters and return to top">
-                    <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover">
+                    <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 40 40\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%236366f1\'/%3E%3Ctext x=\'50%25\' y=\'55%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'sans-serif\' font-size=\'20\' font-weight=\'bold\'%3EA%3C/text%3E%3C/svg%3E';">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.7</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.8</span>
                     </div>
                 </div>
 
@@ -227,24 +225,31 @@
             </div>
         </div>
 
-        <!-- Category & Search Bar Controls -->
+        <!-- Main Tab Bar (Anime, Manga, Watch Order) -->
         <div class="glass-card rounded-2xl p-3 sm:p-4 space-y-3 sm:space-y-4">
-            <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-                <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 w-full sm:w-auto">
-                    <button id="cat-tab-anime" onclick="app.setCategory('anime')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white">
+            <div class="flex flex-col lg:flex-row flex-wrap xl:flex-nowrap gap-3 items-stretch lg:items-center justify-between">
+                <!-- Main Category Switcher (Anime / Manga / Watch Order) -->
+                <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 shrink-0 w-full lg:w-auto">
+                    <button id="cat-tab-anime" onclick="app.setCategory('anime')" class="flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white whitespace-nowrap">
                         <i class="fa-solid fa-tv"></i>
                         <span>Anime</span>
                         <span id="badge-anime-count" class="px-1.5 py-0.5 text-[10px] sm:text-xs rounded-md bg-slate-800 text-slate-300">0</span>
                     </button>
-                    <button id="cat-tab-manga" onclick="app.setCategory('manga')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white">
+                    <button id="cat-tab-manga" onclick="app.setCategory('manga')" class="flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white whitespace-nowrap">
                         <i class="fa-solid fa-book-open"></i>
                         <span>Manga</span>
                         <span id="badge-manga-count" class="px-1.5 py-0.5 text-[10px] sm:text-xs rounded-md bg-slate-800 text-slate-300">0</span>
                     </button>
+                    <button id="cat-tab-franchise" onclick="app.setCategory('franchise')" class="flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white whitespace-nowrap">
+                        <i class="fa-solid fa-compass"></i>
+                        <span>Watch Order</span>
+                        <span id="badge-franchise-count" class="px-1.5 py-0.5 text-[10px] sm:text-xs rounded-md bg-slate-800 text-slate-300">0</span>
+                    </button>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center bg-slate-900/50 p-1 rounded-xl border border-slate-800/60 overflow-x-auto w-full sm:w-auto justify-between sm:justify-start">
+                <!-- Sub-filters / Title Display (Visible on Anime/Manga tabs) -->
+                <div id="standard-filters-container" class="flex flex-wrap items-center justify-between sm:justify-start gap-2 w-full lg:w-auto">
+                    <div class="flex items-center bg-slate-900/50 p-1 rounded-xl border border-slate-800/60 flex-1 sm:flex-initial justify-between sm:justify-start">
                         <button id="status-tab-all" onclick="app.setStatus('all')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">All</button>
                         <button id="status-tab-active" onclick="app.setStatus('active')" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white text-center">
                             <span id="status-tab-active-label">Watching</span>
@@ -253,16 +258,25 @@
                     </div>
 
                     <!-- Title Display Mode Toggle -->
-                    <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
+                    <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs shrink-0">
                         <button id="title-mode-english" onclick="app.setTitleDisplayMode('english')" class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-colors" title="Display English Title First">ENG</button>
                         <button id="title-mode-romanji" onclick="app.setTitleDisplayMode('romanji')" class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition-colors" title="Display Romanji Title First">ROM</button>
                     </div>
                 </div>
+
+                <!-- Franchise Action Bar (Visible when Watch Order Tab is Active) -->
+                <div id="franchise-action-container" class="hidden flex items-center gap-2 w-full lg:w-auto">
+                    <button onclick="app.openModal('franchise-wizard-modal')" class="w-full lg:w-auto bg-gradient-to-r from-cyber-cyan to-brand-500 hover:brightness-110 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Create Franchise</span>
+                    </button>
+                </div>
             </div>
 
-            <hr class="border-slate-800/60">
+            <hr id="control-divider" class="border-slate-800/60">
 
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3">
+            <!-- Search & Sort Controls (Hidden on Franchise List, Active on Anime/Manga) -->
+            <div id="search-sort-container" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3">
                 <div class="relative sm:col-span-7">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs sm:text-sm"></i>
                     <input type="text" id="search-input" oninput="app.handleSearch()" placeholder="Search English, Romanji, or arcs..." class="w-full bg-slate-900/80 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-xs sm:text-sm text-slate-200 placeholder-slate-500 rounded-xl pl-9 sm:pl-10 pr-4 py-2.5 outline-none transition-all">
@@ -287,8 +301,11 @@
             </div>
         </div>
 
-        <!-- Media Grid -->
+        <!-- Media Grid (Anime / Manga / Franchise List) -->
         <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5"></div>
+
+        <!-- Franchise Detail View Container (Embedded in Watch Order Tab when viewing a franchise) -->
+        <div id="franchise-detail-container" class="hidden space-y-6"></div>
 
         <!-- Load More Container -->
         <div id="load-more-container" class="hidden flex justify-center pt-4">
@@ -307,9 +324,9 @@
             <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600 mb-4 text-2xl">
                 <i class="fa-solid fa-ghost"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-200 mb-1">No Entries Found</h3>
-            <p class="text-sm text-slate-400 max-w-md mb-6">There are no items matching your filter or search query.</p>
-            <button onclick="app.openModal('entry-modal')" class="bg-brand-600 hover:bg-brand-500 text-white font-medium text-sm px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2">
+            <h3 class="text-lg font-bold text-slate-200 mb-1" id="empty-title">No Entries Found</h3>
+            <p class="text-sm text-slate-400 max-w-md mb-6" id="empty-desc">There are no items matching your filter or search query.</p>
+            <button id="empty-action-btn" onclick="app.openModal('entry-modal')" class="bg-brand-600 hover:bg-brand-500 text-white font-medium text-sm px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2">
                 <i class="fa-solid fa-plus text-xs"></i>
                 Add Entry Now
             </button>
@@ -339,7 +356,6 @@
                 <div class="space-y-2.5 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Catalogue Search & Source</label>
-                        <!-- API Source Selector -->
                         <div class="flex items-center bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs">
                             <button type="button" id="api-source-kitsu" onclick="app.setApiSource('kitsu')" class="px-3 py-1 rounded-md font-semibold transition-colors">Kitsu</button>
                             <button type="button" id="api-source-anilist" onclick="app.setApiSource('anilist')" class="px-3 py-1 rounded-md font-semibold transition-colors">AniList</button>
@@ -590,7 +606,7 @@
             <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
                 <div class="p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl text-[11px] text-brand-300 leading-relaxed">
                     <i class="fa-solid fa-circle-info mr-1"></i>
-                    <strong>Note:</strong> Data is saved in browser local storage. Use JSON Export to backup your collection before importing XML.
+                    <strong>Note:</strong> Data is saved in browser local storage. JSON backups include both your personal library and all franchise watch orders.
                 </div>
 
                 <!-- MyAnimeList Import Section with Duplicate Strategy -->
@@ -622,7 +638,7 @@
                         <i class="fa-solid fa-arrows-rotate"></i>
                         <span>JSON Backup & Restore</span>
                     </div>
-                    <p class="text-xs text-slate-400">Export your library with filters or restore from backup.</p>
+                    <p class="text-xs text-slate-400">Export your complete library and franchises or restore from backup.</p>
                     
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -660,12 +676,253 @@
                         <i class="fa-solid fa-triangle-exclamation"></i>
                         <span>Reset Data</span>
                     </div>
-                    <p class="text-xs text-slate-400">Permanently delete all tracked entries and custom platform links from local storage.</p>
+                    <p class="text-xs text-slate-400">Permanently delete all tracked entries, franchises, and custom platform links from local storage.</p>
                     <button onclick="app.confirmReset()" class="w-full bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-600/40 py-2 rounded-xl text-xs font-semibold transition-all">
                         Clear Storage Library
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal 6: Franchise Wizard & Creation Modal -->
+    <div id="franchise-wizard-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="franchise-wizard-modal-content">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-cyber-cyan"></i>
+                    <span>Create Franchise Watch Order</span>
+                </h3>
+                <button onclick="app.closeModal('franchise-wizard-modal')" aria-label="Close franchise wizard" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5 max-h-[82vh] overflow-y-auto">
+                <!-- Step 1: Search Franchise Query -->
+                <div class="space-y-3 bg-slate-950/70 p-4 rounded-xl border border-slate-800">
+                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">1. Search Franchise Main Title</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="franchise-query-input" placeholder="e.g. Attack on Titan, Naruto, Steins;Gate" class="flex-1 bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchFranchiseWizard();}">
+                        <button type="button" id="franchise-search-btn" onclick="app.searchFranchiseWizard()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyber-cyan hover:brightness-110 transition-all shadow-md">
+                            <i class="fa-solid fa-magnifying-glass mr-1"></i> Find Anime
+                        </button>
+                    </div>
+                    <div id="wizard-search-status" class="hidden text-xs text-slate-400"></div>
+                    <div id="wizard-search-results" class="hidden space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Step 2: Selected Main Title & Discovered Entries Preview -->
+                <div id="wizard-review-section" class="hidden space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider"><i class="fa-solid fa-list-check mr-1"></i> 2. Review Discovered Franchise Entries</h4>
+                        <span id="wizard-entry-count-badge" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 text-[10px] font-semibold border border-emerald-500/20">0 items</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Franchise Name</label>
+                        <input type="text" id="wizard-franchise-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Adaptation Status</label>
+                        <select id="wizard-adaptation-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none cursor-pointer">
+                            <option value="complete_adaptation">Manga adaptation complete</option>
+                            <option value="manga_ongoing">Source manga still ongoing</option>
+                            <option value="incomplete_adaptation">Anime adaptation incomplete</option>
+                            <option value="anime_original">Anime-original story</option>
+                            <option value="different_ending">Anime has a different ending from source</option>
+                            <option value="unknown" selected>Adaptation status unknown</option>
+                            <option value="not_applicable">No applicable manga/source adaptation</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider">Entries (Reorder or reclassify as Main / Optional Extra)</label>
+                        <div id="wizard-entries-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-slate-950/50">
+                <button type="button" onclick="app.closeModal('franchise-wizard-modal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-950 transition-colors">Cancel</button>
+                <button type="button" id="wizard-save-btn" onclick="app.saveNewFranchise()" class="hidden px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-cyber-cyan to-brand-500 shadow-lg shadow-cyan-500/20 hover:brightness-110 transition-all">Save Franchise Watch Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 7: Edit Franchise Modal -->
+    <div id="edit-franchise-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="edit-franchise-modal-content">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-cyber-cyan"></i>
+                    <span>Edit Franchise Metadata</span>
+                </h3>
+                <button onclick="app.closeModal('edit-franchise-modal')" aria-label="Close modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="edit-franchise-form" onsubmit="app.saveEditedFranchise(event)" class="p-6 space-y-4">
+                <input type="hidden" id="edit-franc-id">
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Franchise Name *</label>
+                    <input type="text" id="edit-franc-name" required class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Adaptation Status</label>
+                    <select id="edit-franc-adaptation-status" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none cursor-pointer">
+                        <option value="complete_adaptation">Manga adaptation complete</option>
+                        <option value="manga_ongoing">Source manga still ongoing</option>
+                        <option value="incomplete_adaptation">Anime adaptation incomplete</option>
+                        <option value="anime_original">Anime-original story</option>
+                        <option value="different_ending">Anime has a different ending from source</option>
+                        <option value="unknown">Adaptation status unknown</option>
+                        <option value="not_applicable">No applicable manga/source adaptation</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Adaptation Clarification / Notes (Optional)</label>
+                    <input type="text" id="edit-franc-adaptation-notes" placeholder="e.g. S1-S3 follow manga; movie has anime-original ending" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button type="button" onclick="app.closeModal('edit-franchise-modal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-950 transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyber-cyan hover:brightness-110 shadow-lg shadow-cyan-500/20 transition-all">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 8: Change Franchise Cover Image Modal -->
+    <div id="cover-franchise-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="cover-franchise-modal-content">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-image text-cyber-cyan"></i>
+                    <span>Change Franchise Cover Poster</span>
+                </h3>
+                <button onclick="app.closeModal('cover-franchise-modal')" aria-label="Close modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                <input type="hidden" id="cover-franc-id">
+
+                <!-- Existing Franchise Entries Poster Selector -->
+                <div>
+                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider mb-2">Select Poster from Franchise Titles</label>
+                    <div id="cover-poster-options" class="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1 bg-slate-950 rounded-xl border border-slate-800"></div>
+                </div>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-800"></div>
+                    <span class="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-500">Or enter URL</span>
+                    <div class="flex-grow border-t border-slate-800"></div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Direct Image URL</label>
+                    <input type="url" id="cover-franc-url-input" placeholder="https://domain.com/poster.jpg" oninput="app.updateFranchiseCoverModalPreview()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                </div>
+
+                <div class="flex items-center gap-3 p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                    <img id="cover-modal-preview-img" src="" class="w-12 h-16 object-cover rounded-lg bg-slate-900 shrink-0">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-200">Active Cover Preview</p>
+                        <p class="text-[10px] text-slate-400">Updates franchise card poster only. Individual anime title posters will remain unchanged.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="app.closeModal('cover-franchise-modal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-950 transition-colors">Cancel</button>
+                    <button type="button" onclick="app.saveFranchiseCoverImage()" class="px-5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyber-cyan hover:brightness-110 shadow-lg shadow-cyan-500/20 transition-all">Apply Cover</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 9: Add Title to Franchise Modal -->
+    <div id="add-franchise-entry-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="add-franchise-entry-modal-content">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-cyber-cyan"></i>
+                    <span>Add Title to Franchise Order</span>
+                </h3>
+                <button onclick="app.closeModal('add-franchise-entry-modal')" aria-label="Close modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="add-franchise-entry-form" onsubmit="app.saveAddedFranchiseEntry(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                <input type="hidden" id="add-fe-franchise-id">
+
+                <!-- Existing Collection Title Quick Selector -->
+                <div id="collection-quick-select-container" class="space-y-1.5 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Select from My Collection (Optional)</label>
+                    <select id="add-fe-collection-select" onchange="app.handleCollectionSelectForFranchiseEntry()" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 outline-none cursor-pointer">
+                        <option value="">-- Manual Entry --</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">English Title *</label>
+                    <input type="text" id="add-fe-title-english" required placeholder="e.g. Attack on Titan Season 2" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Romanji Title</label>
+                    <input type="text" id="add-fe-title-romanji" placeholder="e.g. Shingeki no Kyojin Season 2" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Section Classification *</label>
+                        <select id="add-fe-classification" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3 py-2 text-xs text-slate-100 outline-none cursor-pointer">
+                            <option value="Main story">Main Story</option>
+                            <option value="Sequel or season">Sequel or Season</option>
+                            <option value="Movie">Movie</option>
+                            <option value="Optional extra">Optional Extra</option>
+                            <option value="OVA">OVA</option>
+                            <option value="ONA">ONA</option>
+                            <option value="Special">Special</option>
+                            <option value="Recap">Recap</option>
+                            <option value="Spin-off">Spin-off</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Season / Format Info</label>
+                        <input type="text" id="add-fe-season-info" placeholder="e.g. TV (2017)" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Total Episodes</label>
+                        <input type="number" id="add-fe-total-progress" min="0" value="12" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Internet Score</label>
+                        <input type="number" id="add-fe-external-rating" min="0" max="10" step="0.1" placeholder="8.5" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Cover Image URL</label>
+                    <input type="url" id="add-fe-cover-url" placeholder="https://domain.com/poster.jpg" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button type="button" onclick="app.closeModal('add-franchise-entry-modal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-950 transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyber-cyan hover:brightness-110 shadow-lg shadow-cyan-500/20 transition-all">Add to Franchise Order</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -675,26 +932,35 @@
         class AniTrackApp {
             constructor() {
                 this.STORAGE_KEY = 'anitrack_library_v1';
+                this.FRANCHISES_KEY = 'anitrack_franchises_v1';
                 this.PLATFORMS_KEY = 'anitrack_platforms_v1';
                 this.DEFAULTS_KEY = 'anitrack_defaults_v1';
                 this.PREFERRED_SOURCE_KEY = 'anitrackPreferredMetadataSource';
 
                 this.entries = [];
+                this.franchises = [];
                 this.platforms = [];
                 this.defaultPlatforms = { anime: '', manga: '' };
                 this.preferredApiSource = 'kitsu'; // 'kitsu' or 'anilist'
                 
                 // Settings & Filters
                 this.titleDisplayMode = 'english'; 
-                this.activeCategory = 'anime';    
+                this.activeCategory = 'anime';    // 'anime', 'manga', or 'franchise'
                 this.activeStatus = 'all';         
                 this.searchQuery = '';
                 this.sortBy = 'updated';
                 this.renderLimit = 30;
                 this.renderBatchSize = 30;
 
+                // Franchise active view ID (null when viewing franchise list)
+                this.activeFranchiseId = null;
+
+                // Wizard Discovered State
+                this.wizardDiscoveredEntries = [];
+
                 // Catalogue Search & PWA Prompts
                 this.catalogAbortController = null;
+                this.wizardAbortController = null;
                 this.searchRequestId = 0;
                 this.deferredPrompt = null;
 
@@ -718,6 +984,20 @@
                         this.saveEntriesToStorage();
                     }
 
+                    const storedFranchises = localStorage.getItem(this.FRANCHISES_KEY);
+                    if (storedFranchises) {
+                        const parsed = JSON.parse(storedFranchises);
+                        // Safe Migration for Franchise-Level Adaptation Fields
+                        this.franchises = parsed.map(f => ({
+                            ...f,
+                            adaptationStatus: f.adaptationStatus || 'unknown',
+                            adaptationNotes: f.adaptationNotes || ''
+                        }));
+                    } else {
+                        this.franchises = this.getDefaultFranchisesSeed();
+                        this.saveFranchisesToStorage();
+                    }
+
                     const storedPlatforms = localStorage.getItem(this.PLATFORMS_KEY);
                     if (storedPlatforms) {
                         this.platforms = JSON.parse(storedPlatforms);
@@ -737,9 +1017,6 @@
                     const storedSource = localStorage.getItem(this.PREFERRED_SOURCE_KEY);
                     if (storedSource === 'kitsu' || storedSource === 'anilist') {
                         this.preferredApiSource = storedSource;
-                    } else if (storedSource === 'jikan') {
-                        this.preferredApiSource = 'kitsu';
-                        localStorage.setItem(this.PREFERRED_SOURCE_KEY, 'kitsu');
                     } else {
                         this.preferredApiSource = 'kitsu';
                         localStorage.setItem(this.PREFERRED_SOURCE_KEY, 'kitsu');
@@ -747,6 +1024,7 @@
                 } catch (e) {
                     console.error('Failed to load from localStorage', e);
                     this.entries = [];
+                    this.franchises = [];
                     this.platforms = this.getDefaultPlatforms();
                     this.preferredApiSource = 'kitsu';
                 }
@@ -757,6 +1035,14 @@
                     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.entries));
                 } catch (e) {
                     this.showToast('Failed to save library data.', 'error');
+                }
+            }
+
+            saveFranchisesToStorage() {
+                try {
+                    localStorage.setItem(this.FRANCHISES_KEY, JSON.stringify(this.franchises));
+                } catch (e) {
+                    this.showToast('Failed to save franchise data.', 'error');
                 }
             }
 
@@ -832,10 +1118,43 @@
                 ];
             }
 
+            getDefaultFranchisesSeed() {
+                return [
+                    {
+                        id: 'franc-1',
+                        name: 'Cowboy Bebop Franchise',
+                        coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80',
+                        provider: 'Kitsu',
+                        orderType: 'Release Order',
+                        adaptationStatus: 'anime_original',
+                        adaptationNotes: 'Original television anime series',
+                        createdAt: Date.now(),
+                        entries: [
+                            {
+                                id: 'fe-1',
+                                externalId: 'kitsu-1',
+                                titleEnglish: 'Cowboy Bebop',
+                                titleRomanji: 'Cowboy Bebop',
+                                category: 'anime',
+                                format: 'TV',
+                                seasonInfo: 'TV (1998)',
+                                totalProgress: 26,
+                                externalRating: 8.7,
+                                ratingSource: 'Kitsu',
+                                coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80',
+                                classification: 'Main story',
+                                linkedCollectionId: 'demo-1',
+                                orderIndex: 0
+                            }
+                        ]
+                    }
+                ];
+            }
+
             setupEventListeners() {
                 window.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
-                        ['entry-modal', 'platforms-modal', 'platform-form-modal', 'confirm-modal', 'data-modal'].forEach(id => this.closeModal(id));
+                        ['entry-modal', 'platforms-modal', 'platform-form-modal', 'confirm-modal', 'data-modal', 'franchise-wizard-modal', 'edit-franchise-modal', 'cover-franchise-modal', 'add-franchise-entry-modal'].forEach(id => this.closeModal(id));
                         document.querySelectorAll('.card-action-menu').forEach(m => m.classList.add('hidden'));
                     }
                 });
@@ -847,8 +1166,6 @@
                     if (!e.target.closest('.card-action-btn') && !e.target.closest('.card-action-menu')) {
                         document.querySelectorAll('.card-action-menu').forEach(menu => menu.classList.add('hidden'));
                     }
-                    
-                    // Tap outside active poster on mobile to dismiss title overlays
                     if (!e.target.closest('.anime-card-item')) {
                         document.querySelectorAll('.anime-card-item').forEach(card => card.classList.remove('active-overlay'));
                     }
@@ -940,12 +1257,8 @@
                 const currentInput = document.getElementById('form-current-progress');
                 const totalVal = parseInt(totalInput.value) || 0;
 
-                if (status === 'completed') {
-                    if (totalVal > 0) {
-                        currentInput.value = totalVal;
-                    } else {
-                        this.showToast('Please specify total episodes/chapters to auto-complete progress.', 'info');
-                    }
+                if (status === 'completed' && totalVal > 0) {
+                    currentInput.value = totalVal;
                 }
             }
 
@@ -1150,7 +1463,7 @@
                 } catch (err) {
                     if (err.name === 'AbortError') return;
                     console.warn('Catalogue API search failed', err);
-                    statusEl.textContent = `Error connecting to ${sourceLabel}. Please check your network or try switching sources.`;
+                    statusEl.textContent = `Error connecting to ${sourceLabel}. Please check network or switch source.`;
                     button.disabled = false;
                     button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
                     return;
@@ -1160,13 +1473,13 @@
                 if (currentRequestId !== this.searchRequestId) return;
 
                 if (!unifiedResults.length) {
-                    statusEl.textContent = `No matches found on ${sourceLabel}. Try another query or switch source.`;
+                    statusEl.textContent = `No matches found on ${sourceLabel}.`;
                     button.disabled = false;
                     button.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Search';
                     return;
                 }
 
-                statusEl.textContent = `Found ${unifiedResults.length} matching result(s) via ${sourceLabel}. Select one below:`;
+                statusEl.textContent = `Found ${unifiedResults.length} result(s) via ${sourceLabel}:`;
                 statusEl.classList.remove('hidden');
                 resultsEl.classList.remove('hidden');
 
@@ -1271,6 +1584,8 @@
                     status = 'completed';
                 }
 
+                let savedEntryRecord = null;
+
                 if (id) {
                     const index = this.entries.findIndex(item => item.id === id);
                     if (index !== -1) {
@@ -1279,26 +1594,32 @@
                             externalId: externalId || this.entries[index].externalId,
                             title, titleEnglish, titleRomanji, category, status, 
                             currentProgress, totalProgress, 
-                            externalRating,
-                            ratingSource, 
-                            ratingUpdatedAt, season, coverUrl, externalUrl,
+                            externalRating, ratingSource, ratingUpdatedAt, 
+                            season, coverUrl, externalUrl,
                             updatedAt: Date.now()
                         };
+                        savedEntryRecord = this.entries[index];
                         this.showToast(`Updated "${this.escapeHTML(title)}"`, 'success');
                     }
                 } else {
-                    const newEntry = {
+                    savedEntryRecord = {
                         id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                         externalId, title, titleEnglish, titleRomanji, category, status, 
                         currentProgress, totalProgress, externalRating, ratingSource, 
                         ratingUpdatedAt, season, coverUrl, externalUrl,
                         updatedAt: Date.now()
                     };
-                    this.entries.unshift(newEntry);
+                    this.entries.unshift(savedEntryRecord);
                     this.showToast(`Added "${this.escapeHTML(title)}"`, 'success');
                 }
 
                 this.saveEntriesToStorage();
+                
+                // Sync with any franchise entries linked to this collection record
+                if (savedEntryRecord) {
+                    this.syncCollectionUpdatesToFranchises(savedEntryRecord);
+                }
+
                 this.closeModal('entry-modal');
                 this.render();
             }
@@ -1323,6 +1644,7 @@
                 }
 
                 this.saveEntriesToStorage();
+                this.syncCollectionUpdatesToFranchises(entry);
                 this.render();
             }
 
@@ -1333,14 +1655,1060 @@
 
                 this.showConfirmDialog(
                     'Delete Media Entry',
-                    `Are you sure you want to delete "${this.escapeHTML(this.getEntryTitle(entry))}"?`,
+                    `Delete "${this.escapeHTML(this.getEntryTitle(entry))}" from collection? (Linked franchise entries will remain unlinked).`,
                     () => {
                         this.entries = this.entries.filter(item => item.id !== id);
+                        // Unlink from franchises
+                        this.franchises.forEach(f => {
+                            f.entries.forEach(fe => {
+                                if (fe.linkedCollectionId === id) fe.linkedCollectionId = null;
+                            });
+                        });
                         this.saveEntriesToStorage();
+                        this.saveFranchisesToStorage();
                         this.showToast(`Removed "${this.escapeHTML(this.getEntryTitle(entry))}"`, 'info');
                         this.render();
                     }
                 );
+            }
+
+            // --- Franchise Feature Implementation ---
+            setCategory(category) {
+                this.activeCategory = category;
+                this.renderLimit = this.renderBatchSize;
+                
+                const standardFilters = document.getElementById('standard-filters-container');
+                const franchiseAction = document.getElementById('franchise-action-container');
+                const searchSort = document.getElementById('search-sort-container');
+                const divider = document.getElementById('control-divider');
+
+                if (category === 'franchise') {
+                    standardFilters.classList.add('hidden');
+                    franchiseAction.classList.remove('hidden');
+                    searchSort.classList.add('hidden');
+                    divider.classList.add('hidden');
+                    this.activeFranchiseId = null; // Return to franchise list
+                } else {
+                    standardFilters.classList.remove('hidden');
+                    franchiseAction.classList.add('hidden');
+                    searchSort.classList.remove('hidden');
+                    divider.classList.remove('hidden');
+                    this.toggleCategoryFormLabels();
+                }
+
+                this.render();
+            }
+
+            setStatus(status) {
+                this.activeStatus = status;
+                this.renderLimit = this.renderBatchSize;
+                this.render();
+            }
+
+            handleSearch() {
+                this.searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+                this.renderLimit = this.renderBatchSize;
+                this.renderGrid();
+            }
+
+            handleSort() {
+                this.sortBy = document.getElementById('sort-select').value;
+                this.renderLimit = this.renderBatchSize;
+                this.renderGrid();
+            }
+
+            resetFilters() {
+                this.searchQuery = '';
+                document.getElementById('search-input').value = '';
+                this.sortBy = 'updated';
+                document.getElementById('sort-select').value = 'updated';
+                if (this.activeCategory !== 'franchise') {
+                    this.activeCategory = 'anime';
+                    this.activeStatus = 'all';
+                }
+                this.activeFranchiseId = null;
+                this.renderLimit = this.renderBatchSize;
+                this.render();
+            }
+
+            toggleCategoryFormLabels() {
+                const cat = document.getElementById('form-category').value;
+                document.getElementById('opt-status-active').textContent = cat === 'anime' ? 'Watching' : 'Reading';
+                document.getElementById('lbl-progress-current').textContent = cat === 'anime' ? 'Watched Episodes' : 'Read Chapters';
+                document.getElementById('lbl-progress-total').textContent = cat === 'anime' ? 'Total Episodes (0 = ∞)' : 'Total Chapters (0 = ∞)';
+            }
+
+            // Adaptation Status Info Formatter
+            getAdaptationBadgeInfo(status) {
+                switch(status) {
+                    case 'complete_adaptation':
+                        return { text: 'Manga adaptation complete', class: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+                    case 'manga_ongoing':
+                        return { text: 'Source manga still ongoing', class: 'bg-cyan-500/15 text-cyber-cyan border-cyan-500/30' };
+                    case 'incomplete_adaptation':
+                        return { text: 'Anime adaptation incomplete', class: 'bg-amber-500/15 text-amber-300 border-amber-500/30' };
+                    case 'anime_original':
+                        return { text: 'Anime-original story', class: 'bg-brand-500/15 text-brand-300 border-brand-500/30' };
+                    case 'different_ending':
+                        return { text: 'Anime has different ending from source', class: 'bg-purple-500/15 text-purple-300 border-purple-500/30' };
+                    case 'not_applicable':
+                        return { text: 'No applicable source adaptation', class: 'bg-slate-800 text-slate-400 border-slate-700' };
+                    case 'unknown':
+                    default:
+                        return { text: 'Adaptation status unknown', class: 'bg-slate-900/90 text-slate-400 border-slate-800' };
+                }
+            }
+
+            // Add Title to Franchise Modal Handler
+            openAddFranchiseEntryModal(franchiseId) {
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+
+                document.getElementById('add-fe-franchise-id').value = franchiseId;
+                document.getElementById('add-franchise-entry-form').reset();
+
+                const select = document.getElementById('add-fe-collection-select');
+                select.innerHTML = '<option value="">-- Manual Entry / Custom Search --</option>' + 
+                    this.entries.map(e => `<option value="${e.id}">${this.escapeHTML(e.titleEnglish || e.title)} (${e.category.toUpperCase()})</option>`).join('');
+
+                this.openModal('add-franchise-entry-modal');
+            }
+
+            handleCollectionSelectForFranchiseEntry() {
+                const selectVal = document.getElementById('add-fe-collection-select').value;
+                if (!selectVal) return;
+
+                const entry = this.entries.find(e => e.id === selectVal);
+                if (!entry) return;
+
+                document.getElementById('add-fe-title-english').value = entry.titleEnglish || entry.title || '';
+                document.getElementById('add-fe-title-romanji').value = entry.titleRomanji || entry.title || '';
+                document.getElementById('add-fe-season-info').value = entry.season || 'TV';
+                document.getElementById('add-fe-total-progress').value = entry.totalProgress || 12;
+                document.getElementById('add-fe-external-rating').value = entry.externalRating || '';
+                document.getElementById('add-fe-cover-url').value = entry.coverUrl || '';
+            }
+
+            saveAddedFranchiseEntry(e) {
+                e.preventDefault();
+                const franchiseId = document.getElementById('add-fe-franchise-id').value;
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+
+                const collectionId = document.getElementById('add-fe-collection-select').value || null;
+                const titleEnglish = document.getElementById('add-fe-title-english').value.trim();
+                const titleRomanji = document.getElementById('add-fe-title-romanji').value.trim();
+                const classification = document.getElementById('add-fe-classification').value;
+                const seasonInfo = document.getElementById('add-fe-season-info').value.trim() || 'TV';
+                const totalProgress = parseInt(document.getElementById('add-fe-total-progress').value) || 0;
+                const externalRating = parseFloat(document.getElementById('add-fe-external-rating').value) || 0;
+                const coverUrl = document.getElementById('add-fe-cover-url').value.trim();
+
+                const newEntry = {
+                    id: 'fe-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                    externalId: '',
+                    titleEnglish,
+                    titleRomanji: titleRomanji || titleEnglish,
+                    category: 'anime',
+                    format: seasonInfo,
+                    seasonInfo,
+                    totalProgress,
+                    externalRating,
+                    ratingSource: 'Manual',
+                    coverUrl,
+                    classification,
+                    linkedCollectionId: collectionId,
+                    orderIndex: franc.entries.length
+                };
+
+                franc.entries.push(newEntry);
+                this.saveFranchisesToStorage();
+                this.closeModal('add-franchise-entry-modal');
+                this.showToast(`Added "${this.escapeHTML(titleEnglish)}" to franchise order`, 'success');
+                this.render();
+            }
+
+            // Franchise Wizard Search (Find main title + related titles)
+            async searchFranchiseWizard() {
+                if (!navigator.onLine) {
+                    this.showToast('Franchise search requires internet connectivity.', 'error');
+                    return;
+                }
+
+                const query = document.getElementById('franchise-query-input').value.trim();
+                const statusEl = document.getElementById('wizard-search-status');
+                const resultsEl = document.getElementById('wizard-search-results');
+                const searchBtn = document.getElementById('franchise-search-btn');
+
+                if (query.length < 2) {
+                    statusEl.textContent = 'Enter at least 2 characters.';
+                    statusEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (this.wizardAbortController) this.wizardAbortController.abort();
+                this.wizardAbortController = new AbortController();
+
+                searchBtn.disabled = true;
+                searchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Searching';
+                statusEl.textContent = `Discovering related titles via ${this.preferredApiSource === 'anilist' ? 'AniList' : 'Kitsu'}…`;
+                statusEl.classList.remove('hidden');
+                resultsEl.innerHTML = '';
+                resultsEl.classList.add('hidden');
+
+                try {
+                    let discovered = [];
+                    if (this.preferredApiSource === 'kitsu') {
+                        const url = `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(query)}&page[limit]=8`;
+                        const res = await fetch(url, { signal: this.wizardAbortController.signal });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const items = Array.isArray(data.data) ? data.data : [];
+                            items.forEach((item, idx) => {
+                                const attr = item.attributes || {};
+                                const titleEnglish = attr.titles?.en || attr.canonicalTitle || 'Untitled';
+                                const titleRomanji = attr.titles?.en_jp || attr.canonicalTitle || titleEnglish;
+                                const imageUrl = attr.posterImage?.medium || attr.posterImage?.original || '';
+                                const year = attr.startDate ? attr.startDate.slice(0, 4) : '';
+                                const total = attr.episodeCount || 0;
+                                const subtype = attr.subtype ? attr.subtype.toUpperCase() : 'TV';
+                                
+                                let classification = idx === 0 ? 'Main story' : (subtype === 'MOVIE' ? 'Movie' : (subtype === 'OVA' ? 'OVA' : 'Sequel or season'));
+                                if (idx > 2 && subtype === 'OVA') classification = 'Optional extra';
+
+                                discovered.push({
+                                    externalId: 'kitsu-' + item.id,
+                                    titleEnglish,
+                                    titleRomanji,
+                                    category: 'anime',
+                                    format: subtype,
+                                    seasonInfo: `${subtype} ${year ? `(${year})` : ''}`,
+                                    totalProgress: total,
+                                    externalRating: attr.averageRating ? parseFloat((parseFloat(attr.averageRating) / 10).toFixed(1)) : 0,
+                                    ratingSource: 'Kitsu',
+                                    coverUrl: imageUrl,
+                                    classification,
+                                    linkedCollectionId: null,
+                                    orderIndex: idx
+                                });
+                            });
+                        }
+                    } else {
+                        // AniList GraphQL Franchise Discovery
+                        const gqlQuery = `
+                            query ($search: String) {
+                                Page (perPage: 8) {
+                                    media (search: $search, type: ANIME) {
+                                        id
+                                        title { english romaji }
+                                        coverImage { large medium }
+                                        episodes
+                                        seasonYear
+                                        format
+                                        averageScore
+                                    }
+                                }
+                            }
+                        `;
+                        const res = await fetch('https://graphql.anilist.co', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify({ query: gqlQuery, variables: { search: query } }),
+                            signal: this.wizardAbortController.signal
+                        });
+                        if (res.ok) {
+                            const payload = await res.json();
+                            const mediaList = payload.data?.Page?.media || [];
+                            mediaList.forEach((item, idx) => {
+                                const titleEnglish = item.title?.english || item.title?.romaji || 'Untitled';
+                                const titleRomanji = item.title?.romaji || item.title?.english || titleEnglish;
+                                const imageUrl = item.coverImage?.large || item.coverImage?.medium || '';
+                                const total = item.episodes || 0;
+                                const year = item.seasonYear ? String(item.seasonYear) : '';
+                                const format = item.format ? item.format.replace(/_/g, ' ') : 'ANIME';
+
+                                let classification = idx === 0 ? 'Main story' : 'Sequel or season';
+                                if (format.includes('MOVIE')) classification = 'Movie';
+                                if (format.includes('OVA')) classification = 'OVA';
+
+                                discovered.push({
+                                    externalId: 'anilist-' + item.id,
+                                    titleEnglish,
+                                    titleRomanji,
+                                    category: 'anime',
+                                    format,
+                                    seasonInfo: `${format} ${year ? `(${year})` : ''}`,
+                                    totalProgress: total,
+                                    externalRating: item.averageScore ? parseFloat((item.averageScore / 10).toFixed(1)) : 0,
+                                    ratingSource: 'AniList',
+                                    coverUrl: imageUrl,
+                                    classification,
+                                    linkedCollectionId: null,
+                                    orderIndex: idx
+                                });
+                            });
+                        }
+                    }
+
+                    if (discovered.length === 0) {
+                        statusEl.textContent = 'No titles found. You can add entries manually.';
+                        searchBtn.disabled = false;
+                        searchBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Find Anime';
+                        return;
+                    }
+
+                    this.wizardDiscoveredEntries = discovered;
+                    document.getElementById('wizard-franchise-name').value = query.charAt(0).toUpperCase() + query.slice(1) + ' Franchise';
+                    document.getElementById('wizard-adaptation-status').value = 'unknown';
+                    this.renderWizardEntriesList();
+
+                    statusEl.textContent = `Discovered ${discovered.length} related entry/entries. Review below:`;
+                    document.getElementById('wizard-review-section').classList.remove('hidden');
+                    document.getElementById('wizard-save-btn').classList.remove('hidden');
+                    document.getElementById('wizard-entry-count-badge').textContent = `${discovered.length} items`;
+
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                    console.warn('Franchise wizard search failed', err);
+                    statusEl.textContent = 'Failed to fetch franchise data.';
+                } finally {
+                    searchBtn.disabled = false;
+                    searchBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass mr-1"></i> Find Anime';
+                }
+            }
+
+            renderWizardEntriesList() {
+                const container = document.getElementById('wizard-entries-list');
+                container.innerHTML = this.wizardDiscoveredEntries.map((item, idx) => `
+                    <div class="glass-card bg-slate-950/80 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-slate-800">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <img src="${this.escapeHTML(item.coverUrl || SVG_POSTER_FALLBACK)}" onerror="this.src='${SVG_POSTER_FALLBACK}';" class="w-10 h-14 object-cover rounded-lg bg-slate-900 shrink-0">
+                            <div class="min-w-0">
+                                <h5 class="text-xs font-bold text-white truncate">${this.escapeHTML(item.titleEnglish)}</h5>
+                                <p class="text-[11px] text-slate-400">${this.escapeHTML(item.seasonInfo)} · ${item.totalProgress} eps</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                            <select onchange="app.updateWizardClassification(${idx}, this.value)" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-200 rounded-lg px-2.5 py-1.5 outline-none">
+                                ${['Main story', 'Sequel or season', 'Movie', 'OVA', 'ONA', 'Special', 'Recap', 'Alternate version', 'Spin-off', 'Optional extra'].map(opt => `<option value="${opt}" ${item.classification === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                            </select>
+                            <button type="button" onclick="app.removeWizardEntry(${idx})" class="p-1.5 text-rose-400 hover:text-white bg-rose-950/40 border border-rose-900/40 rounded-lg text-xs" title="Remove"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateWizardClassification(idx, classification) {
+                if (this.wizardDiscoveredEntries[idx]) {
+                    this.wizardDiscoveredEntries[idx].classification = classification;
+                }
+            }
+
+            removeWizardEntry(idx) {
+                this.wizardDiscoveredEntries.splice(idx, 1);
+                this.renderWizardEntriesList();
+                document.getElementById('wizard-entry-count-badge').textContent = `${this.wizardDiscoveredEntries.length} items`;
+            }
+
+            saveNewFranchise() {
+                const name = document.getElementById('wizard-franchise-name').value.trim() || 'New Franchise';
+                const adaptationStatus = document.getElementById('wizard-adaptation-status').value || 'unknown';
+
+                if (!this.wizardDiscoveredEntries.length) {
+                    this.showToast('Please include at least one entry in the franchise.', 'error');
+                    return;
+                }
+
+                const newFranchise = {
+                    id: 'franc-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                    name,
+                    coverUrl: this.wizardDiscoveredEntries[0].coverUrl || SVG_POSTER_FALLBACK,
+                    provider: this.preferredApiSource === 'anilist' ? 'AniList' : 'Kitsu',
+                    orderType: 'Release Order',
+                    adaptationStatus,
+                    adaptationNotes: '',
+                    createdAt: Date.now(),
+                    entries: this.wizardDiscoveredEntries.map((e, index) => ({
+                        id: 'fe-' + Date.now() + '-' + index + '-' + Math.random().toString(36).substring(2, 4),
+                        ...e,
+                        orderIndex: index
+                    }))
+                };
+
+                this.franchises.push(newFranchise);
+                this.saveFranchisesToStorage();
+                this.closeModal('franchise-wizard-modal');
+                this.showToast(`Created franchise "${this.escapeHTML(name)}"`, 'success');
+                this.render();
+            }
+
+            openFranchiseDetail(franchiseId) {
+                this.activeFranchiseId = franchiseId;
+                this.render();
+            }
+
+            closeFranchiseDetail() {
+                this.activeFranchiseId = null;
+                this.render();
+            }
+
+            openEditFranchiseModal(franchiseId, e) {
+                if (e) e.stopPropagation();
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+
+                document.getElementById('edit-franc-id').value = franc.id;
+                document.getElementById('edit-franc-name').value = franc.name;
+                document.getElementById('edit-franc-adaptation-status').value = franc.adaptationStatus || 'unknown';
+                document.getElementById('edit-franc-adaptation-notes').value = franc.adaptationNotes || '';
+
+                this.openModal('edit-franchise-modal');
+            }
+
+            saveEditedFranchise(e) {
+                e.preventDefault();
+                const id = document.getElementById('edit-franc-id').value;
+                const franc = this.franchises.find(f => f.id === id);
+                if (!franc) return;
+
+                franc.name = document.getElementById('edit-franc-name').value.trim() || franc.name;
+                franc.adaptationStatus = document.getElementById('edit-franc-adaptation-status').value;
+                franc.adaptationNotes = document.getElementById('edit-franc-adaptation-notes').value.trim();
+
+                this.saveFranchisesToStorage();
+                this.closeModal('edit-franchise-modal');
+                this.showToast(`Updated "${this.escapeHTML(franc.name)}" metadata`, 'success');
+                this.render();
+            }
+
+            openCoverFranchiseModal(franchiseId, e) {
+                if (e) e.stopPropagation();
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+
+                document.getElementById('cover-franc-id').value = franc.id;
+                document.getElementById('cover-franc-url-input').value = franc.coverUrl || '';
+                
+                const previewImg = document.getElementById('cover-modal-preview-img');
+                previewImg.src = franc.coverUrl || SVG_POSTER_FALLBACK;
+
+                const optionsContainer = document.getElementById('cover-poster-options');
+                if (franc.entries && franc.entries.length > 0) {
+                    optionsContainer.innerHTML = franc.entries.map((entry, idx) => `
+                        <button type="button" onclick="app.selectFranchiseCoverOption('${this.escapeHTML(entry.coverUrl)}')" class="aspect-[2/3] rounded-lg overflow-hidden border border-slate-800 hover:border-cyber-cyan transition-colors bg-slate-900 group relative">
+                            <img src="${this.escapeHTML(entry.coverUrl || SVG_POSTER_FALLBACK)}" onerror="this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover">
+                            <span class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 text-[9px] text-white flex items-center justify-center font-bold p-1 text-center">Use Title Poster</span>
+                        </button>
+                    `).join('');
+                } else {
+                    optionsContainer.innerHTML = `<p class="col-span-4 text-xs text-slate-500 p-2 text-center">No associated titles available to select.</p>`;
+                }
+
+                this.openModal('cover-franchise-modal');
+            }
+
+            selectFranchiseCoverOption(url) {
+                document.getElementById('cover-franc-url-input').value = url;
+                this.updateFranchiseCoverModalPreview();
+            }
+
+            updateFranchiseCoverModalPreview() {
+                const url = document.getElementById('cover-franc-url-input').value.trim();
+                const previewImg = document.getElementById('cover-modal-preview-img');
+                previewImg.src = url || SVG_POSTER_FALLBACK;
+            }
+
+            saveFranchiseCoverImage() {
+                const id = document.getElementById('cover-franc-id').value;
+                const franc = this.franchises.find(f => f.id === id);
+                if (!franc) return;
+
+                const newUrl = document.getElementById('cover-franc-url-input').value.trim();
+                franc.coverUrl = newUrl || franc.coverUrl || SVG_POSTER_FALLBACK;
+
+                this.saveFranchisesToStorage();
+                this.closeModal('cover-franchise-modal');
+                this.showToast('Updated franchise cover image', 'success');
+                this.render();
+            }
+
+            deleteFranchise(franchiseId, e) {
+                if (e) e.stopPropagation();
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+
+                this.showConfirmDialog(
+                    'Delete Franchise Watch Order',
+                    `Delete franchise "${this.escapeHTML(franc.name)}"? Your personal collection entries and viewing progress will remain safe in your library.`,
+                    () => {
+                        this.franchises = this.franchises.filter(f => f.id !== franchiseId);
+                        this.saveFranchisesToStorage();
+                        this.activeFranchiseId = null;
+                        this.showToast('Franchise deleted', 'info');
+                        this.render();
+                    }
+                );
+            }
+
+            moveFranchiseEntryOrder(franchiseId, entryId, direction) {
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+
+                const idx = franc.entries.findIndex(e => e.id === entryId);
+                if (idx === -1) return;
+
+                const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+                if (targetIdx < 0 || targetIdx >= franc.entries.length) return;
+
+                const temp = franc.entries[idx];
+                franc.entries[idx] = franc.entries[targetIdx];
+                franc.entries[targetIdx] = temp;
+
+                franc.entries.forEach((e, i) => e.orderIndex = i);
+                this.saveFranchisesToStorage();
+                this.render();
+            }
+
+            updateFranchiseEntryClassification(franchiseId, entryId, newClassification) {
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+                const entry = franc.entries.find(e => e.id === entryId);
+                if (entry) {
+                    entry.classification = newClassification;
+                    this.saveFranchisesToStorage();
+                    this.render();
+                }
+            }
+
+            removeEntryFromFranchise(franchiseId, entryId) {
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+
+                franc.entries = franc.entries.filter(e => e.id !== entryId);
+                franc.entries.forEach((e, i) => e.orderIndex = i);
+                this.saveFranchisesToStorage();
+                this.showToast('Removed entry from franchise', 'info');
+                this.render();
+            }
+
+            linkFranchiseEntryToCollection(franchiseId, franchiseEntryId) {
+                const franc = this.franchises.find(f => f.id === franchiseId);
+                if (!franc) return;
+                const fEntry = franc.entries.find(e => e.id === franchiseEntryId);
+                if (!fEntry) return;
+
+                // Check if already in collection by externalId or exact title match
+                const existing = this.entries.find(item => 
+                    (fEntry.externalId && item.externalId === fEntry.externalId) ||
+                    item.titleEnglish?.toLowerCase() === fEntry.titleEnglish.toLowerCase()
+                );
+
+                if (existing) {
+                    fEntry.linkedCollectionId = existing.id;
+                    this.saveFranchisesToStorage();
+                    this.showToast(`Linked to existing collection item "${this.escapeHTML(existing.title)}"`, 'success');
+                    this.render();
+                } else {
+                    // Create new collection record from franchise entry
+                    const newCollectionRecord = {
+                        id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                        externalId: fEntry.externalId || '',
+                        title: fEntry.titleEnglish,
+                        titleEnglish: fEntry.titleEnglish,
+                        titleRomanji: fEntry.titleRomanji,
+                        category: fEntry.category || 'anime',
+                        status: 'active',
+                        currentProgress: 0,
+                        totalProgress: fEntry.totalProgress || 0,
+                        externalRating: fEntry.externalRating || 0,
+                        ratingSource: fEntry.ratingSource || 'Catalog',
+                        ratingUpdatedAt: new Date().toISOString(),
+                        season: fEntry.seasonInfo || '',
+                        coverUrl: fEntry.coverUrl || '',
+                        externalUrl: '',
+                        updatedAt: Date.now()
+                    };
+                    this.entries.unshift(newCollectionRecord);
+                    fEntry.linkedCollectionId = newCollectionRecord.id;
+                    this.saveEntriesToStorage();
+                    this.saveFranchisesToStorage();
+                    this.showToast(`Added "${this.escapeHTML(fEntry.titleEnglish)}" to My Collection and linked!`, 'success');
+                    this.render();
+                }
+            }
+
+            syncCollectionUpdatesToFranchises(updatedEntry) {
+                // When an item in My Collection is updated, ensure linked franchise cards reflect progress/status
+                this.franchises.forEach(f => {
+                    f.entries.forEach(fe => {
+                        if (fe.linkedCollectionId === updatedEntry.id) {
+                            fe.currentProgress = updatedEntry.currentProgress;
+                            fe.status = updatedEntry.status;
+                        }
+                    });
+                });
+                this.saveFranchisesToStorage();
+            }
+
+            // --- Rendering Core ---
+            render() {
+                this.renderStats();
+                this.renderTabs();
+                this.renderGrid();
+            }
+
+            renderStats() {
+                const total = this.entries.length;
+                const animeCnt = this.entries.filter(i => i.category === 'anime').length;
+                const mangaCnt = this.entries.filter(i => i.category === 'manga').length;
+                const activeCnt = this.entries.filter(i => i.status === 'active').length;
+                const completedCnt = this.entries.filter(i => i.status === 'completed').length;
+
+                document.getElementById('stat-total').textContent = total;
+                document.getElementById('stat-anime-cnt').textContent = animeCnt;
+                document.getElementById('stat-manga-cnt').textContent = mangaCnt;
+                document.getElementById('stat-active').textContent = activeCnt;
+                document.getElementById('stat-completed').textContent = completedCnt;
+
+                document.getElementById('badge-anime-count').textContent = animeCnt;
+                document.getElementById('badge-manga-count').textContent = mangaCnt;
+                document.getElementById('badge-franchise-count').textContent = this.franchises.length;
+            }
+
+            renderTabs() {
+                const animeTab = document.getElementById('cat-tab-anime');
+                const mangaTab = document.getElementById('cat-tab-manga');
+                const francTab = document.getElementById('cat-tab-franchise');
+
+                animeTab.className = "flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white whitespace-nowrap";
+                mangaTab.className = "flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white whitespace-nowrap";
+                francTab.className = "flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white whitespace-nowrap";
+
+                if (this.activeCategory === 'anime') {
+                    animeTab.className = "flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 bg-brand-600 text-white shadow-lg shadow-brand-600/30 glow-cyan whitespace-nowrap";
+                } else if (this.activeCategory === 'manga') {
+                    mangaTab.className = "flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 bg-cyber-pink text-white shadow-lg shadow-pink-600/30 glow-pink whitespace-nowrap";
+                } else if (this.activeCategory === 'franchise') {
+                    francTab.className = "flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all duration-200 bg-gradient-to-r from-cyber-cyan to-brand-500 text-slate-950 font-bold shadow-lg shadow-cyan-500/20 whitespace-nowrap";
+                }
+
+                ['all', 'active', 'completed'].forEach(st => {
+                    const el = document.getElementById(`status-tab-${st}`);
+                    if (this.activeStatus === st) {
+                        el.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 bg-slate-800 text-slate-100 border border-slate-700 shadow-sm";
+                    } else {
+                        el.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white";
+                    }
+                });
+
+                document.getElementById('status-tab-active-label').textContent = this.activeCategory === 'anime' ? 'Watching' : 'Reading';
+            }
+
+            getFilteredEntries() {
+                return this.entries.filter(item => {
+                    if (item.category !== this.activeCategory) return false;
+                    if (this.activeStatus !== 'all' && item.status !== this.activeStatus) return false;
+
+                    if (this.searchQuery) {
+                        const engMatch = item.titleEnglish && item.titleEnglish.toLowerCase().includes(this.searchQuery);
+                        const romMatch = item.titleRomanji && item.titleRomanji.toLowerCase().includes(this.searchQuery);
+                        const titleMatch = item.title && item.title.toLowerCase().includes(this.searchQuery);
+                        const seasonMatch = item.season && item.season.toLowerCase().includes(this.searchQuery);
+                        if (!engMatch && !romMatch && !titleMatch && !seasonMatch) return false;
+                    }
+                    return true;
+                }).sort((a, b) => {
+                    const titleA = this.getEntryTitle(a);
+                    const titleB = this.getEntryTitle(b);
+
+                    if (this.sortBy === 'title') return titleA.localeCompare(titleB);
+                    if (this.sortBy === 'externalRating') return (b.externalRating || 0) - (a.externalRating || 0);
+                    if (this.sortBy === 'progress') {
+                        const pctA = a.totalProgress > 0 ? (a.currentProgress / a.totalProgress) : 0;
+                        const pctB = b.totalProgress > 0 ? (b.currentProgress / b.totalProgress) : 0;
+                        return pctB - pctA;
+                    }
+                    return (b.updatedAt || 0) - (a.updatedAt || 0);
+                });
+            }
+
+            loadMoreEntries() {
+                this.renderLimit += this.renderBatchSize;
+                this.renderGrid();
+            }
+
+            renderGrid() {
+                const grid = document.getElementById('media-grid');
+                const emptyState = document.getElementById('empty-state');
+                const loadMoreBtn = document.getElementById('load-more-container');
+                const detailContainer = document.getElementById('franchise-detail-container');
+
+                if (this.activeCategory === 'franchise') {
+                    if (this.activeFranchiseId) {
+                        // Render Franchise Detail View
+                        grid.classList.add('hidden');
+                        loadMoreBtn.classList.add('hidden');
+                        emptyState.classList.add('hidden');
+                        detailContainer.classList.remove('hidden');
+                        this.renderFranchiseDetail(this.activeFranchiseId);
+                        return;
+                    } else {
+                        // Render Franchise Cards List
+                        detailContainer.classList.add('hidden');
+                        grid.classList.remove('hidden');
+                        
+                        const filteredFrancs = this.franchises.filter(f => {
+                            if (!this.searchQuery) return true;
+                            return f.name.toLowerCase().includes(this.searchQuery);
+                        });
+
+                        if (filteredFrancs.length === 0) {
+                            grid.innerHTML = '';
+                            emptyState.classList.remove('hidden');
+                            emptyState.classList.add('flex');
+                            document.getElementById('empty-title').textContent = 'No Franchises Found';
+                            document.getElementById('empty-desc').textContent = 'Create your first franchise watch order using the button above.';
+                            document.getElementById('empty-action-btn').innerHTML = '<i class="fa-solid fa-plus text-xs"></i> Create Franchise';
+                            document.getElementById('empty-action-btn').setAttribute('onclick', "app.openModal('franchise-wizard-modal')");
+                            loadMoreBtn.classList.add('hidden');
+                            return;
+                        }
+
+                        emptyState.classList.add('hidden');
+                        emptyState.classList.remove('flex');
+                        grid.innerHTML = filteredFrancs.map(franc => this.createFranchiseCardHTML(franc)).join('');
+                        loadMoreBtn.classList.add('hidden');
+                        return;
+                    }
+                }
+
+                detailContainer.classList.add('hidden');
+                grid.classList.remove('hidden');
+
+                const filtered = this.getFilteredEntries();
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    emptyState.classList.add('flex');
+                    document.getElementById('empty-title').textContent = 'No Entries Found';
+                    document.getElementById('empty-desc').textContent = 'There are no items matching your filter or search query.';
+                    document.getElementById('empty-action-btn').innerHTML = '<i class="fa-solid fa-plus text-xs"></i> Add Entry Now';
+                    document.getElementById('empty-action-btn').setAttribute('onclick', "app.openModal('entry-modal')");
+                    loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+
+                const itemsToDisplay = filtered.slice(0, this.renderLimit);
+                grid.innerHTML = itemsToDisplay.map(item => this.createCardHTML(item)).join('');
+
+                if (filtered.length > this.renderLimit) {
+                    loadMoreBtn.classList.remove('hidden');
+                } else {
+                    loadMoreBtn.classList.add('hidden');
+                }
+            }
+
+            createFranchiseCardHTML(franc) {
+                const totalEntries = franc.entries.length;
+                let completedEntries = 0;
+                franc.entries.forEach(e => {
+                    if (e.linkedCollectionId) {
+                        const rec = this.entries.find(item => item.id === e.linkedCollectionId);
+                        if (rec && rec.status === 'completed') completedEntries++;
+                    }
+                });
+                const pct = totalEntries > 0 ? Math.round((completedEntries / totalEntries) * 100) : 0;
+                const adaptInfo = this.getAdaptationBadgeInfo(franc.adaptationStatus);
+
+                return `
+                    <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 cursor-pointer" onclick="app.openFranchiseDetail('${franc.id}')">
+                        <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+                            <img src="${this.escapeHTML(franc.coverUrl || SVG_POSTER_FALLBACK)}" alt="${this.escapeHTML(franc.name)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90"></div>
+
+                            <!-- 3-Dot Menu Top Right -->
+                            <div class="absolute top-2 right-2 z-30">
+                                <button onclick="app.toggleCardMenu('franc-${franc.id}', event)" aria-label="Franchise menu" class="card-action-btn w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                                    <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+                                </button>
+                                <div id="card-menu-franc-${franc.id}" class="card-action-menu hidden absolute right-0 top-full mt-1.5 w-40 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-40 text-left">
+                                    <button onclick="app.openEditFranchiseModal('${franc.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
+                                        <i class="fa-solid fa-pen-to-square text-cyber-cyan"></i> Edit Franchise
+                                    </button>
+                                    <button onclick="app.openCoverFranchiseModal('${franc.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-300 flex items-center gap-2 transition-colors">
+                                        <i class="fa-solid fa-image text-brand-400"></i> Change Cover
+                                    </button>
+                                    <button onclick="app.deleteFranchise('${franc.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 flex items-center gap-2 transition-colors">
+                                        <i class="fa-solid fa-trash-can text-rose-400"></i> Delete Franchise
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="absolute bottom-2 left-2 right-2 z-10 space-y-1">
+                                <p class="text-[9px] font-semibold text-cyber-cyan uppercase tracking-wider truncate">${totalEntries} Entries • ${franc.orderType || 'Release Order'}</p>
+                                <h4 class="text-xs sm:text-sm font-bold text-white leading-snug break-words">${this.escapeHTML(franc.name)}</h4>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-900/90 space-y-2.5 flex-grow flex flex-col justify-between">
+                            <!-- Single Adaptation Status Badge per Franchise Card -->
+                            <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-semibold border ${adaptInfo.class} w-full truncate" title="${this.escapeHTML(franc.adaptationNotes || adaptInfo.text)}">
+                                <i class="fa-solid fa-book-bookmark text-[9px] shrink-0"></i>
+                                <span class="truncate">${this.escapeHTML(adaptInfo.text)}</span>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="text-slate-400 font-medium">Viewing Progress</span>
+                                    <span class="font-bold text-cyber-cyan">${completedEntries} / ${totalEntries} Finished</span>
+                                </div>
+                                <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden p-0.5 border border-slate-800">
+                                    <div class="h-full rounded-full bg-gradient-to-r from-cyber-cyan to-brand-500 transition-all duration-300" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderFranchiseDetail(francId) {
+                const franc = this.franchises.find(f => f.id === francId);
+                const container = document.getElementById('franchise-detail-container');
+                if (!franc) return;
+
+                const mainEntries = franc.entries.filter(e => e.classification === 'Main story' || e.classification === 'Sequel or season' || e.classification === 'Movie');
+                const extraEntries = franc.entries.filter(e => !mainEntries.includes(e));
+                const adaptInfo = this.getAdaptationBadgeInfo(franc.adaptationStatus);
+
+                const renderEntryRow = (entry, idx) => {
+                    const linkedRec = entry.linkedCollectionId ? this.entries.find(item => item.id === entry.linkedCollectionId) : null;
+
+                    return `
+                        <div class="glass-card bg-slate-900/90 rounded-2xl p-3.5 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 border border-slate-800 w-full min-w-0">
+                            <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 w-full md:w-auto">
+                                <div class="flex flex-col items-center justify-center bg-slate-950 w-7 h-12 sm:w-8 sm:h-14 rounded-xl border border-slate-800 text-xs font-black text-brand-400 shrink-0">
+                                    #${idx + 1}
+                                </div>
+                                <img src="${this.escapeHTML(entry.coverUrl || SVG_POSTER_FALLBACK)}" onerror="this.src='${SVG_POSTER_FALLBACK}';" class="w-10 h-14 sm:w-12 sm:h-16 object-cover rounded-xl bg-slate-950 border border-slate-800 shrink-0">
+                                <div class="min-w-0 flex-1 space-y-1">
+                                    <h4 class="text-xs sm:text-sm font-bold text-white break-words">${this.escapeHTML(entry.titleEnglish)}</h4>
+                                    <p class="text-[11px] sm:text-xs text-slate-400">${this.escapeHTML(entry.seasonInfo)} · ${entry.totalProgress} eps ${entry.externalRating ? `· ★ ${entry.externalRating}` : ''}</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                                        <select onchange="app.updateFranchiseEntryClassification('${franc.id}', '${entry.id}', this.value)" class="bg-slate-950 border border-slate-800 text-[11px] text-slate-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
+                                            ${['Main story', 'Sequel or season', 'Movie', 'Optional extra', 'OVA', 'ONA', 'Special', 'Recap', 'Alternate version', 'Spin-off'].map(opt => `<option value="${opt}" ${entry.classification === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Controls: Responsive Flex Wrap for Portrait/Landscape -->
+                            <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 w-full md:w-auto border-t md:border-t-0 pt-2.5 md:pt-0 border-slate-800/80">
+                                ${linkedRec ? `
+                                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs text-emerald-300 flex items-center gap-2">
+                                        <i class="fa-solid fa-check-circle"></i>
+                                        <span>In Collection (${linkedRec.currentProgress}/${linkedRec.totalProgress || '∞'})</span>
+                                        <button onclick="app.incrementProgress('${linkedRec.id}', event)" class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold">+1</button>
+                                    </div>
+                                ` : `
+                                    <button onclick="app.linkFranchiseEntryToCollection('${franc.id}', '${entry.id}')" class="bg-slate-950 hover:bg-slate-800 text-brand-300 border border-brand-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+                                        <i class="fa-solid fa-link text-[10px]"></i> Add to Collection
+                                    </button>
+                                `}
+
+                                <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
+                                    <button onclick="app.moveFranchiseEntryOrder('${franc.id}', '${entry.id}', 'up')" class="p-1.5 text-slate-400 hover:text-white" title="Move Up"><i class="fa-solid fa-chevron-up text-xs"></i></button>
+                                    <button onclick="app.moveFranchiseEntryOrder('${franc.id}', '${entry.id}', 'down')" class="p-1.5 text-slate-400 hover:text-white" title="Move Down"><i class="fa-solid fa-chevron-down text-xs"></i></button>
+                                    <button onclick="app.removeEntryFromFranchise('${franc.id}', '${entry.id}')" class="p-1.5 text-rose-400 hover:text-rose-300" title="Remove from Franchise"><i class="fa-solid fa-xmark text-xs"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                container.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between glass-card p-4 rounded-2xl gap-3">
+                        <div class="flex items-center gap-3">
+                            <button onclick="app.closeFranchiseDetail()" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white shrink-0"><i class="fa-solid fa-arrow-left"></i></button>
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="text-base sm:text-lg font-extrabold text-white leading-tight">${this.escapeHTML(franc.name)}</h3>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${adaptInfo.class}">${adaptInfo.text}</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">${franc.entries.length} entries · Order: ${franc.orderType || 'Release Order'} ${franc.adaptationNotes ? `· ${this.escapeHTML(franc.adaptationNotes)}` : ''}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                            <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="px-3 py-2 bg-gradient-to-r from-cyber-cyan to-brand-500 text-slate-950 rounded-xl text-xs font-bold transition-all shadow"><i class="fa-solid fa-plus mr-1"></i> Add Title</button>
+                            <button onclick="app.openEditFranchiseModal('${franc.id}')" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition-all">Edit Metadata</button>
+                            <button onclick="app.openCoverFranchiseModal('${franc.id}')" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition-all">Cover Poster</button>
+                            <button onclick="app.deleteFranchise('${franc.id}', event)" class="px-3 py-2 bg-rose-950/40 hover:bg-rose-900 text-rose-300 border border-rose-900/40 rounded-xl text-xs font-semibold transition-all">Delete</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs sm:text-sm font-bold text-cyber-cyan uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> Main Story & Key Seasons (${mainEntries.length})
+                            </h4>
+                            <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="text-xs text-cyber-cyan hover:underline font-semibold">+ Add Main Title</button>
+                        </div>
+                        <div class="space-y-2.5">
+                            ${mainEntries.length > 0 ? mainEntries.map((e, i) => renderEntryRow(e, i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No main story entries added yet.</p>`}
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-gift"></i> Optional Extras, Movies & OVAs (${extraEntries.length})
+                            </h4>
+                            <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="text-xs text-amber-400 hover:underline font-semibold">+ Add Extra Title</button>
+                        </div>
+                        <div class="space-y-2.5">
+                            ${extraEntries.length > 0 ? extraEntries.map((e, i) => renderEntryRow(e, mainEntries.length + i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No optional extra entries.</p>`}
+                        </div>
+                    </div>
+                `;
+            }
+
+            createCardHTML(item) {
+                const isAnime = item.category === 'anime';
+                const unit = isAnime ? 'Ep' : 'Ch';
+                
+                let progressPct = 0;
+                if (item.totalProgress > 0) {
+                    progressPct = Math.min(100, Math.round((item.currentProgress / item.totalProgress) * 100));
+                } else if (item.status === 'completed') {
+                    progressPct = 100;
+                }
+
+                const cover = item.coverUrl || SVG_POSTER_FALLBACK;
+                const isCompleted = item.status === 'completed';
+                const displayTitle = this.getEntryTitle(item);
+
+                const applicablePlatforms = this.platforms.filter(p => p.enabled && (p.category === item.category || p.category === 'both'));
+
+                return `
+                    <div id="anime-card-${item.id}" tabindex="0" class="anime-card-item group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        
+                        <!-- Poster Container (2:3 Aspect Ratio with Tap & Hover Interaction) -->
+                        <div class="anime-poster-wrapper relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="app.handlePosterTap('${item.id}', event)">
+                            <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 pointer-events-none"></div>
+                            
+                            <!-- Rating Badge + 3-Dot Menu Stacked (Top-Left) -->
+                            <div class="absolute top-2 left-2 flex flex-col items-start gap-1.5 z-30">
+                                ${item.externalRating > 0 ? `
+                                    <div class="bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Catalog')})">
+                                        <i class="fa-solid fa-star text-[9px]"></i>
+                                        <span>${item.externalRating.toFixed(1)}</span>
+                                    </div>
+                                ` : ''}
+
+                                <!-- 3-Dot Card Menu Trigger & Dropdown -->
+                                <div class="relative">
+                                    <button onclick="app.toggleCardMenu('${item.id}', event)" aria-label="Card options" class="card-action-btn w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                                        <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+                                    </button>
+                                    <div id="card-menu-${item.id}" class="card-action-menu hidden absolute left-0 top-full mt-1.5 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-40 text-left">
+                                        <button onclick="app.openModal('entry-modal', '${item.id}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
+                                            <i class="fa-solid fa-pen-to-square text-brand-400"></i> Edit
+                                        </button>
+                                        <button onclick="app.deleteEntry('${item.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 flex items-center gap-2 transition-colors">
+                                            <i class="fa-solid fa-trash-can text-rose-400"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Clear Status Badge (Top-Right) -->
+                            <div class="absolute top-2 right-2 z-30 shadow-lg pointer-events-none">
+                                ${isCompleted 
+                                    ? `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-emerald-500 text-slate-950 border border-emerald-300 shadow">Completed</span>`
+                                    : `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-cyber-cyan text-slate-950 border border-cyan-300 shadow">${isAnime ? 'Watching' : 'Reading'}</span>`
+                                }
+                            </div>
+
+                            <!-- Hidden Title Overlay (Revealed on Desktop Hover & Mobile Tap) -->
+                            <div class="anime-title-overlay">
+                                <div class="space-y-1">
+                                    ${item.season ? `<p class="text-[10px] font-semibold text-brand-300 uppercase tracking-wider">${this.escapeHTML(item.season)}</p>` : ''}
+                                    <span class="overlay-text">${this.escapeHTML(displayTitle)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer Controls -->
+                        <div class="p-2.5 sm:p-3 bg-slate-900/90 flex flex-col justify-between flex-grow space-y-2">
+                            
+                            <div class="flex items-center justify-between text-[11px] sm:text-xs">
+                                <span class="text-slate-400 font-medium">Episodes</span>
+                                <span class="font-bold text-slate-200">
+                                    ${item.currentProgress} <span class="text-slate-500">/ ${item.totalProgress > 0 ? item.totalProgress : '∞'}</span>
+                                </span>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="w-full bg-slate-950 rounded-full h-1.5 sm:h-2 overflow-hidden p-0.5 border border-slate-800">
+                                <div class="h-full rounded-full ${isCompleted ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-brand-500 to-cyber-cyan'} transition-all duration-300" style="width: ${item.totalProgress > 0 ? progressPct : (item.currentProgress > 0 ? '100' : '0')}%"></div>
+                            </div>
+
+                            <!-- Action Bar Buttons -->
+                            <div class="grid grid-cols-2 gap-1.5 pt-1">
+                                <div class="relative">
+                                    <button onclick="app.openMediaPlatformLink('${item.id}')" class="w-full h-8 sm:h-9 rounded-lg bg-brand-600/90 hover:bg-brand-500 active:scale-95 text-white flex items-center justify-center gap-1 text-[11px] sm:text-xs font-semibold shadow transition-all">
+                                        <i class="fa-solid ${isAnime ? 'fa-play' : 'fa-book-open'} text-[10px]"></i>
+                                        <span>${isAnime ? 'Watch' : 'Read'}</span>
+                                    </button>
+                                    ${applicablePlatforms.length > 0 ? `
+                                        <button onclick="app.togglePlatformMenu('${item.id}', event)" aria-label="Select custom streaming platform" class="platform-dropdown-btn absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center text-[9px] shadow">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                        <div id="platform-menu-${item.id}" class="platform-dropdown-menu hidden absolute left-0 bottom-full mb-1.5 w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-30 text-left">
+                                            <div class="px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80">
+                                                Select Platform
+                                            </div>
+                                            ${applicablePlatforms.map(pf => `
+                                                <button onclick="app.openMediaPlatformLink('${item.id}', '${this.escapeHTML(pf.url)}')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
+                                                    <i class="fa-solid ${this.escapeHTML(pf.icon || 'fa-globe')} text-slate-400 text-xs"></i>
+                                                    <span class="truncate">${this.escapeHTML(pf.name)}</span>
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                <button onclick="app.incrementProgress('${item.id}', event)" class="w-full h-8 sm:h-9 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white flex items-center justify-center gap-1 text-[11px] sm:text-xs font-semibold shadow transition-all" title="Quick +1 ${unit}">
+                                    <i class="fa-solid fa-plus text-[10px]"></i>
+                                    <span>+1 ${unit}</span>
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+            }
+
+            handlePosterTap(entryId, e) {
+                if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) {
+                    return;
+                }
+                const card = document.getElementById(`anime-card-${entryId}`);
+                if (!card) return;
+
+                const isActive = card.classList.contains('active-overlay');
+                document.querySelectorAll('.anime-card-item').forEach(c => c.classList.remove('active-overlay'));
+
+                if (!isActive) {
+                    card.classList.add('active-overlay');
+                }
+                e.stopPropagation();
             }
 
             openPlatformFormModal(platformId = null) {
@@ -1494,7 +2862,7 @@
                 if (defaultPlatform) {
                     window.open(defaultPlatform.url, '_blank', 'noopener,noreferrer');
                 } else {
-                    this.showToast('No default platform set. Manage links in Custom Links.', 'info');
+                    this.showToast('No default platform set.', 'info');
                     this.openModal('platforms-modal');
                 }
             }
@@ -1503,11 +2871,9 @@
                 if (e) e.stopPropagation();
                 const menu = document.getElementById(`platform-menu-${entryId}`);
                 if (!menu) return;
-
                 document.querySelectorAll('.platform-dropdown-menu').forEach(m => {
                     if (m !== menu) m.classList.add('hidden');
                 });
-
                 menu.classList.toggle('hidden');
             }
 
@@ -1515,31 +2881,10 @@
                 if (e) e.stopPropagation();
                 const menu = document.getElementById(`card-menu-${entryId}`);
                 if (!menu) return;
-
                 document.querySelectorAll('.card-action-menu').forEach(m => {
                     if (m !== menu) m.classList.add('hidden');
                 });
-
                 menu.classList.toggle('hidden');
-            }
-
-            // Mobile and Tablet Tap Handling for Title Overlay
-            handlePosterTap(entryId, e) {
-                if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) {
-                    return;
-                }
-                const card = document.getElementById(`anime-card-${entryId}`);
-                if (!card) return;
-
-                const isActive = card.classList.contains('active-overlay');
-                
-                // Accordion behavior: close other cards' overlays first
-                document.querySelectorAll('.anime-card-item').forEach(c => c.classList.remove('active-overlay'));
-
-                if (!isActive) {
-                    card.classList.add('active-overlay');
-                }
-                e.stopPropagation();
             }
 
             openModal(modalId, entryId = null) {
@@ -1548,6 +2893,14 @@
                 if (!modal || !content) return;
 
                 if (modalId === 'platforms-modal') this.renderPlatformsList();
+                if (modalId === 'franchise-wizard-modal') {
+                    document.getElementById('franchise-query-input').value = '';
+                    document.getElementById('wizard-search-status').classList.add('hidden');
+                    document.getElementById('wizard-search-results').classList.add('hidden');
+                    document.getElementById('wizard-review-section').classList.add('hidden');
+                    document.getElementById('wizard-save-btn').classList.add('hidden');
+                    this.wizardDiscoveredEntries = [];
+                }
 
                 if (modalId === 'entry-modal') {
                     const form = document.getElementById('entry-form');
@@ -1585,7 +2938,7 @@
                             this.updatePosterPreview();
                         }
                     } else {
-                        document.getElementById('form-category').value = this.activeCategory || 'anime';
+                        document.getElementById('form-category').value = this.activeCategory === 'franchise' ? 'anime' : this.activeCategory;
                     }
                     this.toggleCategoryFormLabels();
                 }
@@ -1599,7 +2952,6 @@
                 const modal = document.getElementById(modalId);
                 const content = document.getElementById(modalId + '-content');
                 if (!modal) return;
-                
                 modal.classList.add('opacity-0', 'pointer-events-none');
                 content.classList.remove('scale-100');
                 content.classList.add('scale-95');
@@ -1613,7 +2965,6 @@
                 const confirmBtn = document.getElementById('confirm-action-btn');
 
                 const cleanup = () => this.closeModal('confirm-modal');
-
                 cancelBtn.onclick = cleanup;
                 confirmBtn.onclick = () => {
                     onConfirm();
@@ -1626,12 +2977,14 @@
             confirmReset() {
                 this.showConfirmDialog(
                     'Reset Storage Library',
-                    'DANGER: Permanently wipe all media entries and settings? It is recommended to export a JSON backup first.',
+                    'DANGER: Permanently wipe all media entries, franchises, and settings?',
                     () => {
                         this.entries = [];
+                        this.franchises = [];
                         this.platforms = this.getDefaultPlatforms();
                         this.defaultPlatforms = { anime: '', manga: '' };
                         this.saveEntriesToStorage();
+                        this.saveFranchisesToStorage();
                         this.savePlatformsToStorage();
                         this.saveDefaultsToStorage();
                         this.showToast('Library wiped to clean state', 'info');
@@ -1652,10 +3005,11 @@
                 });
 
                 const backupData = {
-                    version: '3.7',
+                    version: '3.8',
                     exportedAt: new Date().toISOString(),
                     filterScope: { category: catFilter, status: statusFilter },
                     entries: filteredEntries,
+                    franchises: this.franchises,
                     platforms: this.platforms,
                     defaultPlatforms: this.defaultPlatforms
                 };
@@ -1667,7 +3021,7 @@
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
-                this.showToast('Filtered library backup downloaded!', 'success');
+                this.showToast('Complete library & franchise backup downloaded!', 'success');
             }
 
             importJSON(e) {
@@ -1684,6 +3038,9 @@
                             validEntries = imported;
                         } else if (imported && imported.entries && Array.isArray(imported.entries)) {
                             validEntries = imported.entries;
+                            if (imported.franchises && Array.isArray(imported.franchises)) {
+                                this.franchises = imported.franchises;
+                            }
                             if (imported.platforms) this.platforms = imported.platforms;
                             if (imported.defaultPlatforms) this.defaultPlatforms = imported.defaultPlatforms;
                         } else {
@@ -1692,10 +3049,11 @@
 
                         this.entries = validEntries.filter(item => item && typeof item === 'object');
                         this.saveEntriesToStorage();
+                        this.saveFranchisesToStorage();
                         this.savePlatformsToStorage();
                         this.saveDefaultsToStorage();
 
-                        this.showToast('Successfully restored library backup!', 'success');
+                        this.showToast('Successfully restored backup!', 'success');
                         this.closeModal('data-modal');
                         this.render();
                     } catch (err) {
@@ -1743,7 +3101,6 @@
                                 const score = parseFloat(getNodeText(node, category === 'anime' ? 'my_score' : 'my_score')) || 0;
                                 const type = getNodeText(node, category === 'anime' ? 'series_type' : 'manga_publishing_status');
                                 const startDate = getNodeText(node, 'my_start_date');
-                                const finishDate = getNodeText(node, 'my_finish_date');
 
                                 let status = 'active';
                                 if (statusRaw.includes('completed') || (totalProg > 0 && currentProg >= totalProg)) {
@@ -1773,8 +3130,6 @@
                                     season,
                                     coverUrl: '',
                                     externalUrl: '',
-                                    startDate,
-                                    finishDate,
                                     updatedAt: Date.now()
                                 };
 
@@ -1824,277 +3179,6 @@
 
                 reader.readAsText(file);
                 e.target.value = '';
-            }
-
-            setCategory(category) {
-                this.activeCategory = category;
-                this.renderLimit = this.renderBatchSize;
-                this.toggleCategoryFormLabels();
-                this.render();
-            }
-
-            setStatus(status) {
-                this.activeStatus = status;
-                this.renderLimit = this.renderBatchSize;
-                this.render();
-            }
-
-            handleSearch() {
-                this.searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-                this.renderLimit = this.renderBatchSize;
-                this.renderGrid();
-            }
-
-            handleSort() {
-                this.sortBy = document.getElementById('sort-select').value;
-                this.renderLimit = this.renderBatchSize;
-                this.renderGrid();
-            }
-
-            resetFilters() {
-                this.searchQuery = '';
-                document.getElementById('search-input').value = '';
-                this.sortBy = 'updated';
-                document.getElementById('sort-select').value = 'updated';
-                this.activeCategory = 'anime';
-                this.activeStatus = 'all';
-                this.renderLimit = this.renderBatchSize;
-                this.render();
-            }
-
-            toggleCategoryFormLabels() {
-                const cat = document.getElementById('form-category').value;
-                document.getElementById('opt-status-active').textContent = cat === 'anime' ? 'Watching' : 'Reading';
-                document.getElementById('lbl-progress-current').textContent = cat === 'anime' ? 'Watched Episodes' : 'Read Chapters';
-                document.getElementById('lbl-progress-total').textContent = cat === 'anime' ? 'Total Episodes (0 = ∞)' : 'Total Chapters (0 = ∞)';
-                document.getElementById('status-tab-active-label').textContent = this.activeCategory === 'anime' ? 'Watching' : 'Reading';
-            }
-
-            render() {
-                this.renderStats();
-                this.renderTabs();
-                this.renderGrid();
-            }
-
-            renderStats() {
-                const total = this.entries.length;
-                const animeCnt = this.entries.filter(i => i.category === 'anime').length;
-                const mangaCnt = this.entries.filter(i => i.category === 'manga').length;
-                const activeCnt = this.entries.filter(i => i.status === 'active').length;
-                const completedCnt = this.entries.filter(i => i.status === 'completed').length;
-
-                document.getElementById('stat-total').textContent = total;
-                document.getElementById('stat-anime-cnt').textContent = animeCnt;
-                document.getElementById('stat-manga-cnt').textContent = mangaCnt;
-                document.getElementById('stat-active').textContent = activeCnt;
-                document.getElementById('stat-completed').textContent = completedCnt;
-
-                document.getElementById('badge-anime-count').textContent = animeCnt;
-                document.getElementById('badge-manga-count').textContent = mangaCnt;
-            }
-
-            renderTabs() {
-                const animeTab = document.getElementById('cat-tab-anime');
-                const mangaTab = document.getElementById('cat-tab-manga');
-
-                if (this.activeCategory === 'anime') {
-                    animeTab.className = "flex items-center gap-2.5 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-600 text-white shadow-lg shadow-brand-600/30 glow-cyan";
-                    mangaTab.className = "flex items-center gap-2.5 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/50";
-                } else {
-                    mangaTab.className = "flex items-center gap-2.5 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-cyber-pink text-white shadow-lg shadow-pink-600/30 glow-pink";
-                    animeTab.className = "flex items-center gap-2.5 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/50";
-                }
-
-                ['all', 'active', 'completed'].forEach(st => {
-                    const el = document.getElementById(`status-tab-${st}`);
-                    if (this.activeStatus === st) {
-                        el.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 bg-slate-800 text-slate-100 border border-slate-700 shadow-sm";
-                    } else {
-                        el.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 text-slate-400 hover:text-white";
-                    }
-                });
-
-                document.getElementById('status-tab-active-label').textContent = this.activeCategory === 'anime' ? 'Watching' : 'Reading';
-            }
-
-            getFilteredEntries() {
-                return this.entries.filter(item => {
-                    if (item.category !== this.activeCategory) return false;
-                    if (this.activeStatus !== 'all' && item.status !== this.activeStatus) return false;
-
-                    if (this.searchQuery) {
-                        const engMatch = item.titleEnglish && item.titleEnglish.toLowerCase().includes(this.searchQuery);
-                        const romMatch = item.titleRomanji && item.titleRomanji.toLowerCase().includes(this.searchQuery);
-                        const titleMatch = item.title && item.title.toLowerCase().includes(this.searchQuery);
-                        const seasonMatch = item.season && item.season.toLowerCase().includes(this.searchQuery);
-                        if (!engMatch && !romMatch && !titleMatch && !seasonMatch) return false;
-                    }
-                    return true;
-                }).sort((a, b) => {
-                    const titleA = this.getEntryTitle(a);
-                    const titleB = this.getEntryTitle(b);
-
-                    if (this.sortBy === 'title') return titleA.localeCompare(titleB);
-                    if (this.sortBy === 'externalRating') return (b.externalRating || 0) - (a.externalRating || 0);
-                    if (this.sortBy === 'progress') {
-                        const pctA = a.totalProgress > 0 ? (a.currentProgress / a.totalProgress) : 0;
-                        const pctB = b.totalProgress > 0 ? (b.currentProgress / b.totalProgress) : 0;
-                        return pctB - pctA;
-                    }
-                    return (b.updatedAt || 0) - (a.updatedAt || 0);
-                });
-            }
-
-            loadMoreEntries() {
-                this.renderLimit += this.renderBatchSize;
-                this.renderGrid();
-            }
-
-            renderGrid() {
-                const grid = document.getElementById('media-grid');
-                const emptyState = document.getElementById('empty-state');
-                const loadMoreBtn = document.getElementById('load-more-container');
-                
-                const filtered = this.getFilteredEntries();
-
-                if (filtered.length === 0) {
-                    grid.innerHTML = '';
-                    emptyState.classList.remove('hidden');
-                    emptyState.classList.add('flex');
-                    loadMoreBtn.classList.add('hidden');
-                    return;
-                }
-
-                emptyState.classList.add('hidden');
-                emptyState.classList.remove('flex');
-
-                const itemsToDisplay = filtered.slice(0, this.renderLimit);
-                grid.innerHTML = itemsToDisplay.map(item => this.createCardHTML(item)).join('');
-
-                if (filtered.length > this.renderLimit) {
-                    loadMoreBtn.classList.remove('hidden');
-                } else {
-                    loadMoreBtn.classList.add('hidden');
-                }
-            }
-
-            createCardHTML(item) {
-                const isAnime = item.category === 'anime';
-                const unit = isAnime ? 'Ep' : 'Ch';
-                
-                let progressPct = 0;
-                if (item.totalProgress > 0) {
-                    progressPct = Math.min(100, Math.round((item.currentProgress / item.totalProgress) * 100));
-                } else if (item.status === 'completed') {
-                    progressPct = 100;
-                }
-
-                const cover = item.coverUrl || SVG_POSTER_FALLBACK;
-                const isCompleted = item.status === 'completed';
-                const displayTitle = this.getEntryTitle(item);
-
-                const applicablePlatforms = this.platforms.filter(p => p.enabled && (p.category === item.category || p.category === 'both'));
-
-                return `
-                    <div id="anime-card-${item.id}" tabindex="0" class="anime-card-item group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        
-                        <!-- Poster Container (2:3 Aspect Ratio with Tap & Hover Interaction) -->
-                        <div class="anime-poster-wrapper relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="app.handlePosterTap('${item.id}', event)">
-                            <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 pointer-events-none"></div>
-                            
-                            <!-- Rating Badge + 3-Dot Menu Stacked (Top-Left) -->
-                            <div class="absolute top-2 left-2 flex flex-col items-start gap-1.5 z-30">
-                                ${item.externalRating > 0 ? `
-                                    <div class="bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Catalog')})">
-                                        <i class="fa-solid fa-star text-[9px]"></i>
-                                        <span>${item.externalRating.toFixed(1)}</span>
-                                    </div>
-                                ` : ''}
-
-                                <!-- 3-Dot Card Menu Trigger & Dropdown -->
-                                <div class="relative">
-                                    <button onclick="app.toggleCardMenu('${item.id}', event)" aria-label="Card options" class="card-action-btn w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-                                        <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
-                                    </button>
-                                    <div id="card-menu-${item.id}" class="card-action-menu hidden absolute left-0 top-full mt-1.5 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-40 text-left">
-                                        <button onclick="app.openModal('entry-modal', '${item.id}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
-                                            <i class="fa-solid fa-pen-to-square text-brand-400"></i> Edit
-                                        </button>
-                                        <button onclick="app.deleteEntry('${item.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 flex items-center gap-2 transition-colors">
-                                            <i class="fa-solid fa-trash-can text-rose-400"></i> Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Clear Status Badge (Top-Right) -->
-                            <div class="absolute top-2 right-2 z-30 shadow-lg pointer-events-none">
-                                ${isCompleted 
-                                    ? `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-emerald-500 text-slate-950 border border-emerald-300 shadow">Completed</span>`
-                                    : `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-cyber-cyan text-slate-950 border border-cyan-300 shadow">${isAnime ? 'Watching' : 'Reading'}</span>`
-                                }
-                            </div>
-
-                            <!-- Hidden Title Overlay (Revealed on Desktop Hover & Mobile Tap) -->
-                            <div class="anime-title-overlay">
-                                <div class="space-y-1">
-                                    ${item.season ? `<p class="text-[10px] font-semibold text-brand-300 uppercase tracking-wider">${this.escapeHTML(item.season)}</p>` : ''}
-                                    <span class="overlay-text">${this.escapeHTML(displayTitle)}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card Footer Controls -->
-                        <div class="p-2.5 sm:p-3 bg-slate-900/90 flex flex-col justify-between flex-grow space-y-2">
-                            
-                            <div class="flex items-center justify-between text-[11px] sm:text-xs">
-                                <span class="text-slate-400 font-medium">Episodes</span>
-                                <span class="font-bold text-slate-200">
-                                    ${item.currentProgress} <span class="text-slate-500">/ ${item.totalProgress > 0 ? item.totalProgress : '∞'}</span>
-                                </span>
-                            </div>
-
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-slate-950 rounded-full h-1.5 sm:h-2 overflow-hidden p-0.5 border border-slate-800">
-                                <div class="h-full rounded-full ${isCompleted ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-brand-500 to-cyber-cyan'} transition-all duration-300" style="width: ${item.totalProgress > 0 ? progressPct : (item.currentProgress > 0 ? '100' : '0')}%"></div>
-                            </div>
-
-                            <!-- Action Bar Buttons -->
-                            <div class="grid grid-cols-2 gap-1.5 pt-1">
-                                <div class="relative">
-                                    <button onclick="app.openMediaPlatformLink('${item.id}')" class="w-full h-8 sm:h-9 rounded-lg bg-brand-600/90 hover:bg-brand-500 active:scale-95 text-white flex items-center justify-center gap-1 text-[11px] sm:text-xs font-semibold shadow transition-all">
-                                        <i class="fa-solid ${isAnime ? 'fa-play' : 'fa-book-open'} text-[10px]"></i>
-                                        <span>${isAnime ? 'Watch' : 'Read'}</span>
-                                    </button>
-                                    ${applicablePlatforms.length > 0 ? `
-                                        <button onclick="app.togglePlatformMenu('${item.id}', event)" aria-label="Select custom streaming platform" class="platform-dropdown-btn absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center text-[9px] shadow">
-                                            <i class="fa-solid fa-chevron-down"></i>
-                                        </button>
-                                        <div id="platform-menu-${item.id}" class="platform-dropdown-menu hidden absolute left-0 bottom-full mb-1.5 w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-30 text-left">
-                                            <div class="px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80">
-                                                Select Platform
-                                            </div>
-                                            ${applicablePlatforms.map(pf => `
-                                                <button onclick="app.openMediaPlatformLink('${item.id}', '${this.escapeHTML(pf.url)}')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-cyber-cyan flex items-center gap-2 transition-colors">
-                                                    <i class="fa-solid ${this.escapeHTML(pf.icon || 'fa-globe')} text-slate-400 text-xs"></i>
-                                                    <span class="truncate">${this.escapeHTML(pf.name)}</span>
-                                                </button>
-                                            `).join('')}
-                                        </div>
-                                    ` : ''}
-                                </div>
-
-                                <button onclick="app.incrementProgress('${item.id}', event)" class="w-full h-8 sm:h-9 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white flex items-center justify-center gap-1 text-[11px] sm:text-xs font-semibold shadow transition-all" title="Quick +1 ${unit}">
-                                    <i class="fa-solid fa-plus text-[10px]"></i>
-                                    <span>+1 ${unit}</span>
-                                </button>
-                            </div>
-
-                        </div>
-
-                    </div>
-                `;
             }
 
             showToast(message, type = 'info') {
