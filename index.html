@@ -157,7 +157,7 @@
                     <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 40 40\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%236366f1\'/%3E%3Ctext x=\'50%25\' y=\'55%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'sans-serif\' font-size=\'20\' font-weight=\'bold\'%3EA%3C/text%3E%3C/svg%3E';">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.8</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.9</span>
                     </div>
                 </div>
 
@@ -265,8 +265,12 @@
                 </div>
 
                 <!-- Franchise Action Bar (Visible when Watch Order Tab is Active) -->
-                <div id="franchise-action-container" class="hidden flex items-center gap-2 w-full lg:w-auto">
-                    <button onclick="app.openModal('franchise-wizard-modal')" class="w-full lg:w-auto bg-gradient-to-r from-cyber-cyan to-brand-500 hover:brightness-110 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                <div id="franchise-action-container" class="hidden flex items-center justify-between sm:justify-end gap-2 w-full lg:w-auto">
+                    <button onclick="app.toggleShowHiddenFranchises()" id="toggle-hidden-franchises-btn" class="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-eye-slash text-brand-400"></i>
+                        <span id="toggle-hidden-text">Show Hidden</span>
+                    </button>
+                    <button onclick="app.openModal('franchise-wizard-modal')" class="bg-gradient-to-r from-cyber-cyan to-brand-500 hover:brightness-110 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i>
                         <span>Create Franchise</span>
                     </button>
@@ -725,7 +729,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Adaptation Status</label>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Franchise-Level Adaptation Status</label>
                         <select id="wizard-adaptation-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none cursor-pointer">
                             <option value="complete_adaptation">Manga adaptation complete</option>
                             <option value="manga_ongoing">Source manga still ongoing</option>
@@ -738,7 +742,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider">Entries (Reorder or reclassify as Main / Optional Extra)</label>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider">Entries (Classify into Main Watch Order or Optional Extras)</label>
                         <div id="wizard-entries-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
@@ -847,12 +851,12 @@
         </div>
     </div>
 
-    <!-- Modal 9: Add Title to Franchise Modal -->
+    <!-- Modal 9: Add Title to Franchise Modal (v3.9 Dual Tab: Catalogue Search & Manual Entry with Collection Sync) -->
     <div id="add-franchise-entry-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="add-franchise-entry-modal-content">
+        <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="add-franchise-entry-modal-content">
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
                 <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-plus text-cyber-cyan"></i>
+                    <i class="fa-solid fa-circle-plus text-cyber-cyan"></i>
                     <span>Add Title to Franchise Order</span>
                 </h3>
                 <button onclick="app.closeModal('add-franchise-entry-modal')" aria-label="Close modal" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
@@ -860,69 +864,81 @@
                 </button>
             </div>
 
-            <form id="add-franchise-entry-form" onsubmit="app.saveAddedFranchiseEntry(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <div class="p-6 space-y-4 max-h-[82vh] overflow-y-auto">
                 <input type="hidden" id="add-fe-franchise-id">
+                <input type="hidden" id="add-fe-selected-external-id">
+                <input type="hidden" id="add-fe-selected-rating">
+                <input type="hidden" id="add-fe-selected-source">
 
-                <!-- Existing Collection Title Quick Selector -->
-                <div id="collection-quick-select-container" class="space-y-1.5 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
-                    <label class="block text-xs font-semibold text-brand-300 uppercase tracking-wider">Select from My Collection (Optional)</label>
-                    <select id="add-fe-collection-select" onchange="app.handleCollectionSelectForFranchiseEntry()" class="w-full bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 outline-none cursor-pointer">
-                        <option value="">-- Manual Entry --</option>
-                    </select>
+                <!-- Tab Switcher (Catalogue Search vs Manual Entry) -->
+                <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                    <button type="button" id="add-fe-tab-catalog" onclick="app.switchAddFranchiseTab('catalog')" class="flex-1 py-2 rounded-lg font-bold bg-brand-600 text-white transition-colors">Catalogue Search</button>
+                    <button type="button" id="add-fe-tab-manual" onclick="app.switchAddFranchiseTab('manual')" class="flex-1 py-2 rounded-lg font-medium text-slate-400 hover:text-white transition-colors">Manual Entry</button>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">English Title *</label>
-                    <input type="text" id="add-fe-title-english" required placeholder="e.g. Attack on Titan Season 2" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                <!-- TAB A: CATALOGUE SEARCH -->
+                <div id="add-fe-panel-catalog" class="space-y-3">
+                    <div class="flex gap-2">
+                        <input type="search" id="add-fe-catalog-search-input" placeholder="Search anime title, e.g. Attack on Titan..." class="flex-1 bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();app.searchFranchiseAddCatalog();}">
+                        <button type="button" onclick="app.searchFranchiseAddCatalog()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyber-cyan hover:brightness-110 transition-all"><i class="fa-solid fa-magnifying-glass mr-1"></i> Search</button>
+                    </div>
+                    <div id="add-fe-catalog-status" class="hidden text-xs text-slate-400"></div>
+                    <div id="add-fe-catalog-results" class="hidden space-y-2 max-h-56 overflow-y-auto pr-1"></div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Romanji Title</label>
-                    <input type="text" id="add-fe-title-romanji" placeholder="e.g. Shingeki no Kyojin Season 2" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
+                <!-- TAB B: MANUAL ENTRY FORM -->
+                <form id="add-fe-manual-form" class="hidden space-y-3.5">
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Section Classification *</label>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Anime English Title *</label>
+                        <input type="text" id="add-fe-title-english" required placeholder="e.g. Attack on Titan Season 2" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Romanji Title</label>
+                        <input type="text" id="add-fe-title-romanji" placeholder="e.g. Shingeki no Kyojin Season 2" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-sm text-slate-100 outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Media Format / Type</label>
+                            <input type="text" id="add-fe-season-info" placeholder="TV, Movie, OVA" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Total Episodes</label>
+                            <input type="number" id="add-fe-total-progress" min="0" value="12" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Cover Image URL</label>
+                        <input type="url" id="add-fe-cover-url" placeholder="https://domain.com/poster.jpg" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none">
+                    </div>
+                </form>
+
+                <!-- Common Settings for Both Tabs -->
+                <div class="space-y-3.5 pt-2 border-t border-slate-800">
+                    <div>
+                        <label class="block text-xs font-medium text-brand-300 uppercase tracking-wider mb-1">Watch Order Group *</label>
                         <select id="add-fe-classification" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3 py-2 text-xs text-slate-100 outline-none cursor-pointer">
-                            <option value="Main story">Main Story</option>
-                            <option value="Sequel or season">Sequel or Season</option>
-                            <option value="Movie">Movie</option>
-                            <option value="Optional extra">Optional Extra</option>
-                            <option value="OVA">OVA</option>
-                            <option value="ONA">ONA</option>
-                            <option value="Special">Special</option>
-                            <option value="Recap">Recap</option>
-                            <option value="Spin-off">Spin-off</option>
+                            <option value="Main story">Main Watch Order</option>
+                            <option value="Optional extra">Optional Extras</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Season / Format Info</label>
-                        <input type="text" id="add-fe-season-info" placeholder="e.g. TV (2017)" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Total Episodes</label>
-                        <input type="number" id="add-fe-total-progress" min="0" value="12" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                    <!-- Also add to Anime collection checkbox -->
+                    <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex items-start gap-3">
+                        <input type="checkbox" id="add-fe-sync-collection" checked class="mt-0.5 w-4 h-4 rounded bg-slate-900 border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer">
+                        <div>
+                            <label for="add-fe-sync-collection" class="text-xs font-bold text-slate-200 cursor-pointer">Also add this title to my Anime collection</label>
+                            <p class="text-[10px] text-slate-400 mt-0.5">If checked, creates a synchronized collection record so you can track personal progress and ratings. Skips automatically if already in your library.</p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Internet Score</label>
-                        <input type="number" id="add-fe-external-rating" min="0" max="10" step="0.1" placeholder="8.5" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
-                    </div>
-                </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Cover Image URL</label>
-                    <input type="url" id="add-fe-cover-url" placeholder="https://domain.com/poster.jpg" class="w-full bg-slate-950 border border-slate-800 focus:border-cyber-cyan rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                    <div id="add-fe-status-notice" class="hidden text-xs font-semibold text-emerald-400 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30"></div>
                 </div>
+            </div>
 
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-                    <button type="button" onclick="app.closeModal('add-franchise-entry-modal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-950 transition-colors">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyber-cyan hover:brightness-110 shadow-lg shadow-cyan-500/20 transition-all">Add to Franchise Order</button>
-                </div>
-            </form>
+            <div class="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-slate-950/50">
+                <button type="button" onclick="app.closeModal('add-franchise-entry-modal')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white bg-slate-950 transition-colors">Cancel</button>
+                <button type="button" id="add-fe-submit-btn" onclick="app.submitAddFranchiseEntry()" class="px-5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyber-cyan hover:brightness-110 shadow-lg shadow-cyan-500/20 transition-all">Add to Franchise</button>
+            </div>
         </div>
     </div>
 
@@ -936,10 +952,13 @@
                 this.PLATFORMS_KEY = 'anitrack_platforms_v1';
                 this.DEFAULTS_KEY = 'anitrack_defaults_v1';
                 this.PREFERRED_SOURCE_KEY = 'anitrackPreferredMetadataSource';
+                this.HIDDEN_FRANCHISES_KEY = 'anitrack_hidden_franchises_v1';
 
                 this.entries = [];
                 this.franchises = [];
                 this.platforms = [];
+                this.hiddenFranchiseIds = [];
+                this.showHiddenFranchises = false;
                 this.defaultPlatforms = { anime: '', manga: '' };
                 this.preferredApiSource = 'kitsu'; // 'kitsu' or 'anilist'
                 
@@ -958,9 +977,14 @@
                 // Wizard Discovered State
                 this.wizardDiscoveredEntries = [];
 
+                // Add Franchise Entry Dialog State ('catalog' or 'manual')
+                this.addFranchiseTabMode = 'catalog';
+                this.selectedCatalogAddEntry = null;
+
                 // Catalogue Search & PWA Prompts
                 this.catalogAbortController = null;
                 this.wizardAbortController = null;
+                this.addFranchiseAbortController = null;
                 this.searchRequestId = 0;
                 this.deferredPrompt = null;
 
@@ -987,15 +1011,32 @@
                     const storedFranchises = localStorage.getItem(this.FRANCHISES_KEY);
                     if (storedFranchises) {
                         const parsed = JSON.parse(storedFranchises);
-                        // Safe Migration for Franchise-Level Adaptation Fields
-                        this.franchises = parsed.map(f => ({
-                            ...f,
-                            adaptationStatus: f.adaptationStatus || 'unknown',
-                            adaptationNotes: f.adaptationNotes || ''
+                        // Safe Migration & Cleanup for v3.9 Classifications
+                        this.franchises = parsed.map(franc => ({
+                            ...franc,
+                            adaptationStatus: franc.adaptationStatus || 'unknown',
+                            adaptationNotes: franc.adaptationNotes || '',
+                            entries: (franc.entries || []).map(fe => {
+                                let cls = fe.classification || 'Main story';
+                                if (cls !== 'Main story' && cls !== 'Optional extra') {
+                                    // Map legacy granular classifications into Main Watch Order vs Optional Extras
+                                    if (['Recap', 'Alternate version', 'Optional extra', 'Spin-off', 'Special'].includes(cls)) {
+                                        cls = 'Optional extra';
+                                    } else {
+                                        cls = 'Main story';
+                                    }
+                                }
+                                return { ...fe, classification: cls };
+                            })
                         }));
                     } else {
                         this.franchises = this.getDefaultFranchisesSeed();
                         this.saveFranchisesToStorage();
+                    }
+
+                    const storedHidden = localStorage.getItem(this.HIDDEN_FRANCHISES_KEY);
+                    if (storedHidden) {
+                        this.hiddenFranchiseIds = JSON.parse(storedHidden);
                     }
 
                     const storedPlatforms = localStorage.getItem(this.PLATFORMS_KEY);
@@ -1043,6 +1084,14 @@
                     localStorage.setItem(this.FRANCHISES_KEY, JSON.stringify(this.franchises));
                 } catch (e) {
                     this.showToast('Failed to save franchise data.', 'error');
+                }
+            }
+
+            saveHiddenFranchisesToStorage() {
+                try {
+                    localStorage.setItem(this.HIDDEN_FRANCHISES_KEY, JSON.stringify(this.hiddenFranchiseIds));
+                } catch (e) {
+                    console.error('Failed to save hidden franchises', e);
                 }
             }
 
@@ -1672,7 +1721,7 @@
                 );
             }
 
-            // --- Franchise Feature Implementation ---
+            // --- v3.9 Franchise Feature Implementation ---
             setCategory(category) {
                 this.activeCategory = category;
                 this.renderLimit = this.renderBatchSize;
@@ -1759,72 +1808,319 @@
                 }
             }
 
-            // Add Title to Franchise Modal Handler
+            toggleShowHiddenFranchises() {
+                this.showHiddenFranchises = !this.showHiddenFranchises;
+                const btnText = document.getElementById('toggle-hidden-text');
+                if (btnText) {
+                    btnText.textContent = this.showHiddenFranchises ? 'Hide Hidden' : 'Show Hidden';
+                }
+                this.renderGrid();
+            }
+
+            hideFranchise(franchiseId, e) {
+                if (e) e.stopPropagation();
+                if (!this.hiddenFranchiseIds.includes(franchiseId)) {
+                    this.hiddenFranchiseIds.push(franchiseId);
+                    this.saveHiddenFranchisesToStorage();
+                    this.showToast('Franchise hidden from view', 'info');
+                    this.render();
+                }
+            }
+
+            restoreFranchise(franchiseId, e) {
+                if (e) e.stopPropagation();
+                this.hiddenFranchiseIds = this.hiddenFranchiseIds.filter(id => id !== franchiseId);
+                this.saveHiddenFranchisesToStorage();
+                this.showToast('Franchise restored to view', 'success');
+                this.render();
+            }
+
+            // v3.9 Dual Tab Add Franchise Entry Modal Controller
             openAddFranchiseEntryModal(franchiseId) {
                 const franc = this.franchises.find(f => f.id === franchiseId);
                 if (!franc) return;
 
                 document.getElementById('add-fe-franchise-id').value = franchiseId;
-                document.getElementById('add-franchise-entry-form').reset();
+                document.getElementById('add-fe-selected-external-id').value = '';
+                document.getElementById('add-fe-selected-rating').value = '';
+                document.getElementById('add-fe-selected-source').value = '';
+                document.getElementById('add-fe-manual-form').reset();
+                document.getElementById('add-fe-catalog-search-input').value = '';
+                document.getElementById('add-fe-catalog-results').innerHTML = '';
+                document.getElementById('add-fe-catalog-results').classList.add('hidden');
+                document.getElementById('add-fe-catalog-status').classList.add('hidden');
+                document.getElementById('add-fe-status-notice').classList.add('hidden');
+                document.getElementById('add-fe-sync-collection').checked = true;
 
-                const select = document.getElementById('add-fe-collection-select');
-                select.innerHTML = '<option value="">-- Manual Entry / Custom Search --</option>' + 
-                    this.entries.map(e => `<option value="${e.id}">${this.escapeHTML(e.titleEnglish || e.title)} (${e.category.toUpperCase()})</option>`).join('');
-
+                this.switchAddFranchiseTab('catalog');
                 this.openModal('add-franchise-entry-modal');
             }
 
-            handleCollectionSelectForFranchiseEntry() {
-                const selectVal = document.getElementById('add-fe-collection-select').value;
-                if (!selectVal) return;
+            switchAddFranchiseTab(mode) {
+                this.addFranchiseTabMode = mode;
+                const catalogBtn = document.getElementById('add-fe-tab-catalog');
+                const manualBtn = document.getElementById('add-fe-tab-manual');
+                const catalogPanel = document.getElementById('add-fe-panel-catalog');
+                const manualForm = document.getElementById('add-fe-manual-form');
 
-                const entry = this.entries.find(e => e.id === selectVal);
-                if (!entry) return;
-
-                document.getElementById('add-fe-title-english').value = entry.titleEnglish || entry.title || '';
-                document.getElementById('add-fe-title-romanji').value = entry.titleRomanji || entry.title || '';
-                document.getElementById('add-fe-season-info').value = entry.season || 'TV';
-                document.getElementById('add-fe-total-progress').value = entry.totalProgress || 12;
-                document.getElementById('add-fe-external-rating').value = entry.externalRating || '';
-                document.getElementById('add-fe-cover-url').value = entry.coverUrl || '';
+                if (mode === 'catalog') {
+                    catalogBtn.className = "flex-1 py-2 rounded-lg font-bold bg-brand-600 text-white transition-colors";
+                    manualBtn.className = "flex-1 py-2 rounded-lg font-medium text-slate-400 hover:text-white transition-colors";
+                    catalogPanel.classList.remove('hidden');
+                    manualForm.classList.add('hidden');
+                } else {
+                    manualBtn.className = "flex-1 py-2 rounded-lg font-bold bg-brand-600 text-white transition-colors";
+                    catalogBtn.className = "flex-1 py-2 rounded-lg font-medium text-slate-400 hover:text-white transition-colors";
+                    manualForm.classList.remove('hidden');
+                    catalogPanel.classList.add('hidden');
+                    this.selectedCatalogAddEntry = null;
+                }
             }
 
-            saveAddedFranchiseEntry(e) {
-                e.preventDefault();
+            async searchFranchiseAddCatalog() {
+                if (!navigator.onLine) {
+                    this.showToast('Catalogue search requires active internet connection.', 'error');
+                    return;
+                }
+
+                const query = document.getElementById('add-fe-catalog-search-input').value.trim();
+                const statusEl = document.getElementById('add-fe-catalog-status');
+                const resultsEl = document.getElementById('add-fe-catalog-results');
+
+                if (query.length < 2) {
+                    statusEl.textContent = 'Enter at least 2 characters.';
+                    statusEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (this.addFranchiseAbortController) this.addFranchiseAbortController.abort();
+                this.addFranchiseAbortController = new AbortController();
+
+                statusEl.textContent = `Searching ${this.preferredApiSource === 'anilist' ? 'AniList' : 'Kitsu'}…`;
+                statusEl.classList.remove('hidden');
+                resultsEl.innerHTML = '';
+                resultsEl.classList.add('hidden');
+
+                try {
+                    let unifiedResults = [];
+                    if (this.preferredApiSource === 'kitsu') {
+                        const url = `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(query)}&page[limit]=6`;
+                        const res = await fetch(url, { signal: this.addFranchiseAbortController.signal });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const items = Array.isArray(data.data) ? data.data : [];
+                            items.forEach(item => {
+                                const attr = item.attributes || {};
+                                const titleEnglish = attr.titles?.en || attr.canonicalTitle || 'Untitled';
+                                const titleRomanji = attr.titles?.en_jp || attr.canonicalTitle || titleEnglish;
+                                const imageUrl = attr.posterImage?.medium || attr.posterImage?.original || '';
+                                const year = attr.startDate ? attr.startDate.slice(0, 4) : '';
+                                const total = attr.episodeCount || 0;
+                                const subtype = attr.subtype ? attr.subtype.toUpperCase() : 'TV';
+
+                                unifiedResults.push({
+                                    id: 'kitsu-' + item.id,
+                                    titleEnglish,
+                                    titleRomanji,
+                                    imageUrl,
+                                    total,
+                                    seasonInfo: `${subtype} ${year ? `(${year})` : ''}`,
+                                    externalRating: attr.averageRating ? parseFloat((parseFloat(attr.averageRating) / 10).toFixed(1)) : 0,
+                                    source: 'Kitsu'
+                                });
+                            });
+                        }
+                    } else {
+                        const gqlQuery = `
+                            query ($search: String) {
+                                Page (perPage: 6) {
+                                    media (search: $search, type: ANIME) {
+                                        id
+                                        title { english romaji }
+                                        coverImage { large medium }
+                                        episodes
+                                        seasonYear
+                                        format
+                                        averageScore
+                                    }
+                                }
+                            }
+                        `;
+                        const res = await fetch('https://graphql.anilist.co', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify({ query: gqlQuery, variables: { search: query } }),
+                            signal: this.addFranchiseAbortController.signal
+                        });
+                        if (res.ok) {
+                            const payload = await res.json();
+                            const mediaList = payload.data?.Page?.media || [];
+                            mediaList.forEach(item => {
+                                const titleEnglish = item.title?.english || item.title?.romaji || 'Untitled';
+                                const titleRomanji = item.title?.romaji || item.title?.english || titleEnglish;
+                                const imageUrl = item.coverImage?.large || item.coverImage?.medium || '';
+                                const total = item.episodes || 0;
+                                const year = item.seasonYear ? String(item.seasonYear) : '';
+                                const format = item.format ? item.format.replace(/_/g, ' ') : 'ANIME';
+
+                                unifiedResults.push({
+                                    id: 'anilist-' + item.id,
+                                    titleEnglish,
+                                    titleRomanji,
+                                    imageUrl,
+                                    total,
+                                    seasonInfo: `${format} ${year ? `(${year})` : ''}`,
+                                    externalRating: item.averageScore ? parseFloat((item.averageScore / 10).toFixed(1)) : 0,
+                                    source: 'AniList'
+                                });
+                            });
+                        }
+                    }
+
+                    if (unifiedResults.length === 0) {
+                        statusEl.textContent = 'No matches found. Try Manual Entry tab.';
+                        return;
+                    }
+
+                    statusEl.textContent = `Found ${unifiedResults.length} result(s): Click to select.`;
+                    resultsEl.classList.remove('hidden');
+                    resultsEl.innerHTML = unifiedResults.map(item => `
+                        <button type="button" onclick='app.selectFranchiseCatalogResult(${JSON.stringify(item)})' class="w-full flex items-center gap-3 p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:bg-slate-800 text-left transition-colors">
+                            <img src="${this.escapeHTML(item.imageUrl || SVG_POSTER_FALLBACK)}" onerror="this.src='${SVG_POSTER_FALLBACK}';" class="w-10 h-14 object-cover rounded-lg bg-slate-900 shrink-0">
+                            <div class="min-w-0 flex-1">
+                                <h5 class="text-xs font-bold text-white truncate">${this.escapeHTML(item.titleEnglish)}</h5>
+                                <p class="text-[10px] text-slate-400">${this.escapeHTML(item.seasonInfo)} · ${item.total} eps ${item.externalRating ? `· ★ ${item.externalRating}` : ''}</p>
+                            </div>
+                        </button>
+                    `).join('');
+
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                    statusEl.textContent = 'Catalogue search failed.';
+                }
+            }
+
+            selectFranchiseCatalogResult(item) {
+                this.selectedCatalogAddEntry = item;
+                document.getElementById('add-fe-selected-external-id').value = item.id;
+                document.getElementById('add-fe-selected-rating').value = item.externalRating || 0;
+                document.getElementById('add-fe-selected-source').value = item.source || 'Catalog';
+
+                const notice = document.getElementById('add-fe-status-notice');
+                notice.textContent = `Selected: "${item.titleEnglish}" (${item.seasonInfo})`;
+                notice.classList.remove('hidden');
+                document.getElementById('add-fe-catalog-results').classList.add('hidden');
+            }
+
+            submitAddFranchiseEntry() {
                 const franchiseId = document.getElementById('add-fe-franchise-id').value;
                 const franc = this.franchises.find(f => f.id === franchiseId);
                 if (!franc) return;
 
-                const collectionId = document.getElementById('add-fe-collection-select').value || null;
-                const titleEnglish = document.getElementById('add-fe-title-english').value.trim();
-                const titleRomanji = document.getElementById('add-fe-title-romanji').value.trim();
-                const classification = document.getElementById('add-fe-classification').value;
-                const seasonInfo = document.getElementById('add-fe-season-info').value.trim() || 'TV';
-                const totalProgress = parseInt(document.getElementById('add-fe-total-progress').value) || 0;
-                const externalRating = parseFloat(document.getElementById('add-fe-external-rating').value) || 0;
-                const coverUrl = document.getElementById('add-fe-cover-url').value.trim();
+                let titleEnglish = '';
+                let titleRomanji = '';
+                let seasonInfo = 'TV';
+                let totalProgress = 12;
+                let coverUrl = '';
+                let externalId = '';
+                let externalRating = 0;
+                let ratingSource = 'Manual';
 
-                const newEntry = {
+                if (this.addFranchiseTabMode === 'catalog') {
+                    if (!this.selectedCatalogAddEntry) {
+                        this.showToast('Please select a catalogue result or switch to Manual Entry.', 'error');
+                        return;
+                    }
+                    titleEnglish = this.selectedCatalogAddEntry.titleEnglish;
+                    titleRomanji = this.selectedCatalogAddEntry.titleRomanji;
+                    seasonInfo = this.selectedCatalogAddEntry.seasonInfo;
+                    totalProgress = this.selectedCatalogAddEntry.total;
+                    coverUrl = this.selectedCatalogAddEntry.imageUrl;
+                    externalId = this.selectedCatalogAddEntry.id;
+                    externalRating = this.selectedCatalogAddEntry.externalRating || 0;
+                    ratingSource = this.selectedCatalogAddEntry.source || 'Catalog';
+                } else {
+                    titleEnglish = document.getElementById('add-fe-title-english').value.trim();
+                    if (!titleEnglish) {
+                        this.showToast('Please enter an anime title.', 'error');
+                        return;
+                    }
+                    titleRomanji = document.getElementById('add-fe-title-romanji').value.trim() || titleEnglish;
+                    seasonInfo = document.getElementById('add-fe-season-info').value.trim() || 'TV';
+                    totalProgress = parseInt(document.getElementById('add-fe-total-progress').value) || 0;
+                    coverUrl = document.getElementById('add-fe-cover-url').value.trim();
+                }
+
+                const classification = document.getElementById('add-fe-classification').value;
+                const syncCollection = document.getElementById('add-fe-sync-collection').checked;
+
+                // Check duplicate within the same franchise
+                const alreadyInFranchise = franc.entries.some(e => e.titleEnglish?.toLowerCase() === titleEnglish.toLowerCase());
+                if (alreadyInFranchise) {
+                    this.showToast(`"${this.escapeHTML(titleEnglish)}" is already in this franchise!`, 'error');
+                    return;
+                }
+
+                let linkedCollectionId = null;
+
+                if (syncCollection) {
+                    // Check if already in personal anime collection
+                    const existingRec = this.entries.find(item => 
+                        (externalId && item.externalId === externalId) || 
+                        item.titleEnglish?.toLowerCase() === titleEnglish.toLowerCase()
+                    );
+
+                    if (existingRec) {
+                        linkedCollectionId = existingRec.id;
+                        this.showToast(`Linked to existing collection entry for "${this.escapeHTML(existingRec.title)}"`, 'success');
+                    } else {
+                        // Create brand new collection entry
+                        const newRec = {
+                            id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                            externalId,
+                            title: titleEnglish,
+                            titleEnglish,
+                            titleRomanji,
+                            category: 'anime',
+                            status: 'active',
+                            currentProgress: 0,
+                            totalProgress,
+                            externalRating,
+                            ratingSource,
+                            ratingUpdatedAt: externalRating > 0 ? new Date().toISOString() : '',
+                            season: seasonInfo,
+                            coverUrl,
+                            externalUrl: '',
+                            updatedAt: Date.now()
+                        };
+                        this.entries.unshift(newRec);
+                        linkedCollectionId = newRec.id;
+                        this.saveEntriesToStorage();
+                        this.showToast(`Added "${this.escapeHTML(titleEnglish)}" to Anime collection and linked!`, 'success');
+                    }
+                }
+
+                const newFranchiseEntry = {
                     id: 'fe-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-                    externalId: '',
+                    externalId,
                     titleEnglish,
-                    titleRomanji: titleRomanji || titleEnglish,
+                    titleRomanji,
                     category: 'anime',
                     format: seasonInfo,
                     seasonInfo,
                     totalProgress,
                     externalRating,
-                    ratingSource: 'Manual',
+                    ratingSource,
                     coverUrl,
                     classification,
-                    linkedCollectionId: collectionId,
+                    linkedCollectionId,
                     orderIndex: franc.entries.length
                 };
 
-                franc.entries.push(newEntry);
+                franc.entries.push(newFranchiseEntry);
                 this.saveFranchisesToStorage();
                 this.closeModal('add-franchise-entry-modal');
-                this.showToast(`Added "${this.escapeHTML(titleEnglish)}" to franchise order`, 'success');
+                this.showToast(`Successfully added "${this.escapeHTML(titleEnglish)}" to franchise`, 'success');
                 this.render();
             }
 
@@ -1873,8 +2169,8 @@
                                 const total = attr.episodeCount || 0;
                                 const subtype = attr.subtype ? attr.subtype.toUpperCase() : 'TV';
                                 
-                                let classification = idx === 0 ? 'Main story' : (subtype === 'MOVIE' ? 'Movie' : (subtype === 'OVA' ? 'OVA' : 'Sequel or season'));
-                                if (idx > 2 && subtype === 'OVA') classification = 'Optional extra';
+                                let classification = idx === 0 ? 'Main story' : 'Optional extra';
+                                if (subtype === 'MOVIE' || subtype === 'OVA') classification = 'Optional extra';
 
                                 discovered.push({
                                     externalId: 'kitsu-' + item.id,
@@ -1894,7 +2190,6 @@
                             });
                         }
                     } else {
-                        // AniList GraphQL Franchise Discovery
                         const gqlQuery = `
                             query ($search: String) {
                                 Page (perPage: 8) {
@@ -1927,9 +2222,8 @@
                                 const year = item.seasonYear ? String(item.seasonYear) : '';
                                 const format = item.format ? item.format.replace(/_/g, ' ') : 'ANIME';
 
-                                let classification = idx === 0 ? 'Main story' : 'Sequel or season';
-                                if (format.includes('MOVIE')) classification = 'Movie';
-                                if (format.includes('OVA')) classification = 'OVA';
+                                let classification = idx === 0 ? 'Main story' : 'Optional extra';
+                                if (format.includes('MOVIE') || format.includes('OVA')) classification = 'Optional extra';
 
                                 discovered.push({
                                     externalId: 'anilist-' + item.id,
@@ -1990,7 +2284,8 @@
                         </div>
                         <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                             <select onchange="app.updateWizardClassification(${idx}, this.value)" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-200 rounded-lg px-2.5 py-1.5 outline-none">
-                                ${['Main story', 'Sequel or season', 'Movie', 'OVA', 'ONA', 'Special', 'Recap', 'Alternate version', 'Spin-off', 'Optional extra'].map(opt => `<option value="${opt}" ${item.classification === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                                <option value="Main story" ${item.classification === 'Main story' ? 'selected' : ''}>Main Watch Order</option>
+                                <option value="Optional extra" ${item.classification === 'Optional extra' ? 'selected' : ''}>Optional Extras</option>
                             </select>
                             <button type="button" onclick="app.removeWizardEntry(${idx})" class="p-1.5 text-rose-400 hover:text-white bg-rose-950/40 border border-rose-900/40 rounded-lg text-xs" title="Remove"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
@@ -2142,7 +2437,9 @@
                     `Delete franchise "${this.escapeHTML(franc.name)}"? Your personal collection entries and viewing progress will remain safe in your library.`,
                     () => {
                         this.franchises = this.franchises.filter(f => f.id !== franchiseId);
+                        this.hiddenFranchiseIds = this.hiddenFranchiseIds.filter(id => id !== franchiseId);
                         this.saveFranchisesToStorage();
+                        this.saveHiddenFranchisesToStorage();
                         this.activeFranchiseId = null;
                         this.showToast('Franchise deleted', 'info');
                         this.render();
@@ -2197,7 +2494,6 @@
                 const fEntry = franc.entries.find(e => e.id === franchiseEntryId);
                 if (!fEntry) return;
 
-                // Check if already in collection by externalId or exact title match
                 const existing = this.entries.find(item => 
                     (fEntry.externalId && item.externalId === fEntry.externalId) ||
                     item.titleEnglish?.toLowerCase() === fEntry.titleEnglish.toLowerCase()
@@ -2209,7 +2505,6 @@
                     this.showToast(`Linked to existing collection item "${this.escapeHTML(existing.title)}"`, 'success');
                     this.render();
                 } else {
-                    // Create new collection record from franchise entry
                     const newCollectionRecord = {
                         id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                         externalId: fEntry.externalId || '',
@@ -2238,7 +2533,6 @@
             }
 
             syncCollectionUpdatesToFranchises(updatedEntry) {
-                // When an item in My Collection is updated, ensure linked franchise cards reflect progress/status
                 this.franchises.forEach(f => {
                     f.entries.forEach(fe => {
                         if (fe.linkedCollectionId === updatedEntry.id) {
@@ -2358,6 +2652,8 @@
                         grid.classList.remove('hidden');
                         
                         const filteredFrancs = this.franchises.filter(f => {
+                            if (!this.showHiddenFranchises && this.hiddenFranchiseIds.includes(f.id)) return false;
+                            if (this.showHiddenFranchises && !this.hiddenFranchiseIds.includes(f.id)) return false; // Toggle view mode: if showing hidden, only show hidden ones
                             if (!this.searchQuery) return true;
                             return f.name.toLowerCase().includes(this.searchQuery);
                         });
@@ -2366,8 +2662,8 @@
                             grid.innerHTML = '';
                             emptyState.classList.remove('hidden');
                             emptyState.classList.add('flex');
-                            document.getElementById('empty-title').textContent = 'No Franchises Found';
-                            document.getElementById('empty-desc').textContent = 'Create your first franchise watch order using the button above.';
+                            document.getElementById('empty-title').textContent = this.showHiddenFranchises ? 'No Hidden Franchises' : 'No Franchises Found';
+                            document.getElementById('empty-desc').textContent = this.showHiddenFranchises ? 'You have no hidden franchise watch orders.' : 'Create your first franchise watch order using the button above.';
                             document.getElementById('empty-action-btn').innerHTML = '<i class="fa-solid fa-plus text-xs"></i> Create Franchise';
                             document.getElementById('empty-action-btn').setAttribute('onclick', "app.openModal('franchise-wizard-modal')");
                             loadMoreBtn.classList.add('hidden');
@@ -2423,6 +2719,7 @@
                 });
                 const pct = totalEntries > 0 ? Math.round((completedEntries / totalEntries) * 100) : 0;
                 const adaptInfo = this.getAdaptationBadgeInfo(franc.adaptationStatus);
+                const isHidden = this.hiddenFranchiseIds.includes(franc.id);
 
                 return `
                     <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 cursor-pointer" onclick="app.openFranchiseDetail('${franc.id}')">
@@ -2442,6 +2739,15 @@
                                     <button onclick="app.openCoverFranchiseModal('${franc.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-300 flex items-center gap-2 transition-colors">
                                         <i class="fa-solid fa-image text-brand-400"></i> Change Cover
                                     </button>
+                                    ${isHidden ? `
+                                        <button onclick="app.restoreFranchise('${franc.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-emerald-300 hover:bg-emerald-950/40 flex items-center gap-2 transition-colors">
+                                            <i class="fa-solid fa-eye text-emerald-400"></i> Restore
+                                        </button>
+                                    ` : `
+                                        <button onclick="app.hideFranchise('${franc.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-amber-300 hover:bg-amber-950/40 flex items-center gap-2 transition-colors">
+                                            <i class="fa-solid fa-eye-slash text-amber-400"></i> Hide Franchise
+                                        </button>
+                                    `}
                                     <button onclick="app.deleteFranchise('${franc.id}', event)" class="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-950/40 hover:text-rose-200 flex items-center gap-2 transition-colors">
                                         <i class="fa-solid fa-trash-can text-rose-400"></i> Delete Franchise
                                     </button>
@@ -2480,8 +2786,8 @@
                 const container = document.getElementById('franchise-detail-container');
                 if (!franc) return;
 
-                const mainEntries = franc.entries.filter(e => e.classification === 'Main story' || e.classification === 'Sequel or season' || e.classification === 'Movie');
-                const extraEntries = franc.entries.filter(e => !mainEntries.includes(e));
+                const mainEntries = franc.entries.filter(e => e.classification === 'Main story');
+                const extraEntries = franc.entries.filter(e => e.classification === 'Optional extra');
                 const adaptInfo = this.getAdaptationBadgeInfo(franc.adaptationStatus);
 
                 const renderEntryRow = (entry, idx) => {
@@ -2495,12 +2801,16 @@
                                 </div>
                                 <img src="${this.escapeHTML(entry.coverUrl || SVG_POSTER_FALLBACK)}" onerror="this.src='${SVG_POSTER_FALLBACK}';" class="w-10 h-14 sm:w-12 sm:h-16 object-cover rounded-xl bg-slate-950 border border-slate-800 shrink-0">
                                 <div class="min-w-0 flex-1 space-y-1">
-                                    <h4 class="text-xs sm:text-sm font-bold text-white break-words">${this.escapeHTML(entry.titleEnglish)}</h4>
-                                    <p class="text-[11px] sm:text-xs text-slate-400">${this.escapeHTML(entry.seasonInfo)} · ${entry.totalProgress} eps ${entry.externalRating ? `· ★ ${entry.externalRating}` : ''}</p>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h4 class="text-xs sm:text-sm font-bold text-white break-words">${this.escapeHTML(entry.titleEnglish)}</h4>
+                                        ${entry.seasonInfo ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-950 border border-slate-800 text-slate-300">${this.escapeHTML(entry.seasonInfo)}</span>` : ''}
+                                    </div>
+                                    <p class="text-[11px] sm:text-xs text-slate-400">${entry.totalProgress ? `${entry.totalProgress} eps` : 'Ongoing'} ${entry.externalRating ? `· ★ ${entry.externalRating}` : ''}</p>
                                     
                                     <div class="flex flex-wrap items-center gap-2 pt-1">
                                         <select onchange="app.updateFranchiseEntryClassification('${franc.id}', '${entry.id}', this.value)" class="bg-slate-950 border border-slate-800 text-[11px] text-slate-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
-                                            ${['Main story', 'Sequel or season', 'Movie', 'Optional extra', 'OVA', 'ONA', 'Special', 'Recap', 'Alternate version', 'Spin-off'].map(opt => `<option value="${opt}" ${entry.classification === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                                            <option value="Main story" ${entry.classification === 'Main story' ? 'selected' : ''}>Main Watch Order</option>
+                                            <option value="Optional extra" ${entry.classification === 'Optional extra' ? 'selected' : ''}>Optional Extras</option>
                                         </select>
                                     </div>
                                 </div>
@@ -2553,24 +2863,24 @@
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs sm:text-sm font-bold text-cyber-cyan uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-play"></i> Main Story & Key Seasons (${mainEntries.length})
+                                <i class="fa-solid fa-play"></i> Main Watch Order (${mainEntries.length})
                             </h4>
                             <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="text-xs text-cyber-cyan hover:underline font-semibold">+ Add Main Title</button>
                         </div>
                         <div class="space-y-2.5">
-                            ${mainEntries.length > 0 ? mainEntries.map((e, i) => renderEntryRow(e, i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No main story entries added yet.</p>`}
+                            ${mainEntries.length > 0 ? mainEntries.map((e, i) => renderEntryRow(e, i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No main watch order titles added yet.</p>`}
                         </div>
                     </div>
 
                     <div class="space-y-3 pt-2">
                         <div class="flex items-center justify-between">
                             <h4 class="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-gift"></i> Optional Extras, Movies & OVAs (${extraEntries.length})
+                                <i class="fa-solid fa-gift"></i> Optional Extras (${extraEntries.length})
                             </h4>
-                            <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="text-xs text-amber-400 hover:underline font-semibold">+ Add Extra Title</button>
+                            <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="text-xs text-amber-400 hover:underline font-semibold">+ Add Optional Extra</button>
                         </div>
                         <div class="space-y-2.5">
-                            ${extraEntries.length > 0 ? extraEntries.map((e, i) => renderEntryRow(e, mainEntries.length + i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No optional extra entries.</p>`}
+                            ${extraEntries.length > 0 ? extraEntries.map((e, i) => renderEntryRow(e, mainEntries.length + i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No optional extras added.</p>`}
                         </div>
                     </div>
                 `;
@@ -2981,10 +3291,12 @@
                     () => {
                         this.entries = [];
                         this.franchises = [];
+                        this.hiddenFranchiseIds = [];
                         this.platforms = this.getDefaultPlatforms();
                         this.defaultPlatforms = { anime: '', manga: '' };
                         this.saveEntriesToStorage();
                         this.saveFranchisesToStorage();
+                        this.saveHiddenFranchisesToStorage();
                         this.savePlatformsToStorage();
                         this.saveDefaultsToStorage();
                         this.showToast('Library wiped to clean state', 'info');
@@ -3005,11 +3317,12 @@
                 });
 
                 const backupData = {
-                    version: '3.8',
+                    version: '3.9',
                     exportedAt: new Date().toISOString(),
                     filterScope: { category: catFilter, status: statusFilter },
                     entries: filteredEntries,
                     franchises: this.franchises,
+                    hiddenFranchiseIds: this.hiddenFranchiseIds,
                     platforms: this.platforms,
                     defaultPlatforms: this.defaultPlatforms
                 };
@@ -3041,6 +3354,9 @@
                             if (imported.franchises && Array.isArray(imported.franchises)) {
                                 this.franchises = imported.franchises;
                             }
+                            if (imported.hiddenFranchiseIds && Array.isArray(imported.hiddenFranchiseIds)) {
+                                this.hiddenFranchiseIds = imported.hiddenFranchiseIds;
+                            }
                             if (imported.platforms) this.platforms = imported.platforms;
                             if (imported.defaultPlatforms) this.defaultPlatforms = imported.defaultPlatforms;
                         } else {
@@ -3050,6 +3366,7 @@
                         this.entries = validEntries.filter(item => item && typeof item === 'object');
                         this.saveEntriesToStorage();
                         this.saveFranchisesToStorage();
+                        this.saveHiddenFranchisesToStorage();
                         this.savePlatformsToStorage();
                         this.saveDefaultsToStorage();
 
