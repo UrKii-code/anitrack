@@ -157,7 +157,7 @@
                     <img src="icon-192.png" alt="AniTrack Logo" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 border border-brand-500/30 object-cover" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 40 40\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%236366f1\'/%3E%3Ctext x=\'50%25\' y=\'55%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'sans-serif\' font-size=\'20\' font-weight=\'bold\'%3EA%3C/text%3E%3C/svg%3E';">
                     <div>
                         <span class="text-2xl font-black tracking-wider text-gradient">AniTrack</span>
-                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.9</span>
+                        <span class="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">v3.9.1</span>
                     </div>
                 </div>
 
@@ -851,7 +851,7 @@
         </div>
     </div>
 
-    <!-- Modal 9: Add Title to Franchise Modal (v3.9 Dual Tab: Catalogue Search & Manual Entry with Collection Sync) -->
+    <!-- Modal 9: Add Title to Franchise Modal (Dual Tab: Catalogue Search & Manual Entry with Collection Sync) -->
     <div id="add-franchise-entry-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
         <div class="glass-card bg-slate-900/98 border border-slate-800 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="add-franchise-entry-modal-content">
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
@@ -903,7 +903,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-1">Total Episodes</label>
-                            <input type="number" id="add-fe-total-progress" min="0" value="12" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 outline-none">
+                            <input type="number" id="add-fe-total-progress" min="0" value="12" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none">
                         </div>
                     </div>
                     <div>
@@ -1011,7 +1011,6 @@
                     const storedFranchises = localStorage.getItem(this.FRANCHISES_KEY);
                     if (storedFranchises) {
                         const parsed = JSON.parse(storedFranchises);
-                        // Safe Migration & Cleanup for v3.9 Classifications
                         this.franchises = parsed.map(franc => ({
                             ...franc,
                             adaptationStatus: franc.adaptationStatus || 'unknown',
@@ -1019,7 +1018,6 @@
                             entries: (franc.entries || []).map(fe => {
                                 let cls = fe.classification || 'Main story';
                                 if (cls !== 'Main story' && cls !== 'Optional extra') {
-                                    // Map legacy granular classifications into Main Watch Order vs Optional Extras
                                     if (['Recap', 'Alternate version', 'Optional extra', 'Spin-off', 'Special'].includes(cls)) {
                                         cls = 'Optional extra';
                                     } else {
@@ -1664,7 +1662,6 @@
 
                 this.saveEntriesToStorage();
                 
-                // Sync with any franchise entries linked to this collection record
                 if (savedEntryRecord) {
                     this.syncCollectionUpdatesToFranchises(savedEntryRecord);
                 }
@@ -1707,7 +1704,6 @@
                     `Delete "${this.escapeHTML(this.getEntryTitle(entry))}" from collection? (Linked franchise entries will remain unlinked).`,
                     () => {
                         this.entries = this.entries.filter(item => item.id !== id);
-                        // Unlink from franchises
                         this.franchises.forEach(f => {
                             f.entries.forEach(fe => {
                                 if (fe.linkedCollectionId === id) fe.linkedCollectionId = null;
@@ -1721,7 +1717,6 @@
                 );
             }
 
-            // --- v3.9 Franchise Feature Implementation ---
             setCategory(category) {
                 this.activeCategory = category;
                 this.renderLimit = this.renderBatchSize;
@@ -1736,7 +1731,7 @@
                     franchiseAction.classList.remove('hidden');
                     searchSort.classList.add('hidden');
                     divider.classList.add('hidden');
-                    this.activeFranchiseId = null; // Return to franchise list
+                    this.activeFranchiseId = null;
                 } else {
                     standardFilters.classList.remove('hidden');
                     franchiseAction.classList.add('hidden');
@@ -1787,7 +1782,6 @@
                 document.getElementById('lbl-progress-total').textContent = cat === 'anime' ? 'Total Episodes (0 = ∞)' : 'Total Chapters (0 = ∞)';
             }
 
-            // Adaptation Status Info Formatter
             getAdaptationBadgeInfo(status) {
                 switch(status) {
                     case 'complete_adaptation':
@@ -1835,7 +1829,6 @@
                 this.render();
             }
 
-            // v3.9 Dual Tab Add Franchise Entry Modal Controller
             openAddFranchiseEntryModal(franchiseId) {
                 const franc = this.franchises.find(f => f.id === franchiseId);
                 if (!franc) return;
@@ -2054,7 +2047,6 @@
                 const classification = document.getElementById('add-fe-classification').value;
                 const syncCollection = document.getElementById('add-fe-sync-collection').checked;
 
-                // Check duplicate within the same franchise
                 const alreadyInFranchise = franc.entries.some(e => e.titleEnglish?.toLowerCase() === titleEnglish.toLowerCase());
                 if (alreadyInFranchise) {
                     this.showToast(`"${this.escapeHTML(titleEnglish)}" is already in this franchise!`, 'error');
@@ -2064,7 +2056,6 @@
                 let linkedCollectionId = null;
 
                 if (syncCollection) {
-                    // Check if already in personal anime collection
                     const existingRec = this.entries.find(item => 
                         (externalId && item.externalId === externalId) || 
                         item.titleEnglish?.toLowerCase() === titleEnglish.toLowerCase()
@@ -2074,7 +2065,6 @@
                         linkedCollectionId = existingRec.id;
                         this.showToast(`Linked to existing collection entry for "${this.escapeHTML(existingRec.title)}"`, 'success');
                     } else {
-                        // Create brand new collection entry
                         const newRec = {
                             id: 'entry-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                             externalId,
@@ -2124,7 +2114,6 @@
                 this.render();
             }
 
-            // Franchise Wizard Search (Find main title + related titles)
             async searchFranchiseWizard() {
                 if (!navigator.onLine) {
                     this.showToast('Franchise search requires internet connectivity.', 'error');
@@ -2544,7 +2533,6 @@
                 this.saveFranchisesToStorage();
             }
 
-            // --- Rendering Core ---
             render() {
                 this.renderStats();
                 this.renderTabs();
@@ -2639,7 +2627,6 @@
 
                 if (this.activeCategory === 'franchise') {
                     if (this.activeFranchiseId) {
-                        // Render Franchise Detail View
                         grid.classList.add('hidden');
                         loadMoreBtn.classList.add('hidden');
                         emptyState.classList.add('hidden');
@@ -2647,13 +2634,12 @@
                         this.renderFranchiseDetail(this.activeFranchiseId);
                         return;
                     } else {
-                        // Render Franchise Cards List
                         detailContainer.classList.add('hidden');
                         grid.classList.remove('hidden');
                         
                         const filteredFrancs = this.franchises.filter(f => {
                             if (!this.showHiddenFranchises && this.hiddenFranchiseIds.includes(f.id)) return false;
-                            if (this.showHiddenFranchises && !this.hiddenFranchiseIds.includes(f.id)) return false; // Toggle view mode: if showing hidden, only show hidden ones
+                            if (this.showHiddenFranchises && !this.hiddenFranchiseIds.includes(f.id)) return false;
                             if (!this.searchQuery) return true;
                             return f.name.toLowerCase().includes(this.searchQuery);
                         });
@@ -2722,12 +2708,11 @@
                 const isHidden = this.hiddenFranchiseIds.includes(franc.id);
 
                 return `
-                    <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 cursor-pointer" onclick="app.openFranchiseDetail('${franc.id}')">
+                    <div class="group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 cursor-pointer h-full" onclick="app.openFranchiseDetail('${franc.id}')">
                         <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
                             <img src="${this.escapeHTML(franc.coverUrl || SVG_POSTER_FALLBACK)}" alt="${this.escapeHTML(franc.name)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90"></div>
 
-                            <!-- 3-Dot Menu Top Right -->
                             <div class="absolute top-2 right-2 z-30">
                                 <button onclick="app.toggleCardMenu('franc-${franc.id}', event)" aria-label="Franchise menu" class="card-action-btn w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
                                     <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
@@ -2761,7 +2746,6 @@
                         </div>
 
                         <div class="p-3 bg-slate-900/90 space-y-2.5 flex-grow flex flex-col justify-between">
-                            <!-- Single Adaptation Status Badge per Franchise Card -->
                             <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-semibold border ${adaptInfo.class} w-full truncate" title="${this.escapeHTML(franc.adaptationNotes || adaptInfo.text)}">
                                 <i class="fa-solid fa-book-bookmark text-[9px] shrink-0"></i>
                                 <span class="truncate">${this.escapeHTML(adaptInfo.text)}</span>
@@ -2795,7 +2779,8 @@
 
                     return `
                         <div class="glass-card bg-slate-900/90 rounded-2xl p-3.5 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 border border-slate-800 w-full min-w-0">
-                            <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 w-full md:w-auto">
+                            <!-- Left Info: Order Number, Poster, Titles & Unified Metadata Line -->
+                            <div class="flex items-center gap-3 sm:gap-4 min-w-0 w-full md:w-auto">
                                 <div class="flex flex-col items-center justify-center bg-slate-950 w-7 h-12 sm:w-8 sm:h-14 rounded-xl border border-slate-800 text-xs font-black text-brand-400 shrink-0">
                                     #${idx + 1}
                                 </div>
@@ -2803,11 +2788,16 @@
                                 <div class="min-w-0 flex-1 space-y-1">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <h4 class="text-xs sm:text-sm font-bold text-white break-words">${this.escapeHTML(entry.titleEnglish)}</h4>
-                                        ${entry.seasonInfo ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-950 border border-slate-800 text-slate-300">${this.escapeHTML(entry.seasonInfo)}</span>` : ''}
                                     </div>
-                                    <p class="text-[11px] sm:text-xs text-slate-400">${entry.totalProgress ? `${entry.totalProgress} eps` : 'Ongoing'} ${entry.externalRating ? `· ★ ${entry.externalRating}` : ''}</p>
+                                    <!-- Unified Line: Format tag, episodes/chapters count, rating, and classification selector -->
+                                    <div class="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs text-slate-400">
+                                        ${entry.seasonInfo ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-950 border border-slate-800 text-slate-300 uppercase">${this.escapeHTML(entry.seasonInfo)}</span>` : ''}
+                                        <span>•</span>
+                                        <span>${entry.totalProgress ? `${entry.totalProgress} eps` : 'Ongoing'}</span>
+                                        ${entry.externalRating ? `<span>•</span><span class="text-amber-400 font-semibold"><i class="fa-solid fa-star text-[9px] mr-0.5"></i> ${entry.externalRating}</span>` : ''}
+                                    </div>
                                     
-                                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                                    <div class="flex flex-wrap items-center gap-2 pt-0.5">
                                         <select onchange="app.updateFranchiseEntryClassification('${franc.id}', '${entry.id}', this.value)" class="bg-slate-950 border border-slate-800 text-[11px] text-slate-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
                                             <option value="Main story" ${entry.classification === 'Main story' ? 'selected' : ''}>Main Watch Order</option>
                                             <option value="Optional extra" ${entry.classification === 'Optional extra' ? 'selected' : ''}>Optional Extras</option>
@@ -2816,24 +2806,26 @@
                                 </div>
                             </div>
 
-                            <!-- Right Controls: Responsive Flex Wrap for Portrait/Landscape -->
-                            <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 w-full md:w-auto border-t md:border-t-0 pt-2.5 md:pt-0 border-slate-800/80">
+                            <!-- Right Controls: Consistent Vertical/Horizontal Stack for Collection & Reorder -->
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between sm:justify-end gap-2.5 w-full md:w-auto border-t md:border-t-0 pt-2.5 md:pt-0 border-slate-800/80">
                                 ${linkedRec ? `
-                                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs text-emerald-300 flex items-center gap-2">
-                                        <i class="fa-solid fa-check-circle"></i>
-                                        <span>In Collection (${linkedRec.currentProgress}/${linkedRec.totalProgress || '∞'})</span>
-                                        <button onclick="app.incrementProgress('${linkedRec.id}', event)" class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-bold">+1</button>
+                                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-[11px] sm:text-xs text-emerald-300 flex items-center justify-between sm:justify-start gap-2">
+                                        <div class="flex items-center gap-1.5">
+                                            <i class="fa-solid fa-check-circle"></i>
+                                            <span>In Collection (${linkedRec.currentProgress}/${linkedRec.totalProgress || '∞'})</span>
+                                        </div>
+                                        <button onclick="app.incrementProgress('${linkedRec.id}', event)" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow transition-all">+1</button>
                                     </div>
                                 ` : `
-                                    <button onclick="app.linkFranchiseEntryToCollection('${franc.id}', '${entry.id}')" class="bg-slate-950 hover:bg-slate-800 text-brand-300 border border-brand-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+                                    <button onclick="app.linkFranchiseEntryToCollection('${franc.id}', '${entry.id}')" class="bg-slate-950 hover:bg-slate-800 text-brand-300 border border-brand-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5">
                                         <i class="fa-solid fa-link text-[10px]"></i> Add to Collection
                                     </button>
                                 `}
 
-                                <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
-                                    <button onclick="app.moveFranchiseEntryOrder('${franc.id}', '${entry.id}', 'up')" class="p-1.5 text-slate-400 hover:text-white" title="Move Up"><i class="fa-solid fa-chevron-up text-xs"></i></button>
-                                    <button onclick="app.moveFranchiseEntryOrder('${franc.id}', '${entry.id}', 'down')" class="p-1.5 text-slate-400 hover:text-white" title="Move Down"><i class="fa-solid fa-chevron-down text-xs"></i></button>
-                                    <button onclick="app.removeEntryFromFranchise('${franc.id}', '${entry.id}')" class="p-1.5 text-rose-400 hover:text-rose-300" title="Remove from Franchise"><i class="fa-solid fa-xmark text-xs"></i></button>
+                                <div class="flex items-center justify-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
+                                    <button onclick="app.moveFranchiseEntryOrder('${franc.id}', '${entry.id}', 'up')" class="p-2 text-slate-400 hover:text-white" title="Move Up"><i class="fa-solid fa-chevron-up text-xs"></i></button>
+                                    <button onclick="app.moveFranchiseEntryOrder('${franc.id}', '${entry.id}', 'down')" class="p-2 text-slate-400 hover:text-white" title="Move Down"><i class="fa-solid fa-chevron-down text-xs"></i></button>
+                                    <button onclick="app.removeEntryFromFranchise('${franc.id}', '${entry.id}')" class="p-2 text-rose-400 hover:text-rose-300" title="Remove from Franchise"><i class="fa-solid fa-xmark text-xs"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -2865,7 +2857,6 @@
                             <h4 class="text-xs sm:text-sm font-bold text-cyber-cyan uppercase tracking-wider flex items-center gap-2">
                                 <i class="fa-solid fa-play"></i> Main Watch Order (${mainEntries.length})
                             </h4>
-                            <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="text-xs text-cyber-cyan hover:underline font-semibold">+ Add Main Title</button>
                         </div>
                         <div class="space-y-2.5">
                             ${mainEntries.length > 0 ? mainEntries.map((e, i) => renderEntryRow(e, i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No main watch order titles added yet.</p>`}
@@ -2877,7 +2868,6 @@
                             <h4 class="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
                                 <i class="fa-solid fa-gift"></i> Optional Extras (${extraEntries.length})
                             </h4>
-                            <button onclick="app.openAddFranchiseEntryModal('${franc.id}')" class="text-xs text-amber-400 hover:underline font-semibold">+ Add Optional Extra</button>
                         </div>
                         <div class="space-y-2.5">
                             ${extraEntries.length > 0 ? extraEntries.map((e, i) => renderEntryRow(e, mainEntries.length + i)).join('') : `<p class="text-xs text-slate-500 italic p-3 glass-card rounded-xl">No optional extras added.</p>`}
@@ -2904,14 +2894,12 @@
                 const applicablePlatforms = this.platforms.filter(p => p.enabled && (p.category === item.category || p.category === 'both'));
 
                 return `
-                    <div id="anime-card-${item.id}" tabindex="0" class="anime-card-item group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <div id="anime-card-${item.id}" tabindex="0" class="anime-card-item group glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative border border-slate-800/85 focus:outline-none focus:ring-2 focus:ring-brand-500 h-full">
                         
-                        <!-- Poster Container (2:3 Aspect Ratio with Tap & Hover Interaction) -->
                         <div class="anime-poster-wrapper relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="app.handlePosterTap('${item.id}', event)">
                             <img src="${this.escapeHTML(cover)}" alt="${this.escapeHTML(displayTitle)}" loading="lazy" onerror="this.onerror=null;this.src='${SVG_POSTER_FALLBACK}';" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 pointer-events-none"></div>
                             
-                            <!-- Rating Badge + 3-Dot Menu Stacked (Top-Left) -->
                             <div class="absolute top-2 left-2 flex flex-col items-start gap-1.5 z-30">
                                 ${item.externalRating > 0 ? `
                                     <div class="bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1 shadow-md" title="Internet Rating (${this.escapeHTML(item.ratingSource || 'Catalog')})">
@@ -2920,7 +2908,6 @@
                                     </div>
                                 ` : ''}
 
-                                <!-- 3-Dot Card Menu Trigger & Dropdown -->
                                 <div class="relative">
                                     <button onclick="app.toggleCardMenu('${item.id}', event)" aria-label="Card options" class="card-action-btn w-7 h-7 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
                                         <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
@@ -2936,7 +2923,6 @@
                                 </div>
                             </div>
 
-                            <!-- Clear Status Badge (Top-Right) -->
                             <div class="absolute top-2 right-2 z-30 shadow-lg pointer-events-none">
                                 ${isCompleted 
                                     ? `<span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-md bg-emerald-500 text-slate-950 border border-emerald-300 shadow">Completed</span>`
@@ -2944,7 +2930,6 @@
                                 }
                             </div>
 
-                            <!-- Hidden Title Overlay (Revealed on Desktop Hover & Mobile Tap) -->
                             <div class="anime-title-overlay">
                                 <div class="space-y-1">
                                     ${item.season ? `<p class="text-[10px] font-semibold text-brand-300 uppercase tracking-wider">${this.escapeHTML(item.season)}</p>` : ''}
@@ -2953,9 +2938,7 @@
                             </div>
                         </div>
 
-                        <!-- Card Footer Controls -->
                         <div class="p-2.5 sm:p-3 bg-slate-900/90 flex flex-col justify-between flex-grow space-y-2">
-                            
                             <div class="flex items-center justify-between text-[11px] sm:text-xs">
                                 <span class="text-slate-400 font-medium">Episodes</span>
                                 <span class="font-bold text-slate-200">
@@ -2963,12 +2946,10 @@
                                 </span>
                             </div>
 
-                            <!-- Progress Bar -->
                             <div class="w-full bg-slate-950 rounded-full h-1.5 sm:h-2 overflow-hidden p-0.5 border border-slate-800">
                                 <div class="h-full rounded-full ${isCompleted ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-brand-500 to-cyber-cyan'} transition-all duration-300" style="width: ${item.totalProgress > 0 ? progressPct : (item.currentProgress > 0 ? '100' : '0')}%"></div>
                             </div>
 
-                            <!-- Action Bar Buttons -->
                             <div class="grid grid-cols-2 gap-1.5 pt-1">
                                 <div class="relative">
                                     <button onclick="app.openMediaPlatformLink('${item.id}')" class="w-full h-8 sm:h-9 rounded-lg bg-brand-600/90 hover:bg-brand-500 active:scale-95 text-white flex items-center justify-center gap-1 text-[11px] sm:text-xs font-semibold shadow transition-all">
@@ -2998,9 +2979,7 @@
                                     <span>+1 ${unit}</span>
                                 </button>
                             </div>
-
                         </div>
-
                     </div>
                 `;
             }
@@ -3317,7 +3296,7 @@
                 });
 
                 const backupData = {
-                    version: '3.9',
+                    version: '3.9.1',
                     exportedAt: new Date().toISOString(),
                     filterScope: { category: catFilter, status: statusFilter },
                     entries: filteredEntries,
